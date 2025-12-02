@@ -5,21 +5,21 @@
       "lastname": "Tolman",
       "username": "Tolman",
       "profile": "https://via.placeholder.com/64",
-      "monthly_distance_km": 120
+       "daily_distance_km": [2,3,0,5,1,4,0,3,2,1,0,4,3,2,5,0,1,3,2,4,3,2,0,1,2,4,3,2,5,1]
     },
     "user2": {
       "firstname": "Dave",
       "lastname": "Welsh",
       "username": "Welsh",
       "profile": "https://via.placeholder.com/64",
-      "monthly_distance_km": 95
+      "daily_distance_km": [1,0,2,3,1,2,0,1,4,3,0,2,1,0,3,2,1,4,2,1,0,3,2,1,0,2,1,3,2,0]
     },
     "user3": {
       "firstname": "Toby",
       "lastname": "Huckle",
       "username": "Huckle",
       "profile": "https://via.placeholder.com/64",
-      "monthly_distance_km": 80
+      "daily_distance_km": [0,2,1,0,3,1,2,0,3,1,2,0,3,1,2,0,3,1,2,0,3,1,2,0,3,1,2,0,3,1]
     }
   }
 }
