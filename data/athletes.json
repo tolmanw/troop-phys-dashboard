@@ -1,25 +1,42 @@
 {
   "athletes": {
-    "user1": {
+    "Tolman": {
       "firstname": "Will",
       "lastname": "Tolman",
-      "username": "Tolman",
-      "profile": "https://via.placeholder.com/64",
-       "daily_distance_km": [2,3,0,5,1,4,0,3,2,1,0,4,3,2,5,0,1,3,2,4,3,2,0,1,2,4,3,2,5,1]
-    },
-    "user2": {
-      "firstname": "Dave",
-      "lastname": "Welsh",
-      "username": "Welsh",
-      "profile": "https://via.placeholder.com/64",
-      "daily_distance_km": [1,0,2,3,1,2,0,1,4,3,0,2,1,0,3,2,1,4,2,1,0,3,2,1,0,2,1,3,2,0]
-    },
-    "user3": {
-      "firstname": "Toby",
-      "lastname": "Huckle",
-      "username": "Huckle",
-      "profile": "https://via.placeholder.com/64",
-      "daily_distance_km": [0,2,1,0,3,1,2,0,3,1,2,0,3,1,2,0,3,1,2,0,3,1,2,0,3,1,2,0,3,1]
+      "username": "will_tolman",
+      "profile": "https://dgalywyr863hv.cloudfront.net/pictures/athletes/15478346/24115300/2/medium.jpg",
+      "daily_distance_km": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
     }
   }
 }
