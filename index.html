@@ -39,7 +39,7 @@
           `;
           leaderboardDiv.appendChild(div);
 
-          // Daily chart dataset
+          // Daily distance line chart
           dailyDatasets.push({
             label: `${user.firstname} ${user.lastname}`,
             data: user.daily_distance_km,
@@ -48,7 +48,7 @@
             tension: 0.1
           });
 
-          // Monthly chart dataset
+          // Monthly bar chart
           monthlyDatasets.push({
             label: `${user.firstname} ${user.lastname}`,
             data: user.monthly_distances,
@@ -56,7 +56,7 @@
           });
         });
 
-        // Daily distance line chart
+        // Render daily line chart
         new Chart(document.getElementById('dailyChart').getContext('2d'), {
           type: 'line',
           data: {
@@ -73,7 +73,7 @@
           }
         });
 
-        // Monthly distance bar chart
+        // Render last 2 months bar chart
         new Chart(document.getElementById('monthlyChart').getContext('2d'), {
           type: 'bar',
           data: {
