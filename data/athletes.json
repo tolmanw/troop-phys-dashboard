@@ -1,23 +1,23 @@
 {
   "athletes": {
     "user1": {
-      "firstname": "Jane",
-      "lastname": "Smith",
-      "username": "jane_smith",
+      "firstname": "Will",
+      "lastname": "Tolman",
+      "username": "Tolman",
       "profile": "https://via.placeholder.com/64",
       "monthly_distance_km": 120
     },
     "user2": {
-      "firstname": "Mark",
-      "lastname": "Patel",
-      "username": "mark_patel",
+      "firstname": "Dave",
+      "lastname": "Welsh",
+      "username": "Welsh",
       "profile": "https://via.placeholder.com/64",
       "monthly_distance_km": 95
     },
     "user3": {
-      "firstname": "Zoe",
-      "lastname": "Turner",
-      "username": "zoe_turner",
+      "firstname": "Toby",
+      "lastname": "Huckle",
+      "username": "Huckle",
       "profile": "https://via.placeholder.com/64",
       "monthly_distance_km": 80
     }
