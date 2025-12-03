@@ -1,74 +1,3 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Strava Dashboard</title>
-
-<style>
-body {
-    background: #0d1117;
-    color: #e6edf3;
-    font-family: Arial, sans-serif;
-    padding: 20px;
-}
-.card {
-    background: #161b22;
-    padding: 15px;
-    border-radius: 12px;
-    margin-bottom: 20px;
-    box-shadow: 0 0 10px #0005;
-    display: inline-block;
-    width: 45%;
-    vertical-align: top;
-    margin-right: 2%;
-}
-.athlete {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-}
-img {
-    width: 50px;
-    height: 50px;
-    border-radius: 50%;
-}
-canvas {
-    background: #0d1117;
-    border-radius: 10px;
-    padding: 10px;
-    height: 200px;
-    width: 100%;
-}
-select {
-    background: #21262d;
-    color: white;
-    padding: 8px;
-    border-radius: 6px;
-    border: 1px solid #30363d;
-    margin-bottom: 20px;
-}
-</style>
-
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-</head>
-<body>
-
-<h1>Strava Dashboard</h1>
-<label>Select Activity Type:</label>
-<select id="activityFilter">
-    <option value="All">All</option>
-    <option value="Run">Run</option>
-    <option value="Trail Run">Trail Run</option>
-    <option value="Walk">Walk</option>
-    <option value="Hike">Hike</option>
-    <option value="Ride">Ride</option>
-    <option value="Virtual Ride">Virtual Ride</option>
-</select>
-
-<div id="container"></div>
-
-<script>
 async function loadData(activityType="All") {
     const response = await fetch("data/athletes.json");
     const data = await response.json();
@@ -78,11 +7,22 @@ async function loadData(activityType="All") {
     const monthNames = data.month_names;
 
     Object.entries(data.athletes).forEach(([username, athlete]) => {
-        const monthlyData = activityType === "All" ? athlete.monthly_total_miles : athlete.monthly_by_type_miles[activityType];
-        const dailyData = activityType === "All" ? athlete.daily_total_miles : athlete.daily_by_type_miles[activityType];
 
-        const monthlyTime = activityType === "All" ? athlete.monthly_total_time : athlete.monthly_time_by_type[activityType];
-        const dailyTime = activityType === "All" ? athlete.daily_total_time : athlete.daily_time_by_type[activityType];
+        // Distance data
+        const monthlyDistance = activityType === "All" ? athlete.monthly_total_miles : athlete.monthly_by_type_miles[activityType];
+        const dailyDistance = activityType === "All" ? athlete.daily_total_miles : athlete.daily_by_type_miles[activityType];
+
+        // Time data
+        const monthlyTimeArr = activityType === "All" ? athlete.monthly_total_time : athlete.monthly_time_by_type[activityType];
+        const dailyTimeArr = activityType === "All" ? athlete.daily_total_time : athlete.daily_time_by_type[activityType];
+
+        // Convert hh:mm to minutes for Chart.js plotting
+        function hhmmToMinutes(arr){ 
+            return arr.map(s => { 
+                const [h,m] = s.split(":"); 
+                return parseInt(h)*60 + parseInt(m); 
+            }); 
+        }
 
         const card = document.createElement("div");
         card.className = "card";
@@ -97,7 +37,6 @@ async function loadData(activityType="All") {
             </div>
 
             <h3>Monthly Distance (miles)</h3>
-            <p>${monthNames[0]} vs ${monthNames[1]}</p>
             <canvas id="monthChart-${username}"></canvas>
 
             <h3>Daily Distance (miles) - ${monthNames[1]}</h3>
@@ -109,14 +48,13 @@ async function loadData(activityType="All") {
             <h3>Daily Time (hh:mm) - ${monthNames[1]}</h3>
             <canvas id="dailyTimeChart-${username}"></canvas>
         `;
-
         container.appendChild(card);
 
         new Chart(document.getElementById(`monthChart-${username}`), {
             type: "bar",
             data: {
                 labels: monthNames,
-                datasets: [{ label: "Distance (miles)", data: monthlyData, backgroundColor: "rgba(75, 192, 192, 0.6)" }]
+                datasets: [{ label: "Distance (miles)", data: monthlyDistance, backgroundColor: "rgba(75, 192, 192, 0.6)" }]
             },
             options: { responsive: true, maintainAspectRatio: true }
         });
@@ -124,41 +62,52 @@ async function loadData(activityType="All") {
         new Chart(document.getElementById(`dailyChart-${username}`), {
             type: "line",
             data: {
-                labels: dailyData.map((_, i) => i + 1),
-                datasets: [{ label: "Daily Distance (miles)", data: dailyData, borderColor: "rgba(75, 192, 192, 1)", borderWidth: 2 }]
+                labels: dailyDistance.map((_, i) => i + 1),
+                datasets: [{ label: "Daily Distance (miles)", data: dailyDistance, borderColor: "rgba(75, 192, 192, 1)", borderWidth: 2 }]
             },
             options: { responsive: true, maintainAspectRatio: true }
         });
-
-        // Convert hh:mm to minutes for Chart.js plotting
-        function hhmmToMinutes(arr){ return arr.map(s => { const [h,m] = s.split(":"); return parseInt(h)*60 + parseInt(m); }); }
 
         new Chart(document.getElementById(`monthTimeChart-${username}`), {
             type: "bar",
             data: {
                 labels: monthNames,
-                datasets: [{ label: "Monthly Time (minutes)", data: hhmmToMinutes(monthlyTime), backgroundColor: "rgba(255, 159, 64, 0.6)" }]
+                datasets: [{ label: "Monthly Time (minutes)", data: hhmmToMinutes(monthlyTimeArr), backgroundColor: "rgba(255, 159, 64, 0.6)" }]
             },
-            options: { responsive: true, maintainAspectRatio: true, plugins:{tooltip:{callbacks:{label: function(ctx){const val = monthlyTime[ctx.dataIndex]; return `Time: ${val}`;}}}}}
+            options: {
+                responsive: true,
+                maintainAspectRatio: true,
+                plugins:{
+                    tooltip:{
+                        callbacks:{
+                            label: function(ctx){
+                                return `Time: ${monthlyTimeArr[ctx.dataIndex]}`;
+                            }
+                        }
+                    }
+                }
+            }
         });
 
         new Chart(document.getElementById(`dailyTimeChart-${username}`), {
             type: "line",
             data: {
-                labels: dailyData.map((_, i) => i + 1),
-                datasets: [{ label: "Daily Time (minutes)", data: hhmmToMinutes(dailyTime), borderColor: "rgba(255, 159, 64, 1)", borderWidth: 2 }]
+                labels: dailyDistance.map((_, i) => i + 1),
+                datasets: [{ label: "Daily Time (hh:mm)", data: hhmmToMinutes(dailyTimeArr), borderColor: "rgba(255, 159, 64, 1)", borderWidth: 2 }]
             },
-            options: { responsive: true, maintainAspectRatio: true, plugins:{tooltip:{callbacks:{label: function(ctx){const val = dailyTime[ctx.dataIndex]; return `Time: ${val}`;}}}}}
+            options: {
+                responsive: true,
+                maintainAspectRatio: true,
+                plugins:{
+                    tooltip:{
+                        callbacks:{
+                            label: function(ctx){
+                                return `Time: ${dailyTimeArr[ctx.dataIndex]}`;
+                            }
+                        }
+                    }
+                }
+            }
         });
-
     });
 }
-
-document.getElementById("activityFilter").addEventListener("change", e => loadData(e.target.value));
-
-// Initial load
-loadData();
-</script>
-
-</body>
-</html>
