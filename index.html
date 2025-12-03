@@ -1,54 +1,53 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Strava Dashboard</title>
 
-<!-- Dark Theme Styling -->
 <style>
-    body {
-        background: #0d1117;
-        color: #e6edf3;
-        font-family: Arial, sans-serif;
-        padding: 20px;
-    }
-    .card {
-        background: #161b22;
-        padding: 15px;
-        border-radius: 12px;
-        margin-bottom: 20px;
-        box-shadow: 0 0 10px #0005;
-        display: inline-block;
-        width: 45%;
-        vertical-align: top;
-        margin-right: 2%;
-    }
-    .athlete {
-        display: flex;
-        align-items: center;
-        gap: 10px;
-    }
-    img {
-        width: 50px;
-        height: 50px;
-        border-radius: 50%;
-    }
-    canvas {
-        background: #0d1117;
-        border-radius: 10px;
-        padding: 10px;
-        height: 200px;
-        width: 100%;
-    }
-    select {
-        background: #21262d;
-        color: white;
-        padding: 8px;
-        border-radius: 6px;
-        border: 1px solid #30363d;
-        margin-bottom: 20px;
-    }
+body {
+    background: #0d1117;
+    color: #e6edf3;
+    font-family: Arial, sans-serif;
+    padding: 20px;
+}
+.card {
+    background: #161b22;
+    padding: 15px;
+    border-radius: 12px;
+    margin-bottom: 20px;
+    box-shadow: 0 0 10px #0005;
+    display: inline-block;
+    width: 45%;
+    vertical-align: top;
+    margin-right: 2%;
+}
+.athlete {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+img {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+}
+canvas {
+    background: #0d1117;
+    border-radius: 10px;
+    padding: 10px;
+    height: 200px;
+    width: 100%;
+}
+select {
+    background: #21262d;
+    color: white;
+    padding: 8px;
+    border-radius: 6px;
+    border: 1px solid #30363d;
+    margin-bottom: 20px;
+}
 </style>
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -56,8 +55,6 @@
 <body>
 
 <h1>Strava Dashboard</h1>
-
-<!-- Activity Filter -->
 <label>Select Activity Type:</label>
 <select id="activityFilter">
     <option value="All">All</option>
@@ -81,8 +78,11 @@ async function loadData(activityType="All") {
     const monthNames = data.month_names;
 
     Object.entries(data.athletes).forEach(([username, athlete]) => {
-        const monthlyData = activityType === "All" ? athlete.monthly_total : athlete.monthly_by_type[activityType];
-        const dailyData = activityType === "All" ? athlete.daily_total : athlete.daily_by_type[activityType];
+        const monthlyData = activityType === "All" ? athlete.monthly_total_miles : athlete.monthly_by_type_miles[activityType];
+        const dailyData = activityType === "All" ? athlete.daily_total_miles : athlete.daily_by_type_miles[activityType];
+
+        const monthlyTime = activityType === "All" ? athlete.monthly_total_time : athlete.monthly_time_by_type[activityType];
+        const dailyTime = activityType === "All" ? athlete.daily_total_time : athlete.daily_time_by_type[activityType];
 
         const card = document.createElement("div");
         card.className = "card";
@@ -96,12 +96,18 @@ async function loadData(activityType="All") {
                 </div>
             </div>
 
-            <h3>Monthly Distance</h3>
+            <h3>Monthly Distance (miles)</h3>
             <p>${monthNames[0]} vs ${monthNames[1]}</p>
-            <canvas id="monthChart-${username}" style="height:200px; width:100%;"></canvas>
+            <canvas id="monthChart-${username}"></canvas>
 
-            <h3>Daily Distance (${monthNames[1]})</h3>
-            <canvas id="dailyChart-${username}" style="height:200px; width:100%;"></canvas>
+            <h3>Daily Distance (miles) - ${monthNames[1]}</h3>
+            <canvas id="dailyChart-${username}"></canvas>
+
+            <h3>Monthly Time (hh:mm)</h3>
+            <canvas id="monthTimeChart-${username}"></canvas>
+
+            <h3>Daily Time (hh:mm) - ${monthNames[1]}</h3>
+            <canvas id="dailyTimeChart-${username}"></canvas>
         `;
 
         container.appendChild(card);
@@ -110,7 +116,7 @@ async function loadData(activityType="All") {
             type: "bar",
             data: {
                 labels: monthNames,
-                datasets: [{ label: "Distance (km)", data: monthlyData, backgroundColor: "rgba(75, 192, 192, 0.6)" }]
+                datasets: [{ label: "Distance (miles)", data: monthlyData, backgroundColor: "rgba(75, 192, 192, 0.6)" }]
             },
             options: { responsive: true, maintainAspectRatio: true }
         });
@@ -119,15 +125,36 @@ async function loadData(activityType="All") {
             type: "line",
             data: {
                 labels: dailyData.map((_, i) => i + 1),
-                datasets: [{ label: "Daily Distance (km)", data: dailyData, borderColor: "rgba(75, 192, 192, 1)", borderWidth: 2 }]
+                datasets: [{ label: "Daily Distance (miles)", data: dailyData, borderColor: "rgba(75, 192, 192, 1)", borderWidth: 2 }]
             },
             options: { responsive: true, maintainAspectRatio: true }
         });
+
+        // Convert hh:mm to minutes for Chart.js plotting
+        function hhmmToMinutes(arr){ return arr.map(s => { const [h,m] = s.split(":"); return parseInt(h)*60 + parseInt(m); }); }
+
+        new Chart(document.getElementById(`monthTimeChart-${username}`), {
+            type: "bar",
+            data: {
+                labels: monthNames,
+                datasets: [{ label: "Monthly Time (minutes)", data: hhmmToMinutes(monthlyTime), backgroundColor: "rgba(255, 159, 64, 0.6)" }]
+            },
+            options: { responsive: true, maintainAspectRatio: true, plugins:{tooltip:{callbacks:{label: function(ctx){const val = monthlyTime[ctx.dataIndex]; return `Time: ${val}`;}}}}}
+        });
+
+        new Chart(document.getElementById(`dailyTimeChart-${username}`), {
+            type: "line",
+            data: {
+                labels: dailyData.map((_, i) => i + 1),
+                datasets: [{ label: "Daily Time (minutes)", data: hhmmToMinutes(dailyTime), borderColor: "rgba(255, 159, 64, 1)", borderWidth: 2 }]
+            },
+            options: { responsive: true, maintainAspectRatio: true, plugins:{tooltip:{callbacks:{label: function(ctx){const val = dailyTime[ctx.dataIndex]; return `Time: ${val}`;}}}}}
+        });
+
     });
 }
 
-const activitySelect = document.getElementById("activityFilter");
-activitySelect.addEventListener("change", () => loadData(activitySelect.value));
+document.getElementById("activityFilter").addEventListener("change", e => loadData(e.target.value));
 
 // Initial load
 loadData();
