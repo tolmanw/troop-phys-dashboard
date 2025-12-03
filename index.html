@@ -1,3 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Strava Dashboard</title>
+
+<style>
+body {
+    background: #0d1117;
+    color: #e6edf3;
+    font-family: Arial, sans-serif;
+    padding: 20px;
+}
+.card {
+    background: #161b22;
+    padding: 15px;
+    border-radius: 12px;
+    margin-bottom: 20px;
+    box-shadow: 0 0 10px #0005;
+    display: inline-block;
+    width: 45%;
+    vertical-align: top;
+    margin-right: 2%;
+}
+.athlete {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+img {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+}
+canvas {
+    background: #0d1117;
+    border-radius: 10px;
+    padding: 10px;
+    height: 200px;
+    width: 100%;
+}
+select {
+    background: #21262d;
+    color: white;
+    padding: 8px;
+    border-radius: 6px;
+    border: 1px solid #30363d;
+    margin-bottom: 20px;
+}
+</style>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+
+<h1>Strava Dashboard</h1>
+<label>Select Activity Type:</label>
+<select id="activityFilter">
+    <option value="All">All</option>
+    <option value="Run">Run</option>
+    <option value="Trail Run">Trail Run</option>
+    <option value="Walk">Walk</option>
+    <option value="Hike">Hike</option>
+    <option value="Ride">Ride</option>
+    <option value="Virtual Ride">Virtual Ride</option>
+</select>
+
+<div id="container"></div>
+
+<script>
 async function loadData(activityType="All") {
     const response = await fetch("data/athletes.json");
     const data = await response.json();
@@ -7,7 +78,6 @@ async function loadData(activityType="All") {
     const monthNames = data.month_names;
 
     Object.entries(data.athletes).forEach(([username, athlete]) => {
-
         // Distance data
         const monthlyDistance = activityType === "All" ? athlete.monthly_total_miles : athlete.monthly_by_type_miles[activityType];
         const dailyDistance = activityType === "All" ? athlete.daily_total_miles : athlete.daily_by_type_miles[activityType];
@@ -77,15 +147,7 @@ async function loadData(activityType="All") {
             options: {
                 responsive: true,
                 maintainAspectRatio: true,
-                plugins:{
-                    tooltip:{
-                        callbacks:{
-                            label: function(ctx){
-                                return `Time: ${monthlyTimeArr[ctx.dataIndex]}`;
-                            }
-                        }
-                    }
-                }
+                plugins:{tooltip:{callbacks:{label: function(ctx){return `Time: ${monthlyTimeArr[ctx.dataIndex]}`;}}}}
             }
         });
 
@@ -98,16 +160,18 @@ async function loadData(activityType="All") {
             options: {
                 responsive: true,
                 maintainAspectRatio: true,
-                plugins:{
-                    tooltip:{
-                        callbacks:{
-                            label: function(ctx){
-                                return `Time: ${dailyTimeArr[ctx.dataIndex]}`;
-                            }
-                        }
-                    }
-                }
+                plugins:{tooltip:{callbacks:{label: function(ctx){return `Time: ${dailyTimeArr[ctx.dataIndex]}`;}}}}
             }
         });
+
     });
 }
+
+document.getElementById("activityFilter").addEventListener("change", e => loadData(e.target.value));
+
+// Initial load
+loadData();
+</script>
+
+</body>
+</html>
