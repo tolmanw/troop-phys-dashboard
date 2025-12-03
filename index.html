@@ -19,13 +19,17 @@ select {
     border-radius: 6px;
     border: 1px solid #30363d;
     margin-bottom: 20px;
-}
 .card {
-    background: #1b1f25;
+    background: #1b1f25; /* light greyish card */
     padding: 20px;
     border-radius: 12px;
     margin-bottom: 30px;
     box-shadow: 0 0 10px #0005;
+    
+    /* center card and limit width */
+    max-width: 1000px; /* adjust as needed */
+    margin-left: auto;
+    margin-right: auto;
 }
 .athlete {
     display: flex;
@@ -43,12 +47,12 @@ select {
     gap: 15px;
     flex-wrap: wrap;
     margin-bottom: 25px;
-    justify-content: flex-start;
+    justify-content: space-between; /* space between charts, not full stretch */
 }
+
 .chart-container {
-    flex: 1;
-    min-width: 220px;
-    max-width: 320px;
+    flex: 1 1 220px;  /* grow/shrink, min width 220px */
+    max-width: 320px; /* limit width of each chart */
     background: #0d1117;
     border-radius: 10px;
     padding: 10px;
