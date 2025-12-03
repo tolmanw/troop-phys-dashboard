@@ -46,13 +46,13 @@ select {
 }
 .chart-container {
     flex: 1;
-    min-width: 280px;
+    min-width: 250px;
     background: #0d1117;
     border-radius: 10px;
     padding: 10px;
 }
 canvas {
-    height: 150px !important;
+    height: 140px !important;
     width: 100% !important;
 }
 h3 {
@@ -92,20 +92,19 @@ async function loadData(activityType="All") {
 
     Object.entries(data.athletes).forEach(([username, athlete]) => {
 
-        // Distance data
-        const monthlyDistance = activityType === "All" ? athlete.monthly_total_miles : athlete.monthly_by_type_miles[activityType];
-        const dailyDistance = activityType === "All" ? athlete.daily_total_miles : athlete.daily_by_type_miles[activityType];
+        // Distance
+        const monthlyDistance = athlete.monthly_distances.map(d => +(d*0.621371).toFixed(2)); // km -> miles
+        const dailyDistance = athlete.daily_distance_km.map(d => +(d*0.621371).toFixed(2));
 
-        // Time data
-        const monthlyTimeArr = activityType === "All" ? athlete.monthly_total_time : athlete.monthly_time_by_type[activityType];
-        const dailyTimeArr = activityType === "All" ? athlete.daily_total_time : athlete.daily_time_by_type[activityType];
-
+        // Time in minutes
         function hhmmToMinutes(arr){ 
             return arr.map(s => { 
                 const [h,m] = s.split(":"); 
                 return parseInt(h)*60 + parseInt(m); 
             }); 
         }
+        const monthlyTimeMin = hhmmToMinutes(athlete.monthly_time);
+        const dailyTimeMin = hhmmToMinutes(athlete.daily_time);
 
         const card = document.createElement("div");
         card.className = "card";
@@ -125,7 +124,7 @@ async function loadData(activityType="All") {
                     <canvas id="monthChart-${username}"></canvas>
                 </div>
                 <div class="chart-container">
-                    <h3>Monthly Time (hh:mm)</h3>
+                    <h3>Monthly Time (minutes)</h3>
                     <canvas id="monthTimeChart-${username}"></canvas>
                 </div>
             </div>
@@ -136,14 +135,14 @@ async function loadData(activityType="All") {
                     <canvas id="dailyChart-${username}"></canvas>
                 </div>
                 <div class="chart-container">
-                    <h3>Daily Time (hh:mm) - ${monthNames[1]}</h3>
+                    <h3>Daily Time (minutes) - ${monthNames[1]}</h3>
                     <canvas id="dailyTimeChart-${username}"></canvas>
                 </div>
             </div>
         `;
         container.appendChild(card);
 
-        // Monthly Distance Chart (3 months: previous, current, next)
+        // Monthly Distance Chart
         new Chart(document.getElementById(`monthChart-${username}`), {
             type: "bar",
             data: { labels: monthNames, datasets: [{ label: "Distance (miles)", data: monthlyDistance, backgroundColor: "rgba(75, 192, 192, 0.6)" }] },
@@ -160,19 +159,15 @@ async function loadData(activityType="All") {
         // Monthly Time Chart
         new Chart(document.getElementById(`monthTimeChart-${username}`), {
             type: "bar",
-            data: { labels: monthNames, datasets: [{ label:"Monthly Time (minutes)", data: hhmmToMinutes(monthlyTimeArr), backgroundColor:"rgba(255,159,64,0.6)" }] },
-            options: {
-                responsive:true,
-                maintainAspectRatio:true,
-                plugins:{tooltip:{callbacks:{label:function(ctx){return `Time: ${monthlyTimeArr[ctx.dataIndex]}`;}}}}
-            }
+            data: { labels: monthNames, datasets: [{ label:"Monthly Time (minutes)", data: monthlyTimeMin, backgroundColor:"rgba(255,159,64,0.6)" }] },
+            options: { responsive:true, maintainAspectRatio:true }
         });
 
         // Daily Time Chart
         new Chart(document.getElementById(`dailyTimeChart-${username}`), {
             type: "line",
-            data: { labels: dailyDistance.map((_,i)=>i+1), datasets:[{label:"Daily Time (hh:mm)", data:hhmmToMinutes(dailyTimeArr), borderColor:"rgba(255,159,64,1)", borderWidth:2}]},
-            options: { responsive:true, maintainAspectRatio:true, plugins:{tooltip:{callbacks:{label:function(ctx){return `Time: ${dailyTimeArr[ctx.dataIndex]}`;}}}}}
+            data: { labels: dailyTimeMin.map((_,i)=>i+1), datasets:[{label:"Daily Time (minutes)", data:dailyTimeMin, borderColor:"rgba(255,159,64,1)", borderWidth:2}]},
+            options: { responsive:true, maintainAspectRatio:true }
         });
 
     });
