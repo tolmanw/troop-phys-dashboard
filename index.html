@@ -38,7 +38,8 @@
         background: #0d1117;
         border-radius: 10px;
         padding: 10px;
-        height: 150px !important;
+        height: 200px;
+        width: 100%;
     }
     select {
         background: #21262d;
@@ -97,10 +98,10 @@ async function loadData(activityType="All") {
 
             <h3>Monthly Distance</h3>
             <p>${monthNames[0]} vs ${monthNames[1]}</p>
-            <canvas id="monthChart-${username}"></canvas>
+            <canvas id="monthChart-${username}" style="height:200px; width:100%;"></canvas>
 
             <h3>Daily Distance (${monthNames[1]})</h3>
-            <canvas id="dailyChart-${username}"></canvas>
+            <canvas id="dailyChart-${username}" style="height:200px; width:100%;"></canvas>
         `;
 
         container.appendChild(card);
@@ -111,7 +112,7 @@ async function loadData(activityType="All") {
                 labels: monthNames,
                 datasets: [{ label: "Distance (km)", data: monthlyData, backgroundColor: "rgba(75, 192, 192, 0.6)" }]
             },
-            options: { responsive: true, maintainAspectRatio: false }
+            options: { responsive: true, maintainAspectRatio: true }
         });
 
         new Chart(document.getElementById(`dailyChart-${username}`), {
@@ -120,7 +121,7 @@ async function loadData(activityType="All") {
                 labels: dailyData.map((_, i) => i + 1),
                 datasets: [{ label: "Daily Distance (km)", data: dailyData, borderColor: "rgba(75, 192, 192, 1)", borderWidth: 2 }]
             },
-            options: { responsive: true, maintainAspectRatio: false }
+            options: { responsive: true, maintainAspectRatio: true }
         });
     });
 }
