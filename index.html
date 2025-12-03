@@ -140,7 +140,7 @@ function renderDashboard(activityType="All") {
 
             <div class="charts-row">
                 <div class="chart-container">
-                    <h3>Monthly Distance (miles)</h3>
+                    <h3>Monthly Distance </h3>
                     <canvas id="monthChart-${username}"></canvas>
                 </div>
                 <div class="chart-container">
@@ -151,11 +151,11 @@ function renderDashboard(activityType="All") {
 
             <div class="charts-row">
                 <div class="chart-container">
-                    <h3>Daily Distance (miles) - ${monthNames[monthIndex]}</h3>
+                    <h3>Daily Distance - ${monthNames[monthIndex]}</h3>
                     <canvas id="dailyChart-${username}"></canvas>
                 </div>
                 <div class="chart-container">
-                    <h3>Daily Time (minutes) - ${monthNames[monthIndex]}</h3>
+                    <h3>Daily Time - ${monthNames[monthIndex]}</h3>
                     <canvas id="dailyTimeChart-${username}"></canvas>
                 </div>
             </div>
@@ -165,28 +165,28 @@ function renderDashboard(activityType="All") {
         // Monthly Distance
         new Chart(document.getElementById(`monthChart-${username}`), {
             type: "bar",
-            data: { labels: monthNames, datasets: [{ label: "Distance (miles)", data: monthlyDistance, backgroundColor: "rgba(75, 192, 192, 0.6)" }] },
+            data: { labels: monthNames, datasets: [{ label: "miles", data: monthlyDistance, backgroundColor: "rgba(75, 192, 192, 0.6)" }] },
             options: { responsive:true, maintainAspectRatio:true, aspectRatio:1.5, scales:{ y:{ beginAtZero:true } } }
         });
 
         // Monthly Time
         new Chart(document.getElementById(`monthTimeChart-${username}`), {
             type: "bar",
-            data: { labels: monthNames, datasets: [{ label: "Time (minutes)", data: monthlyTime, backgroundColor: "rgba(255,159,64,0.6)" }] },
+            data: { labels: monthNames, datasets: [{ label: "minutes", data: monthlyTime, backgroundColor: "rgba(255,159,64,0.6)" }] },
             options: { responsive:true, maintainAspectRatio:true, aspectRatio:1.5, scales:{ y:{ beginAtZero:true } } }
         });
 
         // Daily Distance
         new Chart(document.getElementById(`dailyChart-${username}`), {
             type: "line",
-            data: { labels: dailyDistance.map((_,i)=>i+1), datasets:[{label:"Daily Distance (miles)", data:dailyDistance, borderColor:"rgba(75,192,192,1)", borderWidth:2, fill:false}]},
+            data: { labels: dailyDistance.map((_,i)=>i+1), datasets:[{label:"miles", data:dailyDistance, borderColor:"rgba(75,192,192,1)", borderWidth:2, fill:false}]},
             options: { responsive:true, maintainAspectRatio:true, aspectRatio:1.5, scales:{ y:{ beginAtZero:true } } }
         });
 
         // Daily Time
         new Chart(document.getElementById(`dailyTimeChart-${username}`), {
             type: "line",
-            data: { labels: dailyTime.map((_,i)=>i+1), datasets:[{label:"Daily Time (minutes)", data:dailyTime, borderColor:"rgba(255,159,64,1)", borderWidth:2, fill:false}]},
+            data: { labels: dailyTime.map((_,i)=>i+1), datasets:[{label:"minutes", data:dailyTime, borderColor:"rgba(255,159,64,1)", borderWidth:2, fill:false}]},
             options: { responsive:true, maintainAspectRatio:true, aspectRatio:1.5, scales:{ y:{ beginAtZero:true } } }
         });
     });
