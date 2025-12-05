@@ -49,9 +49,6 @@ select {
     margin-bottom: 25px;
 }
 .chart-container {
-    flex: 1.2;
-    min-width: 260px;
-    max-width: 400px;
     background: #0d1117;
     border-radius: 10px;
     padding: 10px;
@@ -69,6 +66,11 @@ h3 {
 .unit-toggle {
     margin-bottom: 15px;
 }
+
+/* Specific sizes for the new layout */
+.chart-daily { flex: 1.5; min-width: 390px; max-width: 500px; }
+.chart-extra { flex: 0.8; min-width: 180px; max-width: 250px; }
+.chart-monthly { flex: 1.2; min-width: 260px; max-width: 400px; }
 </style>
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -99,7 +101,7 @@ h3 {
 let athletesData;
 let monthNames;
 
-// Horizontal goal line plugin for Extra Phys Goal
+// Horizontal goal line plugin
 Chart.register({
   id: "goalLine",
   afterDatasetsDraw(chart, args, pluginOptions) {
@@ -111,7 +113,7 @@ Chart.register({
     ctx.moveTo(left, yPos);
     ctx.lineTo(right, yPos);
     ctx.lineWidth = 2;
-    ctx.strokeStyle = pluginOptions.color || "lime"; // bright green
+    ctx.strokeStyle = pluginOptions.color || "lime"; 
     ctx.stroke();
     ctx.restore();
   }
@@ -151,7 +153,7 @@ function renderDashboard(activityType="All") {
         let dailyDistanceKm = athlete.daily_distance_km[monthIndex];
         let dailyDistanceMi = dailyDistanceKm.map(d => +(d*0.621371).toFixed(2));
 
-        const EXTRA_GOAL = 480; // 8 hours in minutes
+        const EXTRA_GOAL = 480; 
         const extraColors = monthlyTime.map(t => t >= EXTRA_GOAL ? "rgba(0,200,0,0.7)" : "rgba(200,0,0,0.7)");
 
         const card = document.createElement("div");
@@ -174,27 +176,24 @@ function renderDashboard(activityType="All") {
             </div>
 
             <div class="charts-row">
-                <div class="chart-container">
+                <div class="chart-container chart-daily">
                     <h3>Daily Distance - ${monthNames[monthIndex]}</h3>
                     <canvas id="dailyChart-${username}"></canvas>
                 </div>
+                <div class="chart-container chart-extra">
+                    <h3>Extra Phys Goal</h3>
+                    <canvas id="extraChart-${username}"></canvas>
+                </div>
             </div>
 
             <div class="charts-row">
-                <div class="chart-container">
+                <div class="chart-container chart-monthly">
                     <h3>Monthly Distance</h3>
                     <canvas id="monthChart-${username}"></canvas>
                 </div>
-                <div class="chart-container">
+                <div class="chart-container chart-monthly">
                     <h3>Monthly Time</h3>
                     <canvas id="monthTimeChart-${username}"></canvas>
-                </div>
-            </div>
-
-            <div class="charts-row">
-                <div class="chart-container">
-                    <h3>Extra Phys Goal</h3>
-                    <canvas id="extraChart-${username}"></canvas>
                 </div>
             </div>
         `;
@@ -204,50 +203,31 @@ function renderDashboard(activityType="All") {
         let monthChart = new Chart(document.getElementById(`monthChart-${username}`), {
             type: "bar",
             data: { labels: monthNames, datasets: [{ data: monthlyDistanceMi, backgroundColor:"rgba(75,192,192,0.6)" }] },
-            options:{
-                responsive:true, maintainAspectRatio:true, aspectRatio:1.5,
-                plugins:{ legend:{ display:false } },
-                scales:{ y:{ beginAtZero:true } }
-            }
+            options:{ responsive:true, maintainAspectRatio:true, aspectRatio:1.5, plugins:{ legend:{ display:false } }, scales:{ y:{ beginAtZero:true } } }
         });
 
         // Monthly Time Chart
         let monthTimeChart = new Chart(document.getElementById(`monthTimeChart-${username}`), {
             type: "bar",
             data: { labels: monthNames, datasets:[{ data: monthlyTime, backgroundColor:"rgba(255,159,64,0.6)" }] },
-            options:{
-                responsive:true, maintainAspectRatio:true, aspectRatio:1.5,
-                plugins:{ legend:{ display:false } },
-                scales:{ y:{ beginAtZero:true } }
-            }
+            options:{ responsive:true, maintainAspectRatio:true, aspectRatio:1.5, plugins:{ legend:{ display:false } }, scales:{ y:{ beginAtZero:true } } }
         });
 
         // Extra Phys Goal Chart
         let extraChart = new Chart(document.getElementById(`extraChart-${username}`), {
             type:"bar",
             data:{ labels: monthNames, datasets:[{ data: monthlyTime, backgroundColor: extraColors, borderRadius:6 }] },
-            options:{
-                responsive:true, maintainAspectRatio:true, aspectRatio:1.5,
-                plugins:{ legend:{ display:false }, goalLine:{ lineAt:EXTRA_GOAL, color:"lime" } },
-                scales:{ y:{ beginAtZero:true, suggestedMax: Math.max(...monthlyTime, EXTRA_GOAL)+60 } }
-            }
+            options:{ responsive:true, maintainAspectRatio:true, aspectRatio:1.5, plugins:{ legend:{ display:false }, goalLine:{ lineAt:EXTRA_GOAL, color:"lime" } }, scales:{ y:{ beginAtZero:true, suggestedMax: Math.max(...monthlyTime, EXTRA_GOAL)+60 } } }
         });
 
-        // Daily Distance Chart (thin bars, actual values)
+        // Daily Distance Chart
         let dailyChart = new Chart(document.getElementById(`dailyChart-${username}`), {
             type:"bar",
             data:{ labels: dailyDistanceMi.map((_,i)=>i+1), datasets:[{ data: dailyDistanceMi, backgroundColor:"rgba(75,192,192,0.8)", minBarLength:2 }] },
-            options:{
-                responsive:true, maintainAspectRatio:true, aspectRatio:1.5,
-                plugins:{ legend:{ display:false } },
-                scales:{
-                    x:{ barPercentage:0.3, categoryPercentage:0.5, ticks:{ autoSkip:false, maxRotation:0, minRotation:0 } },
-                    y:{ beginAtZero:true }
-                }
-            }
+            options:{ responsive:true, maintainAspectRatio:true, aspectRatio:1.5, plugins:{ legend:{ display:false } }, scales:{ x:{ barPercentage:0.3, categoryPercentage:0.5, ticks:{ autoSkip:false, maxRotation:0, minRotation:0 } }, y:{ beginAtZero:true } } }
         });
 
-        // Unit toggle per athlete
+        // Unit toggle
         document.getElementById(`unit-${username}`).addEventListener("change", e=>{
             const unit = e.target.value;
             let monthlyData = unit==="km"? monthlyDistanceKm: monthlyDistanceMi;
