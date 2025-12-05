@@ -73,7 +73,7 @@ select {
     background: #0d1117;
     border-radius: 10px;
     padding: 6px;
-    height: 200px; /* Fixed height for all charts */
+    height: 200px;
 }
 canvas {
     width: 100% !important;
@@ -117,8 +117,6 @@ h3 {
 
 <script>
 let athletesData;
-
-// Abbreviated month names
 const MONTH_ABBR = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
 
 Chart.register({
@@ -165,23 +163,26 @@ function renderDashboard(activityType="All") {
     const monthIndex = parseInt(document.getElementById("dailyMonthSelector").value);
 
     Object.entries(athletesData).forEach(([username, athlete]) => {
+        // Ensure arrays exist
+        const monthlyDistances = athlete.monthly_distances || [];
+        const monthlyTimes = athlete.monthly_time || [];
+        const dailyDistancesAll = athlete.daily_distance_km || [];
 
-        // Extract last two months for Extra Phys Goal & Monthly charts
-        const last2MonthsIdx = [athlete.monthly_distances.length-2, athlete.monthly_distances.length-1];
-        let monthlyDistanceKm = last2MonthsIdx.map(i => athlete.monthly_distances[i]);
-        let monthlyDistanceMi = monthlyDistanceKm.map(d => +(d*0.621371).toFixed(2));
-        const monthlyTime = last2MonthsIdx.map(i => athlete.monthly_time[i]);
+        // Daily distance chart
+        const dailyDistancesKm = dailyDistancesAll[monthIndex] || [];
+        const dailyDistancesMi = dailyDistancesKm.map(d => +(d*0.621371).toFixed(2));
 
-        const extraMonths = last2MonthsIdx.map(i => MONTH_ABBR[i]);
-        const extraTime = monthlyTime;
+        // Extra Phys Goal chart: last 2 months
+        const lastTwoIdx = [monthlyDistances.length-2, monthlyDistances.length-1];
+        const extraMonths = lastTwoIdx.map(i => MONTH_ABBR[i]);
+        const extraTimes = lastTwoIdx.map(i => monthlyTimes[i] || 0);
 
-        // Daily chart data for the selected month
-        let dailyDistanceKm = athlete.daily_distance_km[monthIndex];
-        let dailyDistanceMi = dailyDistanceKm.map(d => +(d*0.621371).toFixed(2));
+        const extraDistancesKm = lastTwoIdx.map(i => monthlyDistances[i] || 0);
+        const extraDistancesMi = extraDistancesKm.map(d => +(d*0.621371).toFixed(2));
 
-        const EXTRA_GOAL = 480; 
         const BAR_COLOR = "rgba(75,192,192,0.8)";
-        const extraColors = extraTime.map(_ => BAR_COLOR);
+        const EXTRA_GOAL = 480;
+        const extraColors = extraTimes.map(_ => BAR_COLOR);
 
         const card = document.createElement("div");
         card.className = "card";
@@ -228,7 +229,7 @@ function renderDashboard(activityType="All") {
         // Daily distance chart
         let dailyChart = new Chart(document.getElementById(`dailyChart-${username}`), {
             type:"bar",
-            data:{ labels: dailyDistanceMi.map((_,i)=>i+1), datasets:[{ data: dailyDistanceMi, backgroundColor:BAR_COLOR, barThickness:6 }] },
+            data:{ labels: dailyDistancesMi.map((_,i)=>i+1), datasets:[{ data: dailyDistancesMi, backgroundColor:BAR_COLOR, barThickness:6 }] },
             options:{ 
                 responsive:true, maintainAspectRatio:false,
                 plugins:{ legend:{ display:false } },
@@ -239,49 +240,47 @@ function renderDashboard(activityType="All") {
         // Extra Phys Goal chart
         let extraChart = new Chart(document.getElementById(`extraChart-${username}`), {
             type:"bar",
-            data:{ labels: extraMonths, datasets:[{ data: extraTime, backgroundColor: extraColors, barThickness:6 }] },
+            data:{ labels: extraMonths, datasets:[{ data: extraTimes, backgroundColor: extraColors, barThickness:6 }] },
             options:{ 
-                responsive:true, 
-                maintainAspectRatio:false,
+                responsive:true, maintainAspectRatio:false,
                 layout:{ padding:{ top:20, bottom:10, left:10, right:10 } },
                 plugins:{ legend:{ display:false }, goalLine:{ lineAt:EXTRA_GOAL, color:"grey" } },
-                scales:{ y:{ beginAtZero:true, suggestedMax: Math.max(...extraTime, EXTRA_GOAL)+60 }, x:{ ticks:{ font:{ size:10 } } } } 
+                scales:{ y:{ beginAtZero:true, suggestedMax: Math.max(...extraTimes, EXTRA_GOAL)+60 }, x:{ ticks:{ font:{ size:10 } } } } 
             }
         });
 
         // Monthly distance chart
         let monthChart = new Chart(document.getElementById(`monthChart-${username}`), {
-            type: "bar",
-            data: { labels: extraMonths, datasets: [{ data: monthlyDistanceMi, backgroundColor: BAR_COLOR, barThickness:6 }] },
+            type:"bar",
+            data:{ labels: extraMonths, datasets:[{ data: extraDistancesMi, backgroundColor:BAR_COLOR, barThickness:6 }] },
             options:{ responsive:true, maintainAspectRatio:false, plugins:{ legend:{ display:false } }, scales:{ y:{ beginAtZero:true }, x:{ ticks:{ font:{ size:10 } } } } }
         });
 
         // Monthly time chart
         let monthTimeChart = new Chart(document.getElementById(`monthTimeChart-${username}`), {
-            type: "bar",
-            data: { labels: extraMonths, datasets:[{ data: monthlyTime, backgroundColor: BAR_COLOR, barThickness:6 }] },
+            type:"bar",
+            data:{ labels: extraMonths, datasets:[{ data: extraTimes, backgroundColor:BAR_COLOR, barThickness:6 }] },
             options:{ responsive:true, maintainAspectRatio:false, plugins:{ legend:{ display:false } }, scales:{ y:{ beginAtZero:true }, x:{ ticks:{ font:{ size:10 } } } } }
         });
 
         // Unit toggle
         document.getElementById(`unit-${username}`).addEventListener("change", e=>{
             const unit = e.target.value;
-            let monthlyData = unit==="km"? monthlyDistanceKm: monthlyDistanceMi;
-            let dailyData = unit==="km"? dailyDistanceKm: dailyDistanceMi;
-
-            monthChart.data.datasets[0].data = monthlyData;
-            monthChart.update();
-
-            monthTimeChart.data.datasets[0].data = monthlyTime;
-            monthTimeChart.update();
-
-            extraChart.data.datasets[0].data = extraTime;
-            extraChart.update();
+            const dailyData = unit==="km"? dailyDistancesKm : dailyDistancesMi;
+            const monthDist = unit==="km"? extraDistancesKm : extraDistancesMi;
 
             dailyChart.data.datasets[0].data = dailyData;
             dailyChart.update();
-        });
 
+            monthChart.data.datasets[0].data = monthDist;
+            monthChart.update();
+
+            monthTimeChart.data.datasets[0].data = extraTimes;
+            monthTimeChart.update();
+
+            extraChart.data.datasets[0].data = extraTimes;
+            extraChart.update();
+        });
     });
 }
 
