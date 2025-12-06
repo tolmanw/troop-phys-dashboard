@@ -39,7 +39,7 @@ select {
     border-radius: 12px;
     margin-bottom: var(--card-gap);
     width: var(--card-width);
-    display: inline-block; /* compact card display */
+    display: inline-block;
     vertical-align: top;
 }
 
@@ -78,6 +78,8 @@ select {
 .daily-chart-wrapper canvas {
     width: 100% !important;
     height: 100% !important;
+    box-sizing: border-box;
+    padding: 5px;
 }
 
 /* Bottom charts: 1x3 layout */
@@ -93,6 +95,9 @@ select {
 .bottom-charts .chart-tile canvas {
     flex: 1;
     width: 100% !important;
+    height: 100% !important;
+    box-sizing: border-box;
+    padding: 5px;
 }
 
 /* Chart title styling */
@@ -133,8 +138,8 @@ const CHARTS = {};
 const FONT_SIZE = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--font-size'));
 const TITLE_SIZE = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--title-size'));
 
-// Goal Line plugin
-Chart.register({
+// Goal line plugin
+const goalLinePlugin = {
   id: "goalLine",
   afterDatasetsDraw(chart, args, pluginOptions) {
     if (!pluginOptions || !pluginOptions.lineAt) return;
@@ -144,18 +149,19 @@ Chart.register({
     ctx.beginPath();
     ctx.moveTo(left, yPos);
     ctx.lineTo(right, yPos);
-    ctx.lineWidth = 2;
+    ctx.lineWidth = pluginOptions.lineWidth || 2;
     ctx.strokeStyle = pluginOptions.color || "blue";
     ctx.stroke();
     ctx.restore();
   }
-});
+};
+Chart.register(goalLinePlugin);
 
 async function loadData(activityType="All") {
     const response = await fetch("data/athletes.json");
     const data = await response.json();
     athletesData = data.athletes;
-    monthNames = data.month_names.map(m => m.replace(/\s*\d{4}/, '').substring(0,3)); // Abbreviate months
+    monthNames = data.month_names.map(m => m.replace(/\s*\d{4}/, '').substring(0,3)); // abbreviated months
 
     const monthSelector = document.getElementById("dailyMonthSelector");
     monthSelector.innerHTML = "";
@@ -286,25 +292,20 @@ function renderDashboard(activityType="All") {
             options:{ responsive:true, maintainAspectRatio:false, plugins:{ legend:{ display:false } }, scales:{ y:{ beginAtZero:true, ticks:{ font:{ size: FONT_SIZE } } }, x:{ ticks:{ font:{ size: FONT_SIZE } } } } }
         });
 
-        // Extra Phys Goal Chart with goal line
+        // Extra Phys Goal Chart with Goal Line
         CHARTS[`extraChart-${alias}`] = new Chart(document.getElementById(`extraChart-${alias}`), {
             type:"bar",
             data:{ labels: extraMonths, datasets:[{ data: extraTime, backgroundColor:"rgba(255,159,64,0.6)", barThickness:15 }] },
-            options:{
-                responsive:true,
-                maintainAspectRatio:false,
-                plugins:{
-                    legend:{ display:false },
-                    goalLine:{ lineAt:EXTRA_GOAL, color:"blue" } // goal line enabled
-                },
-                scales:{
-                    y:{ beginAtZero:true, ticks:{ font:{ size: FONT_SIZE }, suggestedMax: Math.max(...extraTime, EXTRA_GOAL)+60 } },
-                    x:{ ticks:{ font:{ size: FONT_SIZE } } }
-                }
+            options:{ 
+                responsive:true, 
+                maintainAspectRatio:false, 
+                plugins:{ legend:{ display:false }, goalLine:{ lineAt:EXTRA_GOAL, color:"blue", lineWidth:2 } }, 
+                scales:{ y:{ beginAtZero:true, ticks:{ font:{ size: FONT_SIZE }, suggestedMax: Math.max(...extraTime, EXTRA_GOAL)+60 }, x:{ ticks:{ font:{ size: FONT_SIZE } } } } }
             },
-            plugins: [Chart.registry.getPlugin('goalLine')] // ensure plugin used
+            plugins:[goalLinePlugin]
         });
 
+        // Unit toggle
         document.getElementById(`unit-${alias}`).addEventListener("change", e=>{
             const unit = e.target.value;
             let monthlyData = unit==="km"? monthlyDistanceKm: monthlyDistanceMi;
@@ -315,9 +316,6 @@ function renderDashboard(activityType="All") {
 
             const dc = CHARTS[`dailyChart-${alias}`];
             if (dc) { dc.data.labels = dailyData.map((_,i)=>i+1); dc.data.datasets[0].data = dailyData; dc.update(); }
-
-            const ec = CHARTS[`extraChart-${alias}`];
-            if (ec) { ec.data.datasets[0].data = unit==="km"? extraTime : extraTime; ec.update(); } // extra goal stays same
         });
     });
 }
