@@ -27,11 +27,9 @@ activity_types = [
     "Virtual Rowing"
 ]
 
-# Map real usernames to public aliases
-USERNAME_ALIASES = {
-    "will_tolman": "TO2388",
-    # add more here for other athletes
-}
+# --- Load alias mapping from environment variable ---
+ALIASES_JSON = os.environ.get("ATHLETE_ALIASES", "{}")
+USERNAME_ALIASES = json.loads(ALIASES_JSON)
 
 def refresh_access_token(refresh_token):
     response = requests.post(
@@ -120,8 +118,14 @@ for username, info in refresh_tokens.items():
     profile_data = requests.get(athlete_url, headers=headers).json()
     profile_img = profile_data.get("profile","")
 
-    # Use alias for public display
-    alias = USERNAME_ALIASES.get(username, username)
+    # Real Strava name
+    real_name = f"{profile_data.get('firstname','')} {profile_data.get('lastname','')}"
+
+    # Map to alias
+    alias = USERNAME_ALIASES.get(real_name)
+    if not alias:
+        print(f"Skipping {real_name}: no alias defined")
+        continue
 
     athletes_out[alias] = {
         "display_name": alias,  # front-end only sees alias
