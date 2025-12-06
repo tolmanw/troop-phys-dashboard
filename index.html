@@ -6,14 +6,22 @@
 <title>Strava Dashboard</title>
 
 <style>
-/* === General dark theme === */
+:root {
+    --chart-gap: 12px;          /* gap between charts */
+    --daily-chart-height: 180px; /* daily chart height */
+    --small-chart-height: 140px; /* smaller charts height */
+    --chart-bg: #1b1f25;        /* tile background color */
+    --chart-border: #555;       /* tile border color */
+    --font-size: 8px;           /* chart font size */
+}
+
+/* === Body & basic styling === */
 body {
     background: #0d1117;
     color: #e6edf3;
     font-family: Arial, sans-serif;
     padding: 20px;
 }
-
 select {
     background: #21262d;
     color: white;
@@ -24,14 +32,9 @@ select {
 }
 
 .card {
-    /* === TILE SIZE: change width to scale tile === */
-    width: 320px;  
-    padding: 10px;
     border-radius: 12px;
-    background: #1b1f25;
-    box-shadow: 0 0 10px #0005;
     margin-bottom: 20px;
-    flex-shrink: 0;
+    box-shadow: 0 0 10px #0005;
 }
 
 .athlete {
@@ -50,26 +53,41 @@ select {
     margin: 0;
 }
 
+/* === Charts layout === */
 .charts-grid {
     display: flex;
     flex-direction: column;
-    gap: 10px;
-}
-
-.daily-chart-container {
-    height: 160px; /* === DAILY CHART HEIGHT === */
+    gap: var(--chart-gap);
 }
 
 .chart-row {
     display: flex;
-    gap: 10px;
+    gap: var(--chart-gap);
 }
 
+/* === Individual chart tiles === */
+.daily-chart-container,
 .small-chart {
-    flex: 1;
-    height: 120px; /* === SMALL CHART HEIGHT === */
+    background: var(--chart-bg);
+    border: 1px solid var(--chart-border);
+    border-radius: 8px;
+    padding: 10px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
 }
 
+/* Fixed heights */
+.daily-chart-container {
+    height: var(--daily-chart-height);
+}
+.small-chart {
+    flex: 1; /* equal width in 1x3 layout */
+    height: var(--small-chart-height);
+}
+
+/* Charts fill the tile */
 canvas {
     width: 100% !important;
     height: 100% !important;
@@ -77,7 +95,7 @@ canvas {
 
 h3 {
     margin-bottom: 5px;
-    margin-top: 10px;
+    margin-top: 0;
     font-size: 0.9em;
     color: #c9d1d9;
 }
@@ -86,13 +104,13 @@ h3 {
     margin-bottom: 10px;
 }
 
-/* === Mobile-friendly: stack charts vertically on small screens === */
-@media (max-width: 600px) {
-    .card {
-        width: 100%;
-    }
+/* === Responsive adjustments === */
+@media(max-width:900px){
     .chart-row {
         flex-direction: column;
+    }
+    .small-chart {
+        height: 140px;
     }
 }
 </style>
@@ -220,7 +238,9 @@ function renderDashboard(activityType="All") {
         card.innerHTML = `
             <div class="athlete">
                 <img src="${athlete.profile}">
-                <div><h2>${athlete.display_name}</h2></div>
+                <div>
+                    <h2>${athlete.display_name}</h2>
+                </div>
             </div>
 
             <div class="unit-toggle">
@@ -232,27 +252,29 @@ function renderDashboard(activityType="All") {
             </div>
 
             <div class="charts-grid">
-                <!-- Top full-width chart -->
-                <div class="chart-container daily-chart-container">
+
+                <!-- Daily chart -->
+                <div class="daily-chart-container card">
                     <h3>Daily Distance - ${monthNames[monthIndex]}</h3>
                     <canvas id="dailyChart-${alias}"></canvas>
                 </div>
 
-                <!-- Bottom row: 3 smaller charts -->
+                <!-- Row of 3 smaller charts -->
                 <div class="chart-row">
-                    <div class="chart-container small-chart">
+                    <div class="small-chart card">
                         <h3>Extra Phys Goal</h3>
                         <canvas id="extraChart-${alias}"></canvas>
                     </div>
-                    <div class="chart-container small-chart">
+                    <div class="small-chart card">
                         <h3>Monthly Distance</h3>
                         <canvas id="monthChart-${alias}"></canvas>
                     </div>
-                    <div class="chart-container small-chart">
+                    <div class="small-chart card">
                         <h3>Monthly Time</h3>
                         <canvas id="monthTimeChart-${alias}"></canvas>
                     </div>
                 </div>
+
             </div>
         `;
         container.appendChild(card);
@@ -266,28 +288,27 @@ function renderDashboard(activityType="All") {
         CHARTS[`monthChart-${alias}`] = new Chart(document.getElementById(`monthChart-${alias}`), {
             type:"bar",
             data:{ labels: monthNames, datasets:[{ data: monthlyDistanceMi, backgroundColor:"rgba(75,192,192,0.6)", barThickness:15 }] },
-            options:{ responsive:true, maintainAspectRatio:true, aspectRatio:1.2, plugins:{ legend:{ display:false } }, scales:{ y:{ beginAtZero:true, ticks:{ font:{ size:8 } } }, x:{ ticks:{ font:{ size:8 } } } } }
+            options:{ responsive:true, maintainAspectRatio:true, aspectRatio:1.2, plugins:{ legend:{ display:false } }, scales:{ y:{ beginAtZero:true, ticks:{ font:{ size:parseInt(getComputedStyle(document.documentElement).getPropertyValue('--font-size')) } } }, x:{ ticks:{ font:{ size:parseInt(getComputedStyle(document.documentElement).getPropertyValue('--font-size')) } } } } }
         });
 
         CHARTS[`monthTimeChart-${alias}`] = new Chart(document.getElementById(`monthTimeChart-${alias}`), {
             type:"bar",
             data:{ labels: monthNames, datasets:[{ data: monthlyTime, backgroundColor:"rgba(255,159,64,0.6)", barThickness:15 }] },
-            options:{ responsive:true, maintainAspectRatio:true, aspectRatio:1.2, plugins:{ legend:{ display:false } }, scales:{ y:{ beginAtZero:true, ticks:{ font:{ size:8 } } }, x:{ ticks:{ font:{ size:8 } } } } }
+            options:{ responsive:true, maintainAspectRatio:true, aspectRatio:1.2, plugins:{ legend:{ display:false } }, scales:{ y:{ beginAtZero:true, ticks:{ font:{ size:parseInt(getComputedStyle(document.documentElement).getPropertyValue('--font-size')) } } }, x:{ ticks:{ font:{ size:parseInt(getComputedStyle(document.documentElement).getPropertyValue('--font-size')) } } } } }
         });
 
         CHARTS[`extraChart-${alias}`] = new Chart(document.getElementById(`extraChart-${alias}`), {
             type:"bar",
             data:{ labels: extraMonths, datasets:[{ data: extraTime, backgroundColor:"rgba(255,159,64,0.6)", barThickness:15 }] },
-            options:{ responsive:true, maintainAspectRatio:true, aspectRatio:1.2, plugins:{ legend:{ display:false }, goalLine:{ lineAt:EXTRA_GOAL, color:"blue" } }, scales:{ y:{ beginAtZero:true, ticks:{ font:{ size:8 }, suggestedMax: Math.max(...extraTime, EXTRA_GOAL)+60 }, x:{ ticks:{ font:{ size:8 } } } } } }
+            options:{ responsive:true, maintainAspectRatio:true, aspectRatio:1.2, plugins:{ legend:{ display:false }, goalLine:{ lineAt:EXTRA_GOAL, color:"blue" } }, scales:{ y:{ beginAtZero:true, ticks:{ font:{ size:parseInt(getComputedStyle(document.documentElement).getPropertyValue('--font-size')) }, suggestedMax: Math.max(...extraTime, EXTRA_GOAL)+60 }, x:{ ticks:{ font:{ size:parseInt(getComputedStyle(document.documentElement).getPropertyValue('--font-size')) } } } } } }
         });
 
         CHARTS[`dailyChart-${alias}`] = new Chart(document.getElementById(`dailyChart-${alias}`), {
             type:"bar",
             data:{ labels: dailyDistanceMi.map((_,i)=>i+1), datasets:[{ data: dailyDistanceMi, backgroundColor:"rgba(75,192,192,0.8)", minBarLength:2, barThickness:'flex' }] },
-            options:{ responsive:true, maintainAspectRatio:true, plugins:{ legend:{ display:false } }, scales:{ x:{ ticks:{ autoSkip:false, maxRotation:0, minRotation:0, font:{ size:8 } } }, y:{ beginAtZero:true, ticks:{ font:{ size:8 } } } } }
+            options:{ responsive:true, maintainAspectRatio:false, plugins:{ legend:{ display:false } }, scales:{ x:{ ticks:{ autoSkip:false, maxRotation:0, minRotation:0, font:{ size:parseInt(getComputedStyle(document.documentElement).getPropertyValue('--font-size')) } } }, y:{ beginAtZero:true, ticks:{ font:{ size:parseInt(getComputedStyle(document.documentElement).getPropertyValue('--font-size')) } } } } }
         });
 
-        // unit toggle
         document.getElementById(`unit-${alias}`).addEventListener("change", e=>{
             const unit = e.target.value;
             let monthlyData = unit==="km"? monthlyDistanceKm: monthlyDistanceMi;
