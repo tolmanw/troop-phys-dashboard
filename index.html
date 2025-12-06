@@ -14,7 +14,7 @@
     --card-width: 350px;        /* Card width */
     --card-gap: 20px;           /* Gap between cards */
     --font-size: 8px;           /* Axis font size */
-    --title-size: 10px;         /* Chart title font size */
+    --title-size: 8px;          /* Chart title font size */
 }
 
 body {
@@ -39,7 +39,7 @@ select {
     border-radius: 12px;
     margin-bottom: var(--card-gap);
     width: var(--card-width);
-    display: inline-block;
+    display: inline-block; /* compact card display */
     vertical-align: top;
 }
 
@@ -67,8 +67,6 @@ select {
     padding: 5px;
     display: flex;
     flex-direction: column;
-    align-items: center;
-    justify-content: flex-start;
 }
 
 /* Daily chart on top */
@@ -135,6 +133,7 @@ const CHARTS = {};
 const FONT_SIZE = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--font-size'));
 const TITLE_SIZE = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--title-size'));
 
+// Goal Line plugin
 Chart.register({
   id: "goalLine",
   afterDatasetsDraw(chart, args, pluginOptions) {
@@ -156,7 +155,7 @@ async function loadData(activityType="All") {
     const response = await fetch("data/athletes.json");
     const data = await response.json();
     athletesData = data.athletes;
-    monthNames = data.month_names.map(m => m.substr(0,3)); // abbreviated months
+    monthNames = data.month_names.map(m => m.replace(/\s*\d{4}/, '').substring(0,3)); // Abbreviate months
 
     const monthSelector = document.getElementById("dailyMonthSelector");
     monthSelector.innerHTML = "";
@@ -287,7 +286,7 @@ function renderDashboard(activityType="All") {
             options:{ responsive:true, maintainAspectRatio:false, plugins:{ legend:{ display:false } }, scales:{ y:{ beginAtZero:true, ticks:{ font:{ size: FONT_SIZE } } }, x:{ ticks:{ font:{ size: FONT_SIZE } } } } }
         });
 
-        // Extra Phys Goal Chart
+        // Extra Phys Goal Chart with goal line
         CHARTS[`extraChart-${alias}`] = new Chart(document.getElementById(`extraChart-${alias}`), {
             type:"bar",
             data:{ labels: extraMonths, datasets:[{ data: extraTime, backgroundColor:"rgba(255,159,64,0.6)", barThickness:15 }] },
@@ -296,16 +295,16 @@ function renderDashboard(activityType="All") {
                 maintainAspectRatio:false,
                 plugins:{
                     legend:{ display:false },
-                    goalLine:{ lineAt: EXTRA_GOAL, color:"blue" } // ensure line shows
+                    goalLine:{ lineAt:EXTRA_GOAL, color:"blue" } // goal line enabled
                 },
                 scales:{
                     y:{ beginAtZero:true, ticks:{ font:{ size: FONT_SIZE }, suggestedMax: Math.max(...extraTime, EXTRA_GOAL)+60 } },
                     x:{ ticks:{ font:{ size: FONT_SIZE } } }
                 }
-            }
+            },
+            plugins: [Chart.registry.getPlugin('goalLine')] // ensure plugin used
         });
 
-        // Unit toggle
         document.getElementById(`unit-${alias}`).addEventListener("change", e=>{
             const unit = e.target.value;
             let monthlyData = unit==="km"? monthlyDistanceKm: monthlyDistanceMi;
@@ -316,6 +315,9 @@ function renderDashboard(activityType="All") {
 
             const dc = CHARTS[`dailyChart-${alias}`];
             if (dc) { dc.data.labels = dailyData.map((_,i)=>i+1); dc.data.datasets[0].data = dailyData; dc.update(); }
+
+            const ec = CHARTS[`extraChart-${alias}`];
+            if (ec) { ec.data.datasets[0].data = unit==="km"? extraTime : extraTime; ec.update(); } // extra goal stays same
         });
     });
 }
