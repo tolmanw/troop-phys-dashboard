@@ -8,9 +8,14 @@ CLIENT_SECRET = os.environ['STRAVA_CLIENT_SECRET']
 REFRESH_TOKENS_JSON = os.environ['STRAVA_REFRESH_TOKENS']
 
 refresh_tokens = json.loads(REFRESH_TOKENS_JSON)
-
 activity_types = ['Run', 'Trail Run', 'Walk', 'Hike', 'Ride', 'Virtual Ride']
 
+# Map real usernames to public aliases
+# Keep this only in the server code; never output to client
+USERNAME_ALIASES = {
+    "will_tolman": "TO2388",
+    # add more here for other athletes
+}
 
 def refresh_access_token(refresh_token):
     response = requests.post(
@@ -28,7 +33,6 @@ def refresh_access_token(refresh_token):
         return None
     return data["access_token"]
 
-
 def get_last_three_month_starts():
     now = datetime.now(timezone.utc)
     month_starts = []
@@ -40,8 +44,8 @@ def get_last_three_month_starts():
             year -= 1
         first_day = datetime(year, month, 1, tzinfo=timezone.utc)
         month_starts.append(first_day)
-    return [int(d.timestamp()) for d in month_starts], month_starts
-
+    timestamps = [int(d.timestamp()) for d in month_starts]
+    return timestamps, month_starts
 
 def fetch_activities(access_token, after_ts):
     url = "https://www.strava.com/api/v3/athlete/activities"
@@ -54,24 +58,20 @@ def fetch_activities(access_token, after_ts):
     activities = response.json()
     return activities if isinstance(activities, list) else []
 
-
 def days_in_month(dt):
     next_month = dt.replace(day=28) + timedelta(days=4)
     return (next_month - timedelta(days=next_month.day)).day
 
-
-# --- MAIN ---
+# --- Main ---
 athletes_out = {}
 prev_ts, month_starts = get_last_three_month_starts()
 month_names = [m.strftime("%B %Y") for m in month_starts]
 
 for username, info in refresh_tokens.items():
-
     access_token = refresh_access_token(info["refresh_token"])
     if not access_token:
         continue
 
-    # Fetch activities for last 3 months
     activities = fetch_activities(access_token, prev_ts[0])
     activities = [a for a in activities if a.get("type") in activity_types]
 
@@ -80,47 +80,44 @@ for username, info in refresh_tokens.items():
     daily_distance = []
     daily_time_min = []
 
-    # init daily arrays
     for m in month_starts:
-        d = days_in_month(m)
-        daily_distance.append([0.0] * d)
-        daily_time_min.append([0.0] * d)
+        days = days_in_month(m)
+        daily_distance.append([0.0]*days)
+        daily_time_min.append([0.0]*days)
 
     for act in activities:
         dt = datetime.strptime(act["start_date_local"], "%Y-%m-%dT%H:%M:%S%z")
-        dist_km = act.get("distance", 0) / 1000
-        time_min = act.get("moving_time", 0) / 60
+        dist_km = act.get("distance",0)/1000
+        time_min = act.get("moving_time",0)/60
 
         for idx, start in enumerate(month_starts):
             if dt.year == start.year and dt.month == start.month:
                 monthly_distance[idx] += dist_km
                 monthly_time_min[idx] += time_min
-                daily_idx = dt.day - 1
-                daily_distance[idx][daily_idx] += dist_km
-                daily_time_min[idx][daily_idx] += time_min
+                day_idx = dt.day - 1
+                daily_distance[idx][day_idx] += dist_km
+                daily_time_min[idx][day_idx] += time_min
 
-    # Fetch profile
+    # Fetch profile from Strava
     athlete_url = "https://www.strava.com/api/v3/athlete"
     headers = {"Authorization": f"Bearer {access_token}"}
     profile_data = requests.get(athlete_url, headers=headers).json()
+    profile_img = profile_data.get("profile","")
 
-    athletes_out[username] = {
-        "firstname": profile_data.get("firstname", ""),
-        "lastname": profile_data.get("lastname", ""),
-        "username": username,
-        "profile": profile_data.get("profile", ""),
+    # Use alias for public display
+    alias = USERNAME_ALIASES.get(username, username)
 
-        # NEW: activity list for dashboard filter
-        "activity_types": sorted({a.get("type") for a in activities}),
-
-        "monthly_distances": [round(d, 2) for d in monthly_distance],
+    athletes_out[alias] = {
+        "display_name": alias,  # front-end only sees alias
+        "profile": profile_img,
+        "monthly_distances": [round(d,2) for d in monthly_distance],
         "monthly_time": [round(t) for t in monthly_time_min],
-        "daily_distance_km": [[round(d, 2) for d in days] for days in daily_distance],
-        "daily_time_min": [[round(t) for t in days] for days in daily_time_min]
+        "daily_distance_km": [[round(d,2) for d in month] for month in daily_distance],
+        "daily_time_min": [[round(t) for t in month] for month in daily_time_min]
     }
 
 os.makedirs("data", exist_ok=True)
-with open("data/athletes.json", "w") as f:
-    json.dump({"athletes": athletes_out, "month_names": month_names}, f, indent=2)
+with open("data/athletes.json","w") as f:
+    json.dump({"athletes":athletes_out,"month_names":month_names},f,indent=2)
 
 print("athletes.json updated successfully.")
