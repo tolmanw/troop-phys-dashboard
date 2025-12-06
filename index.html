@@ -1,235 +1,200 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="UTF-8" />
 <title>Strava Dashboard</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
 
 <style>
-body {
-    background: #0d1117;
-    color: #e6edf3;
-    font-family: Arial, sans-serif;
-    padding: 20px;
+/* ===============================
+   FIX: Prevent daily chart crashing
+   =============================== */
+.daily-chart-wrapper {
+    height: 200px;
+    overflow: hidden;
 }
-select {
-    background: #21262d;
-    color: white;
-    padding: 6px 10px;
-    border-radius: 6px;
-    border: 1px solid #30363d;
-    margin-bottom: 10px;
+.daily-chart-wrapper canvas {
+    height: 100% !important;
 }
+
+/* Optional polishing (matches your existing look) */
 .card {
-    background: #1b1f25;
-    padding: 15px;
+    background: white;
     border-radius: 12px;
-    margin-bottom: 30px;
-    box-shadow: 0 0 10px #0005;
+    padding: 1.25rem;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
 }
-.athlete {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-}
-.athlete img {
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-}
-.charts-grid {
-    display: grid;
-    grid-template-rows: auto auto;
-    gap: 15px;
-}
-.charts-top {
-    width: 85%;
-    margin: 0 auto;
-}
-chart-container {
-    padding: 10px;
-}
-canvas { width: 100% !important; }
 </style>
-
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
-<body>
+<body class="bg-gray-100">
 
-<h1>Strava Dashboard</h1>
+<div class="max-w-6xl mx-auto p-6">
 
-<label>Select Activity Type:</label>
-<select id="activityFilter">
-    <option value="All">All</option>
-    <option value="Run">Run</option>
-    <option value="Trail Run">Trail Run</option>
-    <option value="Walk">Walk</option>
-    <option value="Hike">Hike</option>
-    <option value="Ride">Ride</option>
-    <option value="Virtual Ride">Virtual Ride</option>
-</select>
+    <!-- Title -->
+    <h1 class="text-3xl font-bold mb-6">Strava Monthly Dashboard</h1>
 
-<br>
+    <!-- Activity Filter -->
+    <div class="mb-6">
+        <label class="font-semibold">Filter by Activity Type:</label>
+        <select id="activityFilter" class="border rounded p-2 ml-2">
+            <option value="All">All</option>
+        </select>
+    </div>
 
-<label>Select Month for Daily Charts:</label>
-<select id="dailyMonthSelector"></select>
+    <!-- Athletes Container -->
+    <div id="athleteContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6"></div>
 
-<div id="container"></div>
+</div>
+
 
 <script>
-let athletesData;
-let monthNames;
+// ===============================
+// Load JSON
+// ===============================
+fetch("data/athletes.json")
+  .then(r => r.json())
+  .then(data => initDashboard(data));
 
-Chart.register({
-  id: "goalLine",
-  afterDatasetsDraw(chart, args, pluginOptions) {
-    if (!pluginOptions.lineAt) return;
-    const { ctx, chartArea: { left, right }, scales: { y } } = chart;
-    const yPos = y.getPixelForValue(pluginOptions.lineAt);
-    ctx.save();
-    ctx.beginPath();
-    ctx.moveTo(left, yPos);
-    ctx.lineTo(right, yPos);
-    ctx.lineWidth = 2;
-    ctx.strokeStyle = pluginOptions.color || "lime";
-    ctx.stroke();
-    ctx.restore();
-  }
-});
+let charts = {};
 
-async function loadData() {
-    const response = await fetch("data/athletes.json");
-    const data = await response.json();
-    athletesData = data.athletes;
+function initDashboard(data) {
+    const athletes = data.athletes;
+    const monthNames = data.month_names;
 
-    monthNames = data.month_names.map(m => m.replace(/\s*\d{4}/,''));
-
-    const sel = document.getElementById("dailyMonthSelector");
-    sel.innerHTML = "";
-    monthNames.forEach((m, i) => {
-        const opt = document.createElement("option");
-        opt.value = i;
-        opt.textContent = m;
-        sel.appendChild(opt);
+    // Populate activity filter dropdown
+    const activitySet = new Set();
+    Object.values(athletes).forEach(a => {
+        (a.activity_types || []).forEach(t => activitySet.add(t));
     });
-    sel.selectedIndex = monthNames.length - 1;
 
-    renderDashboard("All");
+    const filterSelect = document.getElementById("activityFilter");
+    [...activitySet].sort().forEach(act => {
+        const opt = document.createElement("option");
+        opt.value = act;
+        opt.textContent = act;
+        filterSelect.appendChild(opt);
+    });
+
+    filterSelect.addEventListener("change", () => {
+        renderAthletes(athletes, monthNames);
+    });
+
+    renderAthletes(athletes, monthNames);
 }
 
-function renderDashboard(activityType = "All") {
-    const container = document.getElementById("container");
+
+// ===============================
+// Render Athletes
+// ===============================
+function renderAthletes(athletes, monthNames) {
+    const container = document.getElementById("athleteContainer");
     container.innerHTML = "";
+    const activityFilter = document.getElementById("activityFilter").value;
 
-    const monthIndex = parseInt(document.getElementById("dailyMonthSelector").value);
+    Object.entries(athletes).forEach(([username, athlete]) => {
 
-    Object.entries(athletesData).forEach(([username, athlete]) => {
-
-        // 💥 FIX: Activity filter
-        if (activityType !== "All" &&
-            !athlete.activity_types.includes(activityType)) {
+        // FIX: Filtering based on updated JSON field
+        if (activityFilter !== "All" &&
+            !athlete.activity_types.includes(activityFilter)) {
             return;
         }
 
-        // Prepare distance units
-        const km_month = athlete.monthly_distances;
-        const mi_month = km_month.map(d => +(d * 0.621371).toFixed(2));
-
-        const km_daily = athlete.daily_distance_km[monthIndex];
-        const mi_daily = km_daily.map(d => +(d * 0.621371).toFixed(2));
-
-        // Card HTML
         const card = document.createElement("div");
         card.className = "card";
 
+        // Header
         card.innerHTML = `
-            <div class="athlete">
-                <img src="${athlete.profile}">
+            <div class="flex items-center mb-4">
+                <img src="${athlete.profile}" class="w-14 h-14 rounded-full mr-3">
                 <div>
-                    <h2>${athlete.firstname} ${athlete.lastname}</h2>
+                    <h2 class="text-xl font-semibold">${athlete.firstname} ${athlete.lastname}</h2>
+                    <div class="text-gray-500">@${athlete.username}</div>
                 </div>
             </div>
 
-            <div>
-                <label>Distance Unit:</label>
-                <select id="unit-${username}">
-                    <option value="mi">Miles</option>
-                    <option value="km">Kilometers</option>
-                </select>
-            </div>
+            <div class="mb-4 font-semibold">${monthNames.join(" • ")}</div>
 
-            <div class="charts-grid">
-                <div class="charts-top">
-                    <h3>Daily Distance - ${monthNames[monthIndex]}</h3>
-                    <canvas style="height:220px" id="dailyChart-${username}"></canvas>
-                </div>
+            <!-- Monthly Distance Chart -->
+            <canvas id="monthlyChart-${username}" height="120"></canvas>
 
-                <div class="charts-bottom" style="display:grid;grid-template-columns:repeat(3,1fr);gap:15px;">
-                    <div>
-                        <h3>Monthly Distance</h3>
-                        <canvas id="monthChart-${username}"></canvas>
-                    </div>
-                    <div>
-                        <h3>Monthly Time (min)</h3>
-                        <canvas id="monthTimeChart-${username}"></canvas>
-                    </div>
-                </div>
+            <div class="mt-6 mb-2 font-semibold">Daily Distance</div>
+
+            <!-- FIXED wrapper to prevent expansion -->
+            <div class="daily-chart-wrapper">
+                <canvas id="dailyChart-${username}"></canvas>
             </div>
         `;
+
         container.appendChild(card);
 
-        const unitSel = document.getElementById(`unit-${username}`);
-        const initialUnit = unitSel.value;
-
-        let monthData = initialUnit === "km" ? km_month : mi_month;
-        let dailyData = initialUnit === "km" ? km_daily : mi_daily;
-
-        // Create charts
-        const monthChart = new Chart(document.getElementById(`monthChart-${username}`), {
-            type: "bar",
-            data: { labels: monthNames, datasets: [{ data: monthData }] },
-            options: { responsive: true, plugins: { legend: { display:false } } }
-        });
-
-        const monthTimeChart = new Chart(document.getElementById(`monthTimeChart-${username}`), {
-            type: "bar",
-            data: { labels: monthNames, datasets: [{ data: athlete.monthly_time }] },
-            options: { responsive: true, plugins: { legend: { display:false } } }
-        });
-
-        const dailyChart = new Chart(document.getElementById(`dailyChart-${username}`), {
-            type:"bar",
-            data: { labels: dailyData.map((_,i)=>i+1), datasets: [{ data: dailyData }] },
-            options:{
-                responsive:true,
-                maintainAspectRatio:false,
-                plugins:{ legend:{display:false}},
-                scales:{ y:{beginAtZero:true}}
-            }
-        });
-
-        // Unit switch updating charts
-        unitSel.addEventListener("change", e => {
-            const unit = e.target.value;
-            const newMonth = unit==="km"? km_month: mi_month;
-            const newDaily = unit==="km"? km_daily: mi_daily;
-
-            monthChart.data.datasets[0].data = newMonth;
-            monthChart.update();
-
-            dailyChart.data.datasets[0].data = newDaily;
-            dailyChart.update();
-        });
+        drawMonthlyChart(username, athlete, monthNames);
+        drawDailyChart(username, athlete);
     });
 }
 
-document.getElementById("activityFilter")
-    .addEventListener("change", e => renderDashboard(e.target.value));
 
-document.getElementById("dailyMonthSelector")
-    .addEventListener("change", () => renderDashboard(document.getElementById("activityFilter").value));
+// ===============================
+// Monthly Chart
+// ===============================
+function drawMonthlyChart(username, athlete, monthNames) {
+    const id = `monthlyChart-${username}`;
+    if (charts[id]) charts[id].destroy();
 
-loadData();
+    charts[id] = new Chart(document.getElementById(id), {
+        type: 'bar',
+        data: {
+            labels: monthNames,
+            datasets: [{
+                label: "Distance (km)",
+                data: athlete.monthly_distances,
+                backgroundColor: "rgba(54,162,235,0.6)",
+                borderColor: "rgba(54,162,235,1)",
+                borderWidth: 1,
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: { y: { beginAtZero: true } }
+        }
+    });
+}
+
+
+// ===============================
+// Daily Chart (FIXED HEIGHT)
+// ===============================
+function drawDailyChart(username, athlete) {
+    const id = `dailyChart-${username}`;
+    if (charts[id]) charts[id].destroy();
+
+    // Flatten all days across all months
+    const daily = athlete.daily_distance_km.flat();
+    const labels = daily.map((_, i) => i + 1);
+
+    charts[id] = new Chart(document.getElementById(id), {
+        type: 'line',
+        data: {
+            labels: labels,
+            datasets: [{
+                label: "KM per day",
+                data: daily,
+                fill: false,
+                borderWidth: 2,
+                tension: 0.3
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false, // required but safe due to wrapper
+            scales: {
+                y: { beginAtZero: true }
+            }
+        }
+    });
+}
+
 </script>
 
 </body>
