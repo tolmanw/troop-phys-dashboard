@@ -279,7 +279,7 @@ function renderDashboard(activityType="All") {
 
         CHARTS[`extraChart-${alias}`] = new Chart(document.getElementById(`extraChart-${alias}`), {
             type:"bar",
-            data:{ labels: extraMonths, datasets:[{ data: extraTime, backgroundColor: extraColors, borderRadius:0 }] },
+            data:{ labels: extraMonths, datasets:[{ data: extraTime, backgroundColor:"rgba(75,192,192,0.6)" }] },
             options:{ responsive:true, maintainAspectRatio:true, aspectRatio:1.2, plugins:{ legend:{ display:false }, goalLine:{ lineAt:EXTRA_GOAL, color:"blue" } }, scales:{ y:{ beginAtZero:true, suggestedMax: Math.max(...extraTime, EXTRA_GOAL)+60 }, x:{ ticks:{ font:{ size:10 } } } } }
         });
 
