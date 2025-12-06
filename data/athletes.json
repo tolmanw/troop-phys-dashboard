@@ -1,13 +1,8 @@
 {
   "athletes": {
-    "will_tolman": {
-      "firstname": "Will",
-      "lastname": "Tolman",
-      "username": "will_tolman",
+    "TO2388": {
+      "display_name": "TO2388",
       "profile": "https://dgalywyr863hv.cloudfront.net/pictures/athletes/15478346/24115300/2/large.jpg",
-      "activity_types": [
-        "Run"
-      ],
       "monthly_distances": [
         5.17,
         12.58,
