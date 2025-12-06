@@ -136,7 +136,7 @@ Chart.register({
     ctx.moveTo(left, yPos);
     ctx.lineTo(right, yPos);
     ctx.lineWidth = 2;
-    ctx.strokeStyle = pluginOptions.color || "lime";
+    ctx.strokeStyle = pluginOptions.color || "blue";
     ctx.stroke();
     ctx.restore();
   }
@@ -280,7 +280,7 @@ function renderDashboard(activityType="All") {
         CHARTS[`extraChart-${alias}`] = new Chart(document.getElementById(`extraChart-${alias}`), {
             type:"bar",
             data:{ labels: extraMonths, datasets:[{ data: extraTime, backgroundColor: extraColors, borderRadius:0, barThickness:10 }] },
-            options:{ responsive:true, maintainAspectRatio:true, plugins:{ legend:{ display:false }, goalLine:{ lineAt:EXTRA_GOAL, color:"lime" } }, scales:{ y:{ beginAtZero:true, suggestedMax: Math.max(...extraTime, EXTRA_GOAL)+60 }, x:{ ticks:{ font:{ size:10 } } } } }
+            options:{ responsive:true, maintainAspectRatio:true, aspectRatio:1.2, plugins:{ legend:{ display:false }, goalLine:{ lineAt:EXTRA_GOAL, color:"blue" } }, scales:{ y:{ beginAtZero:true, suggestedMax: Math.max(...extraTime, EXTRA_GOAL)+60 }, x:{ ticks:{ font:{ size:10 } } } } }
         });
 
         CHARTS[`dailyChart-${alias}`] = new Chart(document.getElementById(`dailyChart-${alias}`), {
