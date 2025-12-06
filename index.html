@@ -216,7 +216,7 @@ function renderDashboard(activityType="All"){
         const monthlyDistanceMi = athlete.monthly_distances.map(d=> +(d*0.621371).toFixed(2));
         const monthlyTime = athlete.monthly_time;
 
-        const EXTRA_GOAL = 480;
+        const EXTRA_GOAL = 480; // 8 hours
         const extraMonths = [monthNames[prevMonthIndex], monthNames[monthIndex]];
         const extraTime = [monthlyTime[prevMonthIndex], monthlyTime[monthIndex]];
 
@@ -270,20 +270,22 @@ function renderDashboard(activityType="All"){
             options:{ responsive:true, maintainAspectRatio:false, plugins:{ legend:{ display:false } }, scales:{ y:{ beginAtZero:true, ticks:{ font:{ size: FONT_SIZE } } }, x:{ ticks:{ font:{ size: FONT_SIZE } } } } }
         });
 
-        // Extra Phys Goal with inline goal line plugin
+        // Extra Phys Goal chart with 8-hour blue goal line
         const goalLinePlugin = {
             id: 'goalLine',
             afterDatasetsDraw(chart) {
-                const { ctx, chartArea:{left,right}, scales:{y} } = chart;
+                const { ctx, chartArea:{left,right,top,bottom}, scales:{y} } = chart;
                 const yPos = y.getPixelForValue(EXTRA_GOAL);
-                ctx.save();
-                ctx.beginPath();
-                ctx.moveTo(left, yPos);
-                ctx.lineTo(right, yPos);
-                ctx.lineWidth = 2;
-                ctx.strokeStyle = 'blue';
-                ctx.stroke();
-                ctx.restore();
+                if (yPos >= top && yPos <= bottom) {
+                    ctx.save();
+                    ctx.beginPath();
+                    ctx.moveTo(left, yPos);
+                    ctx.lineTo(right, yPos);
+                    ctx.lineWidth = 2;
+                    ctx.strokeStyle = 'blue';
+                    ctx.stroke();
+                    ctx.restore();
+                }
             }
         };
 
@@ -295,7 +297,7 @@ function renderDashboard(activityType="All"){
                 maintainAspectRatio:false,
                 plugins:{ legend:{ display:false } },
                 scales:{
-                    y:{ beginAtZero:true, ticks:{ font:{ size: FONT_SIZE }, suggestedMax: Math.max(...extraTime, EXTRA_GOAL)+60 } },
+                    y:{ beginAtZero:true, max: Math.max(...extraTime, EXTRA_GOAL)+100, ticks:{ font:{ size: FONT_SIZE } } },
                     x:{ ticks:{ font:{ size: FONT_SIZE } } }
                 }
             },
