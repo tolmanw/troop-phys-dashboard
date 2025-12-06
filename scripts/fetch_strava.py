@@ -3,6 +3,7 @@ import json
 import requests
 from datetime import datetime, timedelta, timezone
 
+# --- Environment variables ---
 CLIENT_ID = os.environ['STRAVA_CLIENT_ID']
 CLIENT_SECRET = os.environ['STRAVA_CLIENT_SECRET']
 REFRESH_TOKENS_JSON = os.environ['STRAVA_REFRESH_TOKENS']
@@ -11,8 +12,8 @@ ALIASES_JSON = os.environ.get("ATHLETE_ALIASES", "{}")
 refresh_tokens = json.loads(REFRESH_TOKENS_JSON)
 USERNAME_ALIASES = json.loads(ALIASES_JSON)
 
-# Case-insensitive mapping
-USERNAME_ALIASES_LOWER = {k.lower(): v for k, v in USERNAME_ALIASES.items()}
+# --- Normalize aliases for case-insensitive matching ---
+USERNAME_ALIASES_NORMALIZED = {k.strip().lower(): v for k, v in USERNAME_ALIASES.items()}
 
 # --- All Strava activity types ---
 activity_types = [
@@ -112,17 +113,19 @@ for username, info in refresh_tokens.items():
                 daily_distance[idx][day_idx] += dist_km
                 daily_time_min[idx][day_idx] += time_min
 
+    # Fetch athlete profile
     athlete_url = "https://www.strava.com/api/v3/athlete"
     headers = {"Authorization": f"Bearer {access_token}"}
     profile_data = requests.get(athlete_url, headers=headers).json()
     profile_img = profile_data.get("profile","")
 
-    real_name = f"{profile_data.get('firstname','')} {profile_data.get('lastname','')}"
-    print(f"Found athlete: '{real_name}'")  # Debug
+    real_name = f"{profile_data.get('firstname','').strip()} {profile_data.get('lastname','').strip()}"
+    real_name_normalized = real_name.lower()
+    print(f"DEBUG: Found athlete: '{real_name}'")
 
-    alias = USERNAME_ALIASES_LOWER.get(real_name.lower())
+    alias = USERNAME_ALIASES_NORMALIZED.get(real_name_normalized)
     if not alias:
-        print(f"Skipping {real_name}: no alias defined")
+        print(f"Skipping '{real_name}': no alias defined")
         skipped_athletes.append(real_name)
         continue
 
@@ -136,10 +139,11 @@ for username, info in refresh_tokens.items():
         "daily_time_min": [[round(t) for t in month] for month in daily_time_min]
     }
 
+# Save JSON
 os.makedirs("data", exist_ok=True)
 with open("data/athletes.json","w") as f:
     json.dump({"athletes":athletes_out,"month_names":month_names},f,indent=2)
 
-print(f"athletes.json updated successfully.")
+print("athletes.json updated successfully.")
 print(f"Found athletes: {found_athletes}")
-print(f"Skipped athletes (no alias): {skipped_athletes}")
+print(f"Skipped athletes: {skipped_athletes}")
