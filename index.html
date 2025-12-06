@@ -126,24 +126,6 @@ const CHARTS = {};
 const FONT_SIZE = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--font-size'));
 const TITLE_SIZE = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--title-size'));
 
-// Global goalLine plugin
-Chart.register({
-  id: "goalLine",
-  afterDatasetsDraw(chart, args, pluginOptions) {
-    if (!pluginOptions || !pluginOptions.lineAt) return;
-    const { ctx, chartArea: { left, right }, scales: { y } } = chart;
-    const yPos = y.getPixelForValue(pluginOptions.lineAt);
-    ctx.save();
-    ctx.beginPath();
-    ctx.moveTo(left, yPos);
-    ctx.lineTo(right, yPos);
-    ctx.lineWidth = 2;
-    ctx.strokeStyle = pluginOptions.color || "blue";
-    ctx.stroke();
-    ctx.restore();
-  }
-});
-
 async function loadData(activityType="All") {
     const response = await fetch("data/athletes.json");
     const data = await response.json();
@@ -197,7 +179,6 @@ function updateDailyChart(alias, monthIndex){
         delete CHARTS[chartId];
     }
 
-    // Highlight max day green, weekends red (optional)
     const maxIndex = dailyDistanceMi.indexOf(Math.max(...dailyDistanceMi));
     const barColors = dailyDistanceMi.map((_,i)=> i===maxIndex ? "rgba(0,255,0,0.8)" : "rgba(75,192,192,0.8)");
 
@@ -275,20 +256,37 @@ function renderDashboard(activityType="All"){
         destroyChartIfExists(`extraChart-${alias}`);
         destroyChartIfExists(`dailyChart-${alias}`);
 
-        // Bottom charts (previous + current month)
+        // Monthly distance
         CHARTS[`monthChart-${alias}`] = new Chart(document.getElementById(`monthChart-${alias}`), {
             type:"bar",
             data:{ labels: extraMonths, datasets:[{ data: [monthlyDistanceMi[prevMonthIndex], monthlyDistanceMi[monthIndex]], backgroundColor:"rgba(75,192,192,0.6)", barThickness:15 }] },
             options:{ responsive:true, maintainAspectRatio:false, plugins:{ legend:{ display:false } }, scales:{ y:{ beginAtZero:true, ticks:{ font:{ size: FONT_SIZE } } }, x:{ ticks:{ font:{ size: FONT_SIZE } } } } }
         });
 
+        // Monthly time
         CHARTS[`monthTimeChart-${alias}`] = new Chart(document.getElementById(`monthTimeChart-${alias}`), {
             type:"bar",
             data:{ labels: extraMonths, datasets:[{ data: [monthlyTime[prevMonthIndex], monthlyTime[monthIndex]], backgroundColor:"rgba(255,159,64,0.6)", barThickness:15 }] },
             options:{ responsive:true, maintainAspectRatio:false, plugins:{ legend:{ display:false } }, scales:{ y:{ beginAtZero:true, ticks:{ font:{ size: FONT_SIZE } } }, x:{ ticks:{ font:{ size: FONT_SIZE } } } } }
         });
 
-        // Extra Phys Goal with visible goal line
+        // Extra Phys Goal with inline goal line plugin
+        const goalLinePlugin = {
+            id: 'goalLine',
+            afterDatasetsDraw(chart) {
+                const { ctx, chartArea:{left,right}, scales:{y} } = chart;
+                const yPos = y.getPixelForValue(EXTRA_GOAL);
+                ctx.save();
+                ctx.beginPath();
+                ctx.moveTo(left, yPos);
+                ctx.lineTo(right, yPos);
+                ctx.lineWidth = 2;
+                ctx.strokeStyle = 'blue';
+                ctx.stroke();
+                ctx.restore();
+            }
+        };
+
         CHARTS[`extraChart-${alias}`] = new Chart(document.getElementById(`extraChart-${alias}`), {
             type:"bar",
             data:{ labels: extraMonths, datasets:[{ data: extraTime, backgroundColor:"rgba(255,159,64,0.6)", barThickness:15 }] },
@@ -301,7 +299,7 @@ function renderDashboard(activityType="All"){
                     x:{ ticks:{ font:{ size: FONT_SIZE } } }
                 }
             },
-            plugins:[{ id:"goalLine", lineAt:EXTRA_GOAL, color:"blue" }] // <-- goal line fixed
+            plugins:[goalLinePlugin]
         });
 
         // Initial daily chart
