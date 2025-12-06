@@ -6,13 +6,13 @@
 <title>Strava Dashboard</title>
 
 <style>
-/* === Original dark theme styling === */
 body {
     background: #0d1117;
     color: #e6edf3;
     font-family: Arial, sans-serif;
     padding: 20px;
 }
+
 select {
     background: #21262d;
     color: white;
@@ -22,21 +22,33 @@ select {
     margin-bottom: 10px;
 }
 
-.card {
-    background: #1b1f25;
-    padding: 15px;
-    border-radius: 12px;
-    margin-bottom: 30px;
-    box-shadow: 0 0 10px #0005;
-    width: 600px; /* default tile width for desktop, can adjust */
-    max-width: 95%;
+/* === Fixed grid for tiles === */
+#container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, 300px); /* fixed width tiles */
+    grid-auto-rows: 400px; /* fixed height tiles */
+    gap: 20px; /* even spacing */
+    justify-content: center;
 }
 
+/* Card container */
+.card {
+    background: #1b1f25;
+    border-radius: 12px;
+    padding: 10px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    box-shadow: 0 0 10px #0005;
+    width: 300px;  /* fixed width */
+    height: 400px; /* fixed height */
+}
+
+/* Athlete section */
 .athlete {
     display: flex;
     align-items: center;
     gap: 10px;
-    margin-bottom: 10px;
 }
 .athlete img {
     width: 40px;
@@ -44,79 +56,74 @@ select {
     border-radius: 50%;
 }
 .athlete h2 {
-    font-size: 1em;
+    font-size: 1.2em; /* scaled font */
     margin: 0;
 }
 
+/* Chart containers */
 .charts-grid {
-    display: grid;
-    grid-template-rows: auto auto;
-    gap: 15px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
 }
-
-.charts-top {
+.charts-top, .charts-bottom {
+    display: flex;
+    gap: 10px;
     justify-content: center;
-    width: 100%;
-    margin: 0 auto;
 }
 
-.charts-top canvas {
-    height: 220px !important; /* fixed height */
-}
-
-.charts-bottom {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr); /* desktop layout */
-    gap: 15px;
-}
-
+/* Individual chart container */
 .chart-container {
     background: #0d1117;
     border-radius: 10px;
-    padding: 10px;
-    height: 160px; /* default tile height, adjustable */
+    padding: 5px;
+    height: 120px; /* fixed chart height */
+}
+.chart-container canvas {
+    width: 100% !important;
+    height: 100% !important;
 }
 
-/* Prevent daily chart expanding */
 .daily-chart-wrapper {
-    height: 200px;
-    overflow: hidden;
+    height: 160px;
 }
 .daily-chart-wrapper canvas {
     height: 100% !important;
 }
 
-h3 {
-    margin-bottom: 5px;
-    margin-top: 15px;
+.card h3 {
     font-size: 1em;
-    color: #c9d1d9;
+    margin: 0 0 5px 0;
 }
 
+/* Unit toggle styling */
 .unit-toggle {
     margin-bottom: 10px;
+    font-size: 0.9em;
 }
 
-/* === Mobile responsive === */
+/* === Mobile scaling === */
 @media (max-width: 768px) {
-    .charts-bottom {
-        display: grid;
-        grid-template-columns: 1fr; /* stack vertically */
-        gap: 10px;
+    #container {
+        grid-template-columns: repeat(auto-fit, 250px);
+        grid-auto-rows: 330px;
+        gap: 15px;
     }
-
-    .chart-container {
-        height: 140px;  /* smaller tiles on mobile */
-        padding: 8px;
-    }
-
-    .charts-top canvas, .daily-chart-wrapper {
-        height: 160px !important; /* smaller daily chart on mobile */
-    }
-
     .card {
-        width: 95%;
-        margin: 0 auto 20px auto;
+        width: 250px;
+        height: 330px;
+    }
+    .chart-container {
+        height: 100px;
+    }
+    .daily-chart-wrapper {
+        height: 140px;
+    }
+    .athlete h2 {
+        font-size: 1em;
+    }
+    .card h3 {
+        font-size: 0.9em;
     }
 }
 </style>
@@ -224,6 +231,7 @@ function renderDashboard(activityType="All") {
     const monthIndex = parseInt(document.getElementById("dailyMonthSelector").value);
 
     Object.entries(athletesData).forEach(([alias, athlete]) => {
+
         if (activityType !== "All" && athlete.activity_types && !athlete.activity_types.includes(activityType)) return;
 
         const monthlyDistanceKm = athlete.monthly_distances;
@@ -236,7 +244,6 @@ function renderDashboard(activityType="All") {
         const EXTRA_GOAL = 480;
         const extraMonths = monthNames.slice(-2);
         const extraTime = monthlyTime.slice(-2);
-        const extraColors = extraTime.map(t => t >= EXTRA_GOAL ? "rgba(0,200,0,0.7)" : "rgba(200,0,0,0.7)");
 
         const card = document.createElement("div");
         card.className = "card";
@@ -287,29 +294,29 @@ function renderDashboard(activityType="All") {
         destroyChartIfExists(`extraChart-${alias}`);
         destroyChartIfExists(`dailyChart-${alias}`);
 
-        // ===== Charts =====
+        // Charts
         CHARTS[`monthChart-${alias}`] = new Chart(document.getElementById(`monthChart-${alias}`), {
             type:"bar",
             data:{ labels: monthNames, datasets:[{ data: monthlyDistanceMi, backgroundColor:"rgba(75,192,192,0.6)", barThickness:15 }] },
-            options:{ responsive:true, maintainAspectRatio:true, aspectRatio:1.2, plugins:{ legend:{ display:false } }, scales:{ y:{ beginAtZero:true, ticks:{ font:{ size:8 } } }, x:{ ticks:{ font:{ size:8 } } } } }
+            options:{ responsive:false, maintainAspectRatio:false, plugins:{ legend:{ display:false } }, scales:{ y:{ beginAtZero:true, ticks:{ font:{ size:8 } } }, x:{ ticks:{ font:{ size:8 } } } } }
         });
-
+        
         CHARTS[`monthTimeChart-${alias}`] = new Chart(document.getElementById(`monthTimeChart-${alias}`), {
             type:"bar",
             data:{ labels: monthNames, datasets:[{ data: monthlyTime, backgroundColor:"rgba(255,159,64,0.6)", barThickness:15 }] },
-            options:{ responsive:true, maintainAspectRatio:true, aspectRatio:1.2, plugins:{ legend:{ display:false } }, scales:{ y:{ beginAtZero:true, ticks:{ font:{ size:8 } } }, x:{ ticks:{ font:{ size:8 } } } } }
+            options:{ responsive:false, maintainAspectRatio:false, plugins:{ legend:{ display:false } }, scales:{ y:{ beginAtZero:true, ticks:{ font:{ size:8 } } }, x:{ ticks:{ font:{ size:8 } } } } }
         });
-
+        
         CHARTS[`extraChart-${alias}`] = new Chart(document.getElementById(`extraChart-${alias}`), {
             type:"bar",
             data:{ labels: extraMonths, datasets:[{ data: extraTime, backgroundColor:"rgba(255,159,64,0.6)", barThickness:15 }] },
-            options:{ responsive:true, maintainAspectRatio:true, aspectRatio:1.2, plugins:{ legend:{ display:false }, goalLine:{ lineAt:EXTRA_GOAL, color:"blue" } }, scales:{ y:{ beginAtZero:true, ticks:{ font:{ size:8 }, suggestedMax: Math.max(...extraTime, EXTRA_GOAL)+60 }, x:{ ticks:{ font:{ size:8 } } } } } }
+            options:{ responsive:false, maintainAspectRatio:false, plugins:{ legend:{ display:false }, goalLine:{ lineAt:EXTRA_GOAL, color:"blue" } }, scales:{ y:{ beginAtZero:true, ticks:{ font:{ size:8 }, suggestedMax: Math.max(...extraTime, EXTRA_GOAL)+60 }, x:{ ticks:{ font:{ size:8 } } } } } }
         });
-
+        
         CHARTS[`dailyChart-${alias}`] = new Chart(document.getElementById(`dailyChart-${alias}`), {
             type:"bar",
             data:{ labels: dailyDistanceMi.map((_,i)=>i+1), datasets:[{ data: dailyDistanceMi, backgroundColor:"rgba(75,192,192,0.8)", minBarLength:2, barThickness:'flex' }] },
-            options:{ responsive:true, maintainAspectRatio:false, plugins:{ legend:{ display:false } }, scales:{ x:{ ticks:{ autoSkip:false, maxRotation:0, minRotation:0, font:{ size:8 } } }, y:{ beginAtZero:true, ticks:{ font:{ size:8 } } } } }
+            options:{ responsive:false, maintainAspectRatio:false, plugins:{ legend:{ display:false } }, scales:{ x:{ ticks:{ autoSkip:false, maxRotation:0, minRotation:0, font:{ size:8 } } }, y:{ beginAtZero:true, ticks:{ font:{ size:8 } } } } }
         });
 
         document.getElementById(`unit-${alias}`).addEventListener("change", e=>{
