@@ -6,30 +6,26 @@ from datetime import datetime, timedelta, timezone
 CLIENT_ID = os.environ['STRAVA_CLIENT_ID']
 CLIENT_SECRET = os.environ['STRAVA_CLIENT_SECRET']
 REFRESH_TOKENS_JSON = os.environ['STRAVA_REFRESH_TOKENS']
+ALIASES_JSON = os.environ.get("ATHLETE_ALIASES", "{}")
 
 refresh_tokens = json.loads(REFRESH_TOKENS_JSON)
+USERNAME_ALIASES = json.loads(ALIASES_JSON)
+
+# Create a lowercase mapping for case-insensitive matching
+USERNAME_ALIASES_LOWER = {k.lower(): v for k, v in USERNAME_ALIASES.items()}
 
 # --- All Strava activity types ---
 activity_types = [
-    # Foot Sports
     "Run", "Trail Run", "Walk", "Hike", "Virtual Run",
-    # Cycle Sports
     "Ride", "Mountain Bike Ride", "Gravel Ride", "E-Bike Ride", "E-Mountain Bike Ride",
     "Velomobile", "Virtual Ride",
-    # Water Sports
     "Canoe", "Kayak", "Kitesurf", "Rowing", "Stand Up Paddling", "Surf", "Swim", "Windsurf", "Sail",
-    # Winter Sports
     "Ice Skate", "Alpine Ski", "Backcountry Ski", "Nordic Ski", "Snowboard", "Snowshoe",
-    # Other Sports
     "Handcycle", "Inline Skate", "Rock Climb", "Roller Ski", "Golf", "Skateboard", "Football (Soccer)",
     "Wheelchair", "Badminton", "Tennis", "Pickleball", "Crossfit", "Elliptical", "Stair Stepper",
     "Weight Training", "Yoga", "Workout", "HIIT", "Pilates", "Table Tennis", "Squash", "Racquetball",
     "Virtual Rowing"
 ]
-
-# --- Load alias mapping from environment variable ---
-ALIASES_JSON = os.environ.get("ATHLETE_ALIASES", "{}")
-USERNAME_ALIASES = json.loads(ALIASES_JSON)
 
 def refresh_access_token(refresh_token):
     response = requests.post(
@@ -67,7 +63,7 @@ def fetch_activities(access_token, after_ts):
     headers = {"Authorization": f"Bearer {access_token}"}
     response = requests.get(url, headers=headers, params=params)
     if response.status_code != 200:
-        print("Error fetching activities:", response.text)
+        print("Error fetching activities:", response.status_code, response.text)
         return []
     activities = response.json()
     return activities if isinstance(activities, list) else []
@@ -84,10 +80,13 @@ month_names = [m.strftime("%B %Y") for m in month_starts]
 for username, info in refresh_tokens.items():
     access_token = refresh_access_token(info["refresh_token"])
     if not access_token:
+        print(f"Failed to refresh token for {username}")
         continue
 
+    # Fetch activities
     activities = fetch_activities(access_token, prev_ts[0])
     activities = [a for a in activities if a.get("type") in activity_types]
+    print(f"Fetched {len(activities)} activities for {username}")
 
     monthly_distance = [0.0, 0.0, 0.0]
     monthly_time_min = [0.0, 0.0, 0.0]
@@ -112,17 +111,18 @@ for username, info in refresh_tokens.items():
                 daily_distance[idx][day_idx] += dist_km
                 daily_time_min[idx][day_idx] += time_min
 
-    # Fetch profile from Strava
+    # Fetch profile via HTTPS
     athlete_url = "https://www.strava.com/api/v3/athlete"
     headers = {"Authorization": f"Bearer {access_token}"}
     profile_data = requests.get(athlete_url, headers=headers).json()
     profile_img = profile_data.get("profile","")
 
-    # Real Strava name
+    # Get real name
     real_name = f"{profile_data.get('firstname','')} {profile_data.get('lastname','')}"
+    print(f"Found athlete: '{real_name}'")  # Debug output
 
-    # Map to alias
-    alias = USERNAME_ALIASES.get(real_name)
+    # Map to alias securely
+    alias = USERNAME_ALIASES_LOWER.get(real_name.lower())
     if not alias:
         print(f"Skipping {real_name}: no alias defined")
         continue
