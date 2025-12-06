@@ -125,7 +125,7 @@ let monthNames;
 const CHARTS = {};
 const FONT_SIZE = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--font-size'));
 const TITLE_SIZE = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--title-size'));
-const BAR_THICKNESS = 12; // Global bar thickness
+const BAR_THICKNESS = 10; // Global bar thickness
 
 async function loadData(activityType="All") {
     const response = await fetch("data/athletes.json");
