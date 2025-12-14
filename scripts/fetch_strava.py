@@ -82,9 +82,13 @@ found_athletes = []
 skipped_athletes = []
 
 for username, info in refresh_tokens.items():
+    print(f"DEBUG: Processing athlete '{username}'")
     access_token = refresh_access_token(info["refresh_token"])
+    print(f"DEBUG: Access token: {access_token}")
+
     if not access_token:
         print(f"Failed to refresh token for {username}")
+        skipped_athletes.append(username)
         continue
 
     activities = fetch_activities(access_token, prev_ts[0])
@@ -121,7 +125,7 @@ for username, info in refresh_tokens.items():
 
     real_name = f"{profile_data.get('firstname','').strip()} {profile_data.get('lastname','').strip()}"
     real_name_normalized = real_name.lower()
-    print(f"DEBUG: Found athlete: '{real_name}'")
+    print(f"DEBUG: Found Strava athlete: '{real_name_normalized}'")
 
     alias = USERNAME_ALIASES_NORMALIZED.get(real_name_normalized)
     if not alias:
