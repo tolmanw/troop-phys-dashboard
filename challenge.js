@@ -1,9 +1,9 @@
 let challengeChart = null;
 
 function destroyChallenge() {
-    if (challengeChart) { 
-        challengeChart.destroy(); 
-        challengeChart = null; 
+    if (challengeChart) {
+        challengeChart.destroy();
+        challengeChart = null;
     }
     document.getElementById("challengeContainer").innerHTML = "";
 }
@@ -17,16 +17,17 @@ function renderChallenge(athletesData, monthNames) {
     </div>`;
 
     const canvas = document.getElementById("challengeChartCanvas");
-    canvas.style.height = window.innerWidth <= 600 ? "250px" : "400px";
     canvas.style.width = "100%";
+    canvas.style.height = window.innerWidth <= 600 ? "250px" : "400px";
 
-    // Current month index based on JSON
+    // Use last month in JSON as current month
     const currentMonthIndex = monthNames.length - 1;
 
     // Prepare cumulative datasets
     const datasets = Object.values(athletesData).map(a => {
         let cumulative = 0;
-        const data = a.daily_distance_km[currentMonthIndex].map(d => +(cumulative += d * 0.621371).toFixed(2));
+        const dailyData = a.daily_distance_km[currentMonthIndex] || [];
+        const data = dailyData.map(d => +(cumulative += d * 0.621371).toFixed(2));
         return {
             label: a.display_name,
             data,
@@ -38,7 +39,7 @@ function renderChallenge(athletesData, monthNames) {
         };
     });
 
-    if (!datasets.length || !datasets[0].data.length) return; // Nothing to draw
+    if (!datasets.length || !datasets[0].data.length) return;
 
     const labels = datasets[0].data.map((_, i) => i + 1);
     const maxDistance = Math.max(...datasets.flatMap(d => d.data), 10);
@@ -52,15 +53,8 @@ function renderChallenge(athletesData, monthNames) {
             animation: false,
             plugins: { legend: { display: true, position: "bottom" } },
             scales: {
-                x: { 
-                    title: { display: true, text: "Day of Month" },
-                    ticks: { maxRotation: 0, minRotation: 0 }
-                },
-                y: { 
-                    min: 0,
-                    max: maxDistance + 5,
-                    title: { display: true, text: "Cumulative Distance (mi)" }
-                }
+                x: { title: { display: true, text: "Day of Month" }, ticks: { maxRotation: 0, minRotation: 0 } },
+                y: { min: 0, max: maxDistance + 5, title: { display: true, text: "Cumulative Distance (mi)" } }
             }
         },
         plugins: [{
