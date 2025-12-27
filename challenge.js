@@ -34,9 +34,17 @@ function renderChallenge(athletesData, monthNames) {
 
     const canvas = document.getElementById("challengeChartCanvas");
 
-    /* FIXED SIZE — CONTROLLED BY CSS VARIABLES */
-    canvas.width = cssPx("--challenge-canvas-width");
-    canvas.height = cssPx("--challenge-canvas-height");
+    /* FIXED PIXEL SIZE — from CSS variables */
+    const width = cssPx("--challenge-canvas-width");
+    const height = cssPx("--challenge-canvas-height");
+
+    canvas.width = width;
+    canvas.height = height;
+
+    /* Prevent CSS from stretching the canvas */
+    canvas.style.width = "auto";
+    canvas.style.height = "auto";
+    canvas.style.display = "block";
 
     const currentMonthIndex = monthNames.length - 1;
 
@@ -76,8 +84,8 @@ function renderChallenge(athletesData, monthNames) {
         type: "line",
         data: { labels, datasets },
         options: {
-            responsive: false,
-            maintainAspectRatio: false,
+            responsive: false,           // disables auto scaling
+            maintainAspectRatio: false,  // allows exact pixel dimensions
             plugins: {
                 legend: {
                     display: true,
@@ -90,10 +98,7 @@ function renderChallenge(athletesData, monthNames) {
                         display: true,
                         text: "Day of Month"
                     },
-                    ticks: {
-                        maxRotation: 0,
-                        minRotation: 0
-                    }
+                    ticks: { maxRotation: 0, minRotation: 0 }
                 },
                 y: {
                     min: 0,
@@ -137,7 +142,7 @@ function renderChallenge(athletesData, monthNames) {
     });
 }
 
-/* Toggle logic for showing challenge chart */
+/* Toggle logic */
 function initChallengeToggle() {
     const toggle = document.getElementById("challengeToggle");
 
