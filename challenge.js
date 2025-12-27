@@ -24,23 +24,23 @@ function renderChallenge(athletesData, monthNames) {
     const ctx = canvas.getContext("2d");
 
     // --- Card styling ---
-    card.style.width = "95%";
-    card.style.maxWidth = "1000px";
+    card.style.width = "100%";
+    card.style.maxWidth = "1200px";  // wider card for better chart display
     card.style.margin = "0 auto";
     card.style.padding = "20px";
     card.style.background = "#1b1f25";
     card.style.borderRadius = "12px";
 
-    // --- Canvas sizing ---
+    // --- Responsive canvas sizing ---
     const screenWidth = window.innerWidth;
     if (screenWidth <= 600) {
         // Mobile
         canvas.width = card.clientWidth;
-        canvas.height = 350; // medium height on mobile
+        canvas.height = 400; // medium height
     } else {
         // Desktop / tablet
         canvas.width = card.clientWidth;
-        canvas.height = 500; // larger for readability
+        canvas.height = 550; // taller for readability
     }
 
     const currentMonthIndex = monthNames.length - 1;
@@ -50,7 +50,7 @@ function renderChallenge(athletesData, monthNames) {
         let cumulative = 0;
         return {
             label: a.display_name,
-            data: daily.map(d => +(cumulative += d * 0.621371).toFixed(2)), // convert km to mi
+            data: daily.map(d => +(cumulative += d * 0.621371).toFixed(2)), // km → mi
             borderColor: `hsl(${Math.random()*360},70%,60%)`,
             fill: false,
             tension: 0.3,
@@ -68,18 +68,8 @@ function renderChallenge(athletesData, monthNames) {
 
     const labels = datasets[0].data.map((_, i) => i + 1);
 
-    // --- Calculate max cumulative distance in km and add +5 km buffer ---
-    const maxDistanceKm = Math.max(
-        ...Object.values(athletesData)
-            .flatMap(a => {
-                const daily = a.daily_distance_km[currentMonthIndex] || [];
-                let cum = 0;
-                return daily.map(d => cum += d); // cumulative km
-            })
-    );
-
-    const bufferKm = 5;
-    const maxDistanceMi = (maxDistanceKm + bufferKm) * 0.621371; // convert buffer to mi
+    // --- Calculate max cumulative distance and add 2 mile buffer ---
+    const maxDistanceMi = Math.max(...datasets.flatMap(d => d.data)) + 2;
 
     challengeChart = new Chart(ctx, {
         type: "line",
