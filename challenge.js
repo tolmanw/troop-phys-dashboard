@@ -1,5 +1,12 @@
 let challengeChart = null;
 
+// --- Set CSS root variables dynamically ---
+const root = document.documentElement;
+root.style.setProperty('--challenge-width', '700px');    // Card width
+root.style.setProperty('--challenge-height', '400px');   // Chart height
+root.style.setProperty('--challenge-padding', '20px');   // Card padding
+root.style.setProperty('--font-size', '8px');            // Font size for chart labels
+
 function destroyChallenge() {
     if (challengeChart) {
         challengeChart.destroy();
@@ -23,28 +30,24 @@ function renderChallenge(athletesData, monthNames) {
     const canvas = document.getElementById("challengeChartCanvas");
     const ctx = canvas.getContext("2d");
 
-    // --- Read CSS variables ---
-    const style = getComputedStyle(card);
-    const cardWidth = parseInt(style.getPropertyValue("--card-width")) || 330;
-    const chartPadding = parseInt(style.getPropertyValue("--chart-padding")) || 10;
-    const fontSize = parseInt(style.getPropertyValue("--font-size")) || 8;
+    // --- Read CSS variables from root ---
+    const style = getComputedStyle(document.documentElement);
+    const cardWidth = style.getPropertyValue('--challenge-width') || "700px";
+    const chartHeight = style.getPropertyValue('--challenge-height') || "400px";
+    const chartPadding = style.getPropertyValue('--challenge-padding') || "20px";
+    const fontSize = parseInt(style.getPropertyValue('--font-size')) || 8;
 
-    // --- Card styling ---
-    card.style.width = cardWidth + "px";
-    card.style.margin = "0";
-    card.style.padding = chartPadding + "px";
-    card.style.paddingBottom = "20px";
+    // --- Apply styles dynamically ---
+    card.style.width = cardWidth;
+    card.style.padding = chartPadding;
     card.style.background = "#1b1f25";
     card.style.borderRadius = "20px";
-    card.style.fontSize = fontSize + "px";
+    card.style.margin = "0 auto"; // center card
+    canvas.style.width = "100%";
+    canvas.style.height = chartHeight;
 
-    // --- Responsive canvas sizing ---
-    const screenWidth = window.innerWidth;
-    canvas.width = card.clientWidth;
-    canvas.height = screenWidth <= 600 ? 300 : 500;
-
+    // --- Prepare data ---
     const currentMonthIndex = monthNames.length - 1;
-
     const datasets = Object.values(athletesData).map(a => {
         const daily = a.daily_distance_km[currentMonthIndex] || [];
         let cumulative = 0;
@@ -69,35 +72,21 @@ function renderChallenge(athletesData, monthNames) {
     const labels = datasets[0].data.map((_, i) => i + 1);
     const maxDistanceMi = Math.max(...datasets.flatMap(d => d.data)) + 2; // 2 mile buffer
 
+    // --- Create chart ---
     challengeChart = new Chart(ctx, {
         type: "line",
         data: { labels, datasets },
         options: {
             responsive: false,
             maintainAspectRatio: false,
-            layout: { padding: { bottom: chartPadding * 4 } }, // extra space for x-axis and images
+            layout: { padding: { bottom: parseInt(chartPadding) * 2 } },
             plugins: {
-                legend: {
-                    display: true,
-                    position: "bottom",
-                    labels: { font: { size: fontSize } }
-                },
-                tooltip: {
-                    bodyFont: { size: fontSize },
-                    titleFont: { size: fontSize }
-                }
+                legend: { display: true, position: "bottom", labels: { font: { size: fontSize } } },
+                tooltip: { bodyFont: { size: fontSize }, titleFont: { size: fontSize } }
             },
             scales: {
-                x: {
-                    title: { display: true, text: "Day of Month", font: { size: fontSize } },
-                    ticks: { maxRotation: 0, minRotation: 0, font: { size: fontSize } }
-                },
-                y: {
-                    min: 0,
-                    max: maxDistanceMi,
-                    title: { display: true, text: "Cumulative Distance (mi)", font: { size: fontSize } },
-                    ticks: { font: { size: fontSize } }
-                }
+                x: { title: { display: true, text: "Day of Month", font: { size: fontSize } }, ticks: { font: { size: fontSize }, maxRotation: 0, minRotation: 0 } },
+                y: { min: 0, max: maxDistanceMi, title: { display: true, text: "Cumulative Distance (mi)", font: { size: fontSize } }, ticks: { font: { size: fontSize } } }
             }
         },
         plugins: [{
@@ -113,7 +102,7 @@ function renderChallenge(athletesData, monthNames) {
                     const img = new Image();
                     img.src = a.profile;
                     img.onload = () => {
-                        const size = screenWidth <= 600 ? 20 : 40;
+                        const size = window.innerWidth <= 600 ? 20 : 40;
                         ctx.drawImage(img, xPos - size / 2, yPos - size / 2, size, size);
                     };
                 });
