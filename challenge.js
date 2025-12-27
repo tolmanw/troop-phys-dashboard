@@ -24,7 +24,7 @@ function renderChallenge(athletesData, monthNames) {
     const ctx = canvas.getContext("2d");
 
     // --- Card styling ---
-    card.style.width = "100%";
+    card.style.width = "80%";
     card.style.maxWidth = "1200px"; // wider card for better chart display
     card.style.margin = "0 auto";
     card.style.padding = "20px";
