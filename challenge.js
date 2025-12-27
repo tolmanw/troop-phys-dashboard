@@ -23,7 +23,7 @@ function renderChallenge(athletesData, monthNames) {
     const canvas = document.getElementById("challengeChartCanvas");
     const ctx = canvas.getContext("2d");
 
-    // --- Simplified card styling ---
+    // --- Card styling ---
     card.style.width = "95%";
     card.style.maxWidth = "1000px";
     card.style.margin = "0 auto";
@@ -31,11 +31,17 @@ function renderChallenge(athletesData, monthNames) {
     card.style.background = "#1b1f25";
     card.style.borderRadius = "12px";
 
-    // --- Set canvas internal size (prevents stretching) ---
-    const canvasWidth = Math.min(card.clientWidth, 800); // max width 800px
-    const canvasHeight = 400;                              // fixed medium height
-    canvas.width = canvasWidth;
-    canvas.height = canvasHeight;
+    // --- Canvas sizing ---
+    const screenWidth = window.innerWidth;
+    if (screenWidth <= 600) {
+        // Mobile
+        canvas.width = card.clientWidth;
+        canvas.height = 350; // medium height on mobile
+    } else {
+        // Desktop / tablet
+        canvas.width = card.clientWidth;
+        canvas.height = 500; // larger for readability
+    }
 
     const currentMonthIndex = monthNames.length - 1;
 
@@ -44,7 +50,7 @@ function renderChallenge(athletesData, monthNames) {
         let cumulative = 0;
         return {
             label: a.display_name,
-            data: daily.map(d => +(cumulative += d * 0.621371).toFixed(2)),
+            data: daily.map(d => +(cumulative += d * 0.621371).toFixed(2)), // convert km to mi
             borderColor: `hsl(${Math.random()*360},70%,60%)`,
             fill: false,
             tension: 0.3,
@@ -61,18 +67,30 @@ function renderChallenge(athletesData, monthNames) {
     }
 
     const labels = datasets[0].data.map((_, i) => i + 1);
-    const maxDistance = Math.max(...datasets.flatMap(d => d.data), 10);
+
+    // --- Calculate max cumulative distance in km and add +5 km buffer ---
+    const maxDistanceKm = Math.max(
+        ...Object.values(athletesData)
+            .flatMap(a => {
+                const daily = a.daily_distance_km[currentMonthIndex] || [];
+                let cum = 0;
+                return daily.map(d => cum += d); // cumulative km
+            })
+    );
+
+    const bufferKm = 5;
+    const maxDistanceMi = (maxDistanceKm + bufferKm) * 0.621371; // convert buffer to mi
 
     challengeChart = new Chart(ctx, {
         type: "line",
         data: { labels, datasets },
         options: {
-            responsive: false,          // prevent Chart.js from auto resizing
-            maintainAspectRatio: false, // respect fixed canvas size
+            responsive: false,
+            maintainAspectRatio: false,
             plugins: { legend: { display: true, position: "bottom" } },
             scales: {
                 x: { title: { display: true, text: "Day of Month" }, ticks: { maxRotation:0, minRotation:0 } },
-                y: { min:0, max: maxDistance+5, title: { display:true, text:"Cumulative Distance (mi)" } }
+                y: { min:0, max: maxDistanceMi, title: { display:true, text:"Cumulative Distance (mi)" } }
             }
         },
         plugins: [{
