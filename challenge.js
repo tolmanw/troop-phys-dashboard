@@ -23,24 +23,25 @@ function renderChallenge(athletesData, monthNames) {
     const canvas = document.getElementById("challengeChartCanvas");
     const ctx = canvas.getContext("2d");
 
+    // --- Read CSS variables ---
+    const style = getComputedStyle(card);
+    const cardWidth = parseInt(style.getPropertyValue("--card-width")) || 330;
+    const chartPadding = parseInt(style.getPropertyValue("--chart-padding")) || 10;
+    const fontSize = parseInt(style.getPropertyValue("--font-size")) || 8;
+
     // --- Card styling ---
-    card.style.width = "80%";
-    card.style.maxWidth = "1200px";
+    card.style.width = cardWidth + "px";
     card.style.margin = "0 auto";
-    card.style.padding = "20px";
-    card.style.paddingBottom = "20px";
+    card.style.padding = chartPadding + "px";
+    card.style.paddingBottom = "50px"; // extra space for x-axis and images
     card.style.background = "#1b1f25";
     card.style.borderRadius = "20px";
+    card.style.fontSize = fontSize + "px";
 
     // --- Responsive canvas sizing ---
     const screenWidth = window.innerWidth;
-    if (screenWidth <= 600) {
-        canvas.width = card.clientWidth;
-        canvas.height = 300;
-    } else {
-        canvas.width = card.clientWidth;
-        canvas.height = 650;
-    }
+    canvas.width = card.clientWidth;
+    canvas.height = screenWidth <= 600 ? 300 : 500;
 
     const currentMonthIndex = monthNames.length - 1;
 
@@ -49,7 +50,7 @@ function renderChallenge(athletesData, monthNames) {
         let cumulative = 0;
         return {
             label: a.display_name,
-            data: daily.map(d => +(cumulative += d * 0.621371).toFixed(2)),
+            data: daily.map(d => +(cumulative += d * 0.621371).toFixed(2)), // km → mi
             borderColor: `hsl(${Math.random() * 360},70%,60%)`,
             fill: false,
             tension: 0.3,
@@ -66,7 +67,7 @@ function renderChallenge(athletesData, monthNames) {
     }
 
     const labels = datasets[0].data.map((_, i) => i + 1);
-    const maxDistanceMi = Math.max(...datasets.flatMap(d => d.data)) + 2;
+    const maxDistanceMi = Math.max(...datasets.flatMap(d => d.data)) + 2; // 2 mile buffer
 
     challengeChart = new Chart(ctx, {
         type: "line",
@@ -74,30 +75,28 @@ function renderChallenge(athletesData, monthNames) {
         options: {
             responsive: false,
             maintainAspectRatio: false,
-            layout: { padding: { bottom: 40 } },
+            layout: { padding: { bottom: chartPadding * 4 } }, // extra space for x-axis and images
             plugins: {
                 legend: {
                     display: true,
                     position: "bottom",
-                    labels: {
-                        font: { size: 8 } // legend font size
-                    }
+                    labels: { font: { size: fontSize } }
                 },
                 tooltip: {
-                    bodyFont: { size: 8 },
-                    titleFont: { size: 8 }
+                    bodyFont: { size: fontSize },
+                    titleFont: { size: fontSize }
                 }
             },
             scales: {
                 x: {
-                    title: { display: true, text: "Day of Month", font: { size: 8 } },
-                    ticks: { maxRotation: 0, minRotation: 0, font: { size: 8 } }
+                    title: { display: true, text: "Day of Month", font: { size: fontSize } },
+                    ticks: { maxRotation: 0, minRotation: 0, font: { size: fontSize } }
                 },
                 y: {
                     min: 0,
                     max: maxDistanceMi,
-                    title: { display: true, text: "Cumulative Distance (mi)", font: { size: 8 } },
-                    ticks: { font: { size: 8 } }
+                    title: { display: true, text: "Cumulative Distance (mi)", font: { size: fontSize } },
+                    ticks: { font: { size: fontSize } }
                 }
             }
         },
@@ -114,7 +113,7 @@ function renderChallenge(athletesData, monthNames) {
                     const img = new Image();
                     img.src = a.profile;
                     img.onload = () => {
-                        const size = window.innerWidth <= 600 ? 20 : 40;
+                        const size = screenWidth <= 600 ? 20 : 40;
                         ctx.drawImage(img, xPos - size / 2, yPos - size / 2, size, size);
                     };
                 });
