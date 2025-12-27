@@ -63,3 +63,25 @@ canvas {
   padding: 10px;
   border-radius: 10px;
 }
+
+/* --- Challenge Chart Styles --- */
+.challenge-card {
+  width: 95%;
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 10px;
+  height: 400px; /* default desktop height */
+}
+
+.challenge-card canvas {
+  width: 100%;
+  height: 100%;
+  display: block; /* ensures canvas fills container */
+}
+
+/* --- Mobile Overrides --- */
+@media (max-width: 600px) {
+  .challenge-card {
+    height: 250px; /* smaller chart height for mobile */
+  }
+}
