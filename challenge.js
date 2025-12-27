@@ -30,7 +30,7 @@ function renderChallenge(athletesData, monthNames) {
         return {
             label: a.display_name,
             data: daily.map(d => +(cumulative += d * 0.621371).toFixed(2)),
-            borderColor: `hsl(${Math.random() * 360}, 70%, 60%)`,
+            borderColor: `hsl(${Math.random()*360}, 70%, 60%)`,
             fill: false,
             tension: 0.3,
             pointRadius: 3,
@@ -48,15 +48,16 @@ function renderChallenge(athletesData, monthNames) {
     const labels = datasets[0].data.map((_, i) => i + 1);
     const maxDistance = Math.max(...datasets.flatMap(d => d.data), 10);
 
+    // Keep a fixed aspect ratio
     const aspectRatio = window.innerWidth <= 600 ? 2 : 2.5;
 
     challengeChart = new Chart(ctx, {
         type: "line",
         data: { labels, datasets },
         options: {
-            responsive: true,              // auto-resize with container
-            maintainAspectRatio: true,     // fixed aspect ratio
-            aspectRatio: aspectRatio,      // width / height ratio
+            responsive: true,
+            maintainAspectRatio: true,
+            aspectRatio: aspectRatio,
             plugins: { legend: { display: true, position: "bottom" } },
             scales: {
                 x: {
