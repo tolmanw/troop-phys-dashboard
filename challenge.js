@@ -1,6 +1,5 @@
 let challengeChart = null;
 
-/* Helper to read numeric px from CSS variables */
 function cssPx(varName) {
     return parseInt(
         getComputedStyle(document.documentElement)
@@ -34,23 +33,24 @@ function renderChallenge(athletesData, monthNames) {
 
     const canvas = document.getElementById("challengeChartCanvas");
 
-    /* FIXED PIXEL SIZE — from CSS variables */
-    const width = cssPx("--challenge-canvas-width");
-    const height = cssPx("--challenge-canvas-height");
-    canvas.width = width;
-    canvas.height = height;
+    /* Fixed pixel size */
+    canvas.width = cssPx("--challenge-canvas-width");
+    canvas.height = cssPx("--challenge-canvas-height");
 
     const currentMonthIndex = monthNames.length - 1;
 
-    /* Build cumulative datasets, skip athletes with no data */
-    const datasets = Object.values(athletesData).map(a => {
+    // Build datasets and keep mapping of athlete to dataset
+    const datasets = [];
+    const athleteMap = []; // aligns datasets to athlete data
+
+    Object.values(athletesData).forEach(a => {
         const daily = a.daily_distance_km[currentMonthIndex] || [];
-        if (!daily.length) return null;
+        if (!daily.length) return;
 
         let cumulative = 0;
         const data = daily.map(d => +(cumulative += d * 0.621371).toFixed(2));
 
-        return {
+        datasets.push({
             label: a.display_name,
             data,
             borderColor: `hsl(${Math.random() * 360}, 70%, 60%)`,
@@ -58,17 +58,17 @@ function renderChallenge(athletesData, monthNames) {
             tension: 0.3,
             pointRadius: 3,
             borderWidth: 2
-        };
-    }).filter(d => d !== null); // remove null entries
+        });
 
-    /* If no athlete has data, show message */
+        athleteMap.push(a); // keep same order as datasets
+    });
+
     if (!datasets.length) {
         container.querySelector("canvas").remove();
         container.innerHTML += "<p style='color:#e6edf3'>No challenge data for this month.</p>";
         return;
     }
 
-    /* Labels: day numbers based on first dataset */
     const labels = datasets[0].data.map((_, i) => i + 1);
     const maxDistance = Math.max(...datasets.flatMap(d => d.data), 10);
 
@@ -76,35 +76,23 @@ function renderChallenge(athletesData, monthNames) {
         type: "line",
         data: { labels, datasets },
         options: {
-            responsive: false,           // disables auto scaling
-            maintainAspectRatio: false,  // allows exact pixel dimensions
+            responsive: false,
+            maintainAspectRatio: false,
             plugins: {
-                legend: {
-                    display: true,
-                    position: "bottom"
-                }
+                legend: { display: true, position: "bottom" }
             },
             scales: {
-                x: {
-                    title: { display: true, text: "Day of Month" },
-                    ticks: { maxRotation: 0, minRotation: 0 }
-                },
-                y: {
-                    min: 0,
-                    max: maxDistance + 5,
-                    title: { display: true, text: "Cumulative Distance (mi)" }
-                }
+                x: { title: { display: true, text: "Day of Month" }, ticks: { maxRotation: 0, minRotation: 0 } },
+                y: { min: 0, max: maxDistance + 5, title: { display: true, text: "Cumulative Distance (mi)" } }
             }
         },
         plugins: [{
             id: "athleteImages",
             afterDatasetsDraw(chart) {
                 const { ctx, scales: { x, y } } = chart;
-                if (!chart.data.datasets || !chart.data.datasets.length) return;
-
-                Object.values(athletesData).forEach((a, i) => {
-                    const dataset = chart.data.datasets[i];
-                    if (!dataset || !dataset.data.length) return;
+                chart.data.datasets.forEach((dataset, i) => {
+                    const a = athleteMap[i]; // correct mapping
+                    if (!dataset.data.length) return;
 
                     const lastIndex = dataset.data.length - 1;
                     const xPos = x.getPixelForValue(lastIndex + 1);
@@ -112,16 +100,9 @@ function renderChallenge(athletesData, monthNames) {
 
                     const img = new Image();
                     img.src = a.profile;
-
                     img.onload = () => {
                         const size = 24;
-                        ctx.drawImage(
-                            img,
-                            xPos - size / 2,
-                            yPos - size / 2,
-                            size,
-                            size
-                        );
+                        ctx.drawImage(img, xPos - size / 2, yPos - size / 2, size, size);
                     };
                 });
             }
@@ -129,7 +110,6 @@ function renderChallenge(athletesData, monthNames) {
     });
 }
 
-/* Toggle logic */
 function initChallengeToggle() {
     const toggle = document.getElementById("challengeToggle");
 
@@ -153,7 +133,6 @@ function initChallengeToggle() {
     });
 }
 
-/* Initialize toggle after DOM and dashboard are ready */
 document.addEventListener("DOMContentLoaded", () => {
     if (window.DASHBOARD && window.DASHBOARD.getData) {
         initChallengeToggle();
