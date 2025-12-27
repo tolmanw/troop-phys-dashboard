@@ -31,7 +31,7 @@ function renderChallenge(athletesData, monthNames) {
 
     // --- Card styling ---
     card.style.width = cardWidth + "px";
-    card.style.margin = "0 auto";
+    card.style.margin = "0";
     card.style.padding = chartPadding + "px";
     card.style.paddingBottom = "50px"; // extra space for x-axis and images
     card.style.background = "#1b1f25";
