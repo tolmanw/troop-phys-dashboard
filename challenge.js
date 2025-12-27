@@ -45,10 +45,6 @@ function renderChallenge(athletesData, monthNames) {
     card.style.background = "#1b1f25";
     card.style.borderRadius = "20px";
     card.style.margin = "0";
-
-    // --- Set actual canvas size for Chart.js ---
-    canvas.width = parseInt(cardWidth);
-    canvas.height = parseInt(chartHeight);
     canvas.style.width = "100%";
     canvas.style.height = chartHeight;
 
@@ -153,12 +149,10 @@ function initChallengeToggle() {
         const container = document.getElementById("container");
         const challengeContainer = document.getElementById("challengeContainer");
         const monthSelector = document.getElementById("dailyMonthSelector");
-        const monthLabel = document.getElementById("dailyMonthLabel"); // added label
         const on = toggle.checked;
 
         container.style.display = on ? "none" : "flex";
         monthSelector.style.display = on ? "none" : "inline-block"; // hide dropdown
-        monthLabel.style.display = on ? "none" : "inline-block";    // hide label
         challengeContainer.style.display = on ? "block" : "none";
 
         const { athletesData, monthNames } = window.DASHBOARD.getData();
