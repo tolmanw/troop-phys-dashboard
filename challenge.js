@@ -24,16 +24,24 @@ function renderChallenge(athletesData, monthNames) {
     const ctx = canvas.getContext("2d");
 
     // --- Integrated styling ---
-    card.style.width = "95%";
-    card.style.maxWidth = "800px"; // desktop width
+    if (window.innerWidth <= 600) {
+        // Mobile
+        card.style.width = "95%";
+        card.style.maxWidth = "100%";
+        card.style.padding = "12px";
+        canvas.style.minHeight = "300px";
+    } else {
+        // Desktop
+        card.style.width = "95%";
+        card.style.maxWidth = "1000px"; // bigger desktop width
+        card.style.padding = "20px";
+        canvas.style.minHeight = "500px"; // taller chart
+    }
     card.style.margin = "0 auto";
-    card.style.padding = "15px";
     card.style.background = "#1b1f25";
     card.style.borderRadius = "12px";
-
     canvas.style.display = "block";
     canvas.style.width = "100%";
-    canvas.style.minHeight = window.innerWidth <= 600 ? "250px" : "400px";
 
     const currentMonthIndex = monthNames.length - 1;
 
@@ -47,8 +55,8 @@ function renderChallenge(athletesData, monthNames) {
             borderColor: `hsl(${Math.random()*360},70%,60%)`,
             fill: false,
             tension: 0.3,
-            pointRadius: 3,
-            borderWidth: 2
+            pointRadius: 4,
+            borderWidth: 3
         };
     });
 
@@ -61,7 +69,9 @@ function renderChallenge(athletesData, monthNames) {
 
     const labels = datasets[0].data.map((_, i) => i + 1);
     const maxDistance = Math.max(...datasets.flatMap(d => d.data), 10);
-    const aspectRatio = window.innerWidth <= 600 ? 2 : 2.5;
+
+    // Set aspect ratio: smaller = taller chart
+    const aspectRatio = window.innerWidth <= 600 ? 2 : 1.8;
 
     challengeChart = new Chart(ctx, {
         type: "line",
@@ -89,7 +99,7 @@ function renderChallenge(athletesData, monthNames) {
                     const img = new Image();
                     img.src = a.profile;
                     img.onload = () => {
-                        const size = window.innerWidth <= 600 ? 16 : 24;
+                        const size = window.innerWidth <= 600 ? 16 : 32; // bigger icons on desktop
                         ctx.drawImage(img, xPos - size / 2, yPos - size / 2, size, size);
                     };
                 });
@@ -97,7 +107,7 @@ function renderChallenge(athletesData, monthNames) {
         }]
     });
 
-    // Resize to prevent stretching
+    // Resize to fix stretching
     setTimeout(() => {
         if (challengeChart) challengeChart.resize();
     }, 50);
@@ -132,3 +142,4 @@ document.addEventListener("DOMContentLoaded", () => {
         console.error("Dashboard not loaded yet.");
     }
 });
+
