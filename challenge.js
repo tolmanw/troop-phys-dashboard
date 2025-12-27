@@ -1,20 +1,19 @@
 let challengeChart = null;
 
-// --- Root variables for easy adjustments ---
+// --- Root variables for chart sizing ---
 const root = document.documentElement;
-root.style.setProperty('--challenge-width', '700px');      // Card width
-root.style.setProperty('--challenge-height', '400px');     // Chart height
-root.style.setProperty('--challenge-padding', '15px');     // Card padding
-root.style.setProperty('--font-size', '8px');              // Font size for chart labels
-root.style.setProperty('--padding-right', '60px');         // Right padding for athlete images
+root.style.setProperty('--challenge-width', '700px');    // Card width
+root.style.setProperty('--challenge-height', '400px');   // Chart height
+root.style.setProperty('--challenge-padding', '15px');   // Card padding
+root.style.setProperty('--challenge-font-size', '8px');  // Font size
+root.style.setProperty('--challenge-right-padding', '50px'); // Right padding for athlete images
 
 function destroyChallenge() {
     if (challengeChart) {
         challengeChart.destroy();
         challengeChart = null;
     }
-    const container = document.getElementById("challengeContainer");
-    container.innerHTML = "";
+    document.getElementById("challengeContainer").innerHTML = "";
 }
 
 function renderChallenge(athletesData, monthNames) {
@@ -32,15 +31,18 @@ function renderChallenge(athletesData, monthNames) {
     const canvas = document.getElementById("challengeChartCanvas");
     const ctx = canvas.getContext("2d");
 
-    // --- Apply styles from root ---
-    const cardWidth = root.style.getPropertyValue('--challenge-width');
-    const chartHeight = root.style.getPropertyValue('--challenge-height');
-    const chartPadding = root.style.getPropertyValue('--challenge-padding');
-    const fontSize = parseInt(root.style.getPropertyValue('--font-size'));
-    const paddingRight = parseInt(root.style.getPropertyValue('--padding-right'));
+    // --- Read CSS variables from root ---
+    const style = getComputedStyle(document.documentElement);
+    const cardWidth = style.getPropertyValue('--challenge-width') || "700px";
+    const chartHeight = style.getPropertyValue('--challenge-height') || "400px";
+    const chartPadding = style.getPropertyValue('--challenge-padding') || "15px";
+    const fontSize = parseInt(style.getPropertyValue('--challenge-font-size')) || 8;
+    const rightPadding = style.getPropertyValue('--challenge-right-padding') || "50px";
 
+    // --- Apply styles dynamically ---
     card.style.width = cardWidth;
     card.style.padding = chartPadding;
+    card.style.paddingRight = rightPadding;
     card.style.background = "#1b1f25";
     card.style.borderRadius = "20px";
     card.style.margin = "0";
@@ -58,7 +60,7 @@ function renderChallenge(athletesData, monthNames) {
             borderColor: `hsl(${Math.random() * 360},70%,60%)`,
             fill: false,
             tension: 0.3,
-            pointRadius: 0,   // remove points
+            pointRadius: 0, // remove points
             borderWidth: 3
         };
     });
@@ -71,9 +73,7 @@ function renderChallenge(athletesData, monthNames) {
     }
 
     const labels = datasets[0].data.map((_, i) => i + 1);
-
-    // --- Y-axis buffer: +1 mile rounded up ---
-    const maxDistanceMi = Math.ceil(Math.max(...datasets.flatMap(d => d.data)) + 1);
+    const maxDistanceMi = Math.ceil(Math.max(...datasets.flatMap(d => d.data)) + 1); // +1 mile, round up
 
     // --- Create chart ---
     challengeChart = new Chart(ctx, {
@@ -82,27 +82,14 @@ function renderChallenge(athletesData, monthNames) {
         options: {
             responsive: false,
             maintainAspectRatio: false,
-            layout: { 
-                padding: { 
-                    bottom: parseInt(chartPadding), 
-                    right: paddingRight 
-                } 
-            },
+            layout: { padding: { bottom: parseInt(chartPadding) } },
             plugins: {
                 legend: { display: true, position: "bottom", labels: { font: { size: fontSize } } },
                 tooltip: { bodyFont: { size: fontSize }, titleFont: { size: fontSize } }
             },
             scales: {
-                x: { 
-                    title: { display: true, text: "Day of Month", font: { size: fontSize } }, 
-                    ticks: { font: { size: fontSize }, maxRotation: 0, minRotation: 0 } 
-                },
-                y: { 
-                    min: 0, 
-                    max: maxDistanceMi, 
-                    title: { display: true, text: "Cumulative Distance (mi)", font: { size: fontSize } }, 
-                    ticks: { font: { size: fontSize } } 
-                }
+                x: { title: { display: true, text: "Day of Month", font: { size: fontSize } }, ticks: { font: { size: fontSize }, maxRotation: 0, minRotation: 0 } },
+                y: { min: 0, max: maxDistanceMi, title: { display: true, text: "Cumulative Distance (mi)", font: { size: fontSize } }, ticks: { font: { size: fontSize } } }
             }
         },
         plugins: [{
@@ -119,13 +106,11 @@ function renderChallenge(athletesData, monthNames) {
                     img.src = a.profile;
                     img.onload = () => {
                         const size = window.innerWidth <= 600 ? 20 : 40;
-                        // draw circle with border radius
                         ctx.save();
                         ctx.beginPath();
-                        ctx.arc(xPos, yPos, size/2, 0, 2*Math.PI);
-                        ctx.closePath();
+                        ctx.arc(xPos, yPos, size / 2, 0, Math.PI * 2);
                         ctx.clip();
-                        ctx.drawImage(img, xPos - size/2, yPos - size/2, size, size);
+                        ctx.drawImage(img, xPos - size / 2, yPos - size / 2, size, size);
                         ctx.restore();
                     };
                 });
@@ -138,15 +123,14 @@ function renderChallenge(athletesData, monthNames) {
 function initChallengeToggle() {
     const toggle = document.getElementById("challengeToggle");
     toggle.addEventListener("change", () => {
-        const container = document.getElementById("container");
-        const challengeContainer = document.getElementById("challengeContainer");
+        const container = document.getElementById("container"); // dashboard cards
+        const challengeContainer = document.getElementById("challengeContainer"); // monthly challenge
+        const dailyLine = document.getElementById("dailySelectorLine"); // daily distance line
         const on = toggle.checked;
-
-        // Hide dashboard content but keep toggle in place
-        document.getElementById("dailyMonthSelector").style.display = on ? "none" : "inline-block";
 
         container.style.display = on ? "none" : "flex";
         challengeContainer.style.display = on ? "block" : "none";
+        dailyLine.style.display = on ? "none" : "flex"; // hide only daily distance line
 
         const { athletesData, monthNames } = window.DASHBOARD.getData();
 
