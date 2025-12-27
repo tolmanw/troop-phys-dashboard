@@ -1,3 +1,4 @@
+/* General body and typography */
 body {
   background: #111;
   color: #eee;
@@ -6,6 +7,7 @@ body {
   padding: 0;
 }
 
+/* Header styling */
 header {
   background: #222;
   padding: 20px;
@@ -31,6 +33,7 @@ select {
   border-radius: 4px;
 }
 
+/* Main container and sections */
 main {
   max-width: 1000px;
   margin: auto;
@@ -41,6 +44,7 @@ section {
   margin-bottom: 40px;
 }
 
+/* Leaderboard styling */
 #leaderboard .athlete {
   display: flex;
   align-items: center;
@@ -58,8 +62,17 @@ section {
   margin-right: 15px;
 }
 
+/* Canvas styling */
 canvas {
   background: #1a1a1a;
   padding: 10px;
   border-radius: 10px;
+}
+
+/* Fixed medium size for Monthly Challenge chart */
+#challengeContainer .challenge-card canvas {
+  width: 100% !important;    /* full width of the card */
+  height: 400px !important;  /* medium fixed height */
+  max-width: 1000px;         /* optional max width for large screens */
+  display: block;            /* ensures proper layout */
 }
