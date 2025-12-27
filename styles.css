@@ -72,7 +72,7 @@ canvas {
 /* Fixed medium size for Monthly Challenge chart */
 #challengeContainer .challenge-card canvas {
   width: 100% !important;    /* full width of the card */
-  height: 400px !important;  /* medium fixed height */
-  max-width: 1000px;         /* optional max width for large screens */
+  height: 300px !important;  /* medium fixed height */
+  max-width: 800px;         /* optional max width for large screens */
   display: block;            /* ensures proper layout */
 }
