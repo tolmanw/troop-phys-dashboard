@@ -13,17 +13,31 @@ function renderChallenge(athletesData, monthNames) {
 
     const container = document.getElementById("challengeContainer");
     container.innerHTML = `
-        <div class="card challenge-card">
+        <div class="challenge-card">
             <h2>Monthly Challenge</h2>
             <canvas id="challengeChartCanvas"></canvas>
         </div>
     `;
 
+    const card = container.querySelector(".challenge-card");
     const canvas = document.getElementById("challengeChartCanvas");
     const ctx = canvas.getContext("2d");
+
+    // --- Integrated styling ---
+    card.style.width = "95%";
+    card.style.maxWidth = "800px"; // desktop width
+    card.style.margin = "0 auto";
+    card.style.padding = "15px";
+    card.style.background = "#1b1f25";
+    card.style.borderRadius = "12px";
+
+    canvas.style.display = "block";
+    canvas.style.width = "100%";
+    canvas.style.minHeight = window.innerWidth <= 600 ? "250px" : "400px";
+
     const currentMonthIndex = monthNames.length - 1;
 
-    // Build cumulative datasets
+    // Build datasets
     const datasets = Object.values(athletesData).map(a => {
         const daily = a.daily_distance_km[currentMonthIndex] || [];
         let cumulative = 0;
@@ -38,7 +52,6 @@ function renderChallenge(athletesData, monthNames) {
         };
     });
 
-    // Check for empty data
     const hasData = datasets.some(d => d.data.length > 0);
     if (!hasData) {
         canvas.remove();
@@ -84,7 +97,7 @@ function renderChallenge(athletesData, monthNames) {
         }]
     });
 
-    // Force chart to resize after showing container to fix stretching
+    // Resize to prevent stretching
     setTimeout(() => {
         if (challengeChart) challengeChart.resize();
     }, 50);
