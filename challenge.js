@@ -12,30 +12,23 @@ function renderChallenge(athletesData, monthNames) {
     if (!athletesData || !monthNames) return;
 
     const container = document.getElementById("challengeContainer");
-
     container.innerHTML = `
-        <div class="card" style="width:95%; max-width:600px; margin:0 auto;">
-            <h2 style="text-align:left; margin-bottom:10px;">Monthly Challenge</h2>
+        <div class="card challenge-card">
+            <h2>Monthly Challenge</h2>
             <canvas id="challengeChartCanvas"></canvas>
         </div>
     `;
 
     const canvas = document.getElementById("challengeChartCanvas");
 
-    // Use CSS to control canvas size, Chart.js will scale automatically
-    canvas.style.width = "100%";
-    canvas.style.height = window.innerWidth <= 600 ? "250px" : "400px";
-
     const currentMonthIndex = monthNames.length - 1;
 
-    // Build cumulative datasets
     const datasets = Object.values(athletesData).map(a => {
         const daily = a.daily_distance_km[currentMonthIndex] || [];
         let cumulative = 0;
-        const data = daily.map(d => +(cumulative += d * 0.621371).toFixed(2));
         return {
             label: a.display_name,
-            data,
+            data: daily.map(d => +(cumulative += d * 0.621371).toFixed(2)),
             borderColor: `hsl(${Math.random() * 360}, 70%, 60%)`,
             fill: false,
             tension: 0.3,
@@ -44,10 +37,8 @@ function renderChallenge(athletesData, monthNames) {
         };
     });
 
-    // Prevent rendering if all data is empty
-    const hasData = datasets.some(d => d.data.some(v => v > 0));
-    if (!hasData) {
-        canvas.remove();
+    if (!datasets.some(d => d.data.length > 0)) {
+        container.querySelector("canvas").remove();
         container.innerHTML += "<p style='color:#e6edf3'>No challenge data for this month.</p>";
         return;
     }
@@ -59,19 +50,12 @@ function renderChallenge(athletesData, monthNames) {
         type: "line",
         data: { labels, datasets },
         options: {
-            responsive: true,              // auto-resize with container
-            maintainAspectRatio: false,    // fill container height
+            responsive: true,              // auto-resize
+            maintainAspectRatio: false,    // fill container
             plugins: { legend: { display: true, position: "bottom" } },
             scales: {
-                x: {
-                    title: { display: true, text: "Day of Month" },
-                    ticks: { maxRotation: 0, minRotation: 0 }
-                },
-                y: {
-                    min: 0,
-                    max: maxDistance + 5,
-                    title: { display: true, text: "Cumulative Distance (mi)" }
-                }
+                x: { title: { display: true, text: "Day of Month" } },
+                y: { min: 0, max: maxDistance + 5, title: { display: true, text: "Cumulative Distance (mi)" } }
             }
         },
         plugins: [{
@@ -80,12 +64,10 @@ function renderChallenge(athletesData, monthNames) {
                 const { ctx, scales: { x, y } } = chart;
                 Object.values(athletesData).forEach((a, i) => {
                     const dataset = chart.data.datasets[i];
-                    if (!dataset.data.length) return;
-
+                    if (!dataset || !dataset.data.length) return;
                     const lastIndex = dataset.data.length - 1;
                     const xPos = x.getPixelForValue(lastIndex + 1);
                     const yPos = y.getPixelForValue(dataset.data[lastIndex]);
-
                     const img = new Image();
                     img.src = a.profile;
                     img.onload = () => {
@@ -121,7 +103,6 @@ function initChallengeToggle() {
     });
 }
 
-// Initialize toggle after dashboard data is ready
 document.addEventListener("DOMContentLoaded", () => {
     if (window.DASHBOARD && window.DASHBOARD.getData) {
         initChallengeToggle();
