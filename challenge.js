@@ -169,8 +169,14 @@ function initChallengeToggle() {
     });
 }
 
-// --- Initialize toggle on page load ---
+// --- Hide only the Daily Distance Month label and selector ---
 document.addEventListener("DOMContentLoaded", () => {
+    const monthSelector = document.getElementById("dailyMonthSelector");
+    const monthLabel = monthSelector.previousElementSibling; // label before select
+
+    if (monthSelector) monthSelector.style.display = "none";
+    if (monthLabel) monthLabel.style.display = "none";
+
     if (window.DASHBOARD && window.DASHBOARD.getData) {
         initChallengeToggle();
     } else {
