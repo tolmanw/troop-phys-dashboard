@@ -25,24 +25,21 @@ function renderChallenge(athletesData, monthNames) {
 
     // --- Card styling ---
     card.style.width = "80%";
-    card.style.maxWidth = "1200px"; // wider card for better chart display
+    card.style.maxWidth = "1200px";
     card.style.margin = "0 auto";
     card.style.padding = "20px";
-    card.style.paddingBottom = "20px"; // extra space for x-axis labels and images
+    card.style.paddingBottom = "20px";
     card.style.background = "#1b1f25";
     card.style.borderRadius = "20px";
 
     // --- Responsive canvas sizing ---
     const screenWidth = window.innerWidth;
-
     if (screenWidth <= 600) {
-        // Mobile
         canvas.width = card.clientWidth;
-        canvas.height = 300; // taller on mobile for readability
+        canvas.height = 300;
     } else {
-        // Desktop / tablet
         canvas.width = card.clientWidth;
-        canvas.height = 650; // taller for labels and images
+        canvas.height = 650;
     }
 
     const currentMonthIndex = monthNames.length - 1;
@@ -52,7 +49,7 @@ function renderChallenge(athletesData, monthNames) {
         let cumulative = 0;
         return {
             label: a.display_name,
-            data: daily.map(d => +(cumulative += d * 0.621371).toFixed(2)), // km → mi
+            data: daily.map(d => +(cumulative += d * 0.621371).toFixed(2)),
             borderColor: `hsl(${Math.random() * 360},70%,60%)`,
             fill: false,
             tension: 0.3,
@@ -69,8 +66,6 @@ function renderChallenge(athletesData, monthNames) {
     }
 
     const labels = datasets[0].data.map((_, i) => i + 1);
-
-    // --- Calculate max cumulative distance and add 2 mile buffer ---
     const maxDistanceMi = Math.max(...datasets.flatMap(d => d.data)) + 2;
 
     challengeChart = new Chart(ctx, {
@@ -79,21 +74,30 @@ function renderChallenge(athletesData, monthNames) {
         options: {
             responsive: false,
             maintainAspectRatio: false,
-            layout: {
-                padding: {
-                    bottom: 40 // extra space inside canvas for x-axis and images
+            layout: { padding: { bottom: 40 } },
+            plugins: {
+                legend: {
+                    display: true,
+                    position: "bottom",
+                    labels: {
+                        font: { size: 8 } // legend font size
+                    }
+                },
+                tooltip: {
+                    bodyFont: { size: 8 },
+                    titleFont: { size: 8 }
                 }
             },
-            plugins: { legend: { display: true, position: "bottom" } },
             scales: {
                 x: {
-                    title: { display: true, text: "Day of Month" },
-                    ticks: { maxRotation: 0, minRotation: 0 }
+                    title: { display: true, text: "Day of Month", font: { size: 8 } },
+                    ticks: { maxRotation: 0, minRotation: 0, font: { size: 8 } }
                 },
                 y: {
                     min: 0,
                     max: maxDistanceMi,
-                    title: { display: true, text: "Cumulative Distance (mi)" }
+                    title: { display: true, text: "Cumulative Distance (mi)", font: { size: 8 } },
+                    ticks: { font: { size: 8 } }
                 }
             }
         },
@@ -110,7 +114,7 @@ function renderChallenge(athletesData, monthNames) {
                     const img = new Image();
                     img.src = a.profile;
                     img.onload = () => {
-                        const size = window.innerWidth <= 600 ? 20 : 40; // slightly larger for visibility
+                        const size = window.innerWidth <= 600 ? 20 : 40;
                         ctx.drawImage(img, xPos - size / 2, yPos - size / 2, size, size);
                     };
                 });
