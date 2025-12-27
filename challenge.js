@@ -149,14 +149,16 @@ function initChallengeToggle() {
         const container = document.getElementById("container");
         const challengeContainer = document.getElementById("challengeContainer");
         const monthSelector = document.getElementById("dailyMonthSelector");
+        const monthLabel = document.getElementById("dailyMonthLabel"); // added
         const on = toggle.checked;
-
+    
         container.style.display = on ? "none" : "flex";
         monthSelector.style.display = on ? "none" : "inline-block"; // hide dropdown
+        monthLabel.style.display = on ? "none" : "inline-block";    // hide label
         challengeContainer.style.display = on ? "block" : "none";
-
+    
         const { athletesData, monthNames } = window.DASHBOARD.getData();
-
+    
         if (on) {
             window.DASHBOARD.destroyCharts();
             renderChallenge(athletesData, monthNames);
