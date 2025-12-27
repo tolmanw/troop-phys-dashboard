@@ -25,7 +25,7 @@ function renderChallenge(athletesData, monthNames) {
 
     // --- Read CSS variables ---
     const style = getComputedStyle(card);
-    const cardWidth = parseInt(style.getPropertyValue("--card-width")) || 330;
+    const cardWidth = parseInt(style.getPropertyValue("--card-width")) || 660;
     const chartPadding = parseInt(style.getPropertyValue("--chart-padding")) || 10;
     const fontSize = parseInt(style.getPropertyValue("--font-size")) || 8;
 
