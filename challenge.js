@@ -50,13 +50,24 @@ function renderChallenge(athletesData, monthNames) {
 
     // --- Prepare data ---
     const currentMonthIndex = monthNames.length - 1;
+
+    // Cache vibrant neon colors for athletes
+    const athleteColors = {};
+
     const datasets = Object.values(athletesData).map(a => {
         const daily = a.daily_distance_km[currentMonthIndex] || [];
         let cumulative = 0;
+
+        // Assign a vibrant neon color if not already cached
+        if (!athleteColors[a.display_name]) {
+            const hue = Math.floor(Math.random() * 360);
+            athleteColors[a.display_name] = `hsl(${hue}, 100%, 50%)`; // neon-style
+        }
+
         return {
             label: a.display_name,
             data: daily.map(d => +(cumulative += d * 0.621371).toFixed(2)), // km → mi
-            borderColor: `hsl(${Math.random() * 360},70%,60%)`,
+            borderColor: athleteColors[a.display_name], // use cached neon color
             fill: false,
             tension: 0.3,
             pointRadius: 0, // remove points
