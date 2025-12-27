@@ -1,12 +1,12 @@
 let challengeChart = null;
 
-// --- Root variables for chart sizing ---
+// --- Set CSS root variables dynamically ---
 const root = document.documentElement;
 root.style.setProperty('--challenge-width', '700px');    // Card width
 root.style.setProperty('--challenge-height', '400px');   // Chart height
-root.style.setProperty('--challenge-padding', '15px');   // Card padding
-root.style.setProperty('--challenge-font-size', '8px');  // Font size
-root.style.setProperty('--challenge-right-padding', '50px'); // Right padding for athlete images
+root.style.setProperty('--challenge-padding', '20px');   // Card padding
+root.style.setProperty('--challenge-font-size', '8px');  // Font size for chart labels
+root.style.setProperty('--challenge-padding-right', '60px'); // Extra right padding for images
 
 function destroyChallenge() {
     if (challengeChart) {
@@ -31,18 +31,18 @@ function renderChallenge(athletesData, monthNames) {
     const canvas = document.getElementById("challengeChartCanvas");
     const ctx = canvas.getContext("2d");
 
-    // --- Read CSS variables from root ---
-    const style = getComputedStyle(document.documentElement);
-    const cardWidth = style.getPropertyValue('--challenge-width') || "700px";
-    const chartHeight = style.getPropertyValue('--challenge-height') || "400px";
-    const chartPadding = style.getPropertyValue('--challenge-padding') || "15px";
-    const fontSize = parseInt(style.getPropertyValue('--challenge-font-size')) || 8;
-    const rightPadding = style.getPropertyValue('--challenge-right-padding') || "50px";
+    // --- Read root variables ---
+    const style = getComputedStyle(root);
+    const cardWidth = style.getPropertyValue('--challenge-width');
+    const chartHeight = style.getPropertyValue('--challenge-height');
+    const chartPadding = style.getPropertyValue('--challenge-padding');
+    const fontSize = parseInt(style.getPropertyValue('--challenge-font-size'));
+    const paddingRight = style.getPropertyValue('--challenge-padding-right');
 
-    // --- Apply styles dynamically ---
+    // --- Apply styles ---
     card.style.width = cardWidth;
     card.style.padding = chartPadding;
-    card.style.paddingRight = rightPadding;
+    card.style.paddingRight = paddingRight;
     card.style.background = "#1b1f25";
     card.style.borderRadius = "20px";
     card.style.margin = "0";
@@ -60,7 +60,7 @@ function renderChallenge(athletesData, monthNames) {
             borderColor: `hsl(${Math.random() * 360},70%,60%)`,
             fill: false,
             tension: 0.3,
-            pointRadius: 0, // remove points
+            pointRadius: 0, // no points
             borderWidth: 3
         };
     });
@@ -73,7 +73,8 @@ function renderChallenge(athletesData, monthNames) {
     }
 
     const labels = datasets[0].data.map((_, i) => i + 1);
-    const maxDistanceMi = Math.ceil(Math.max(...datasets.flatMap(d => d.data)) + 1); // +1 mile, round up
+    let maxDistanceMi = Math.max(...datasets.flatMap(d => d.data)) + 1; // +1 mile buffer
+    maxDistanceMi = Math.ceil(maxDistanceMi); // round up
 
     // --- Create chart ---
     challengeChart = new Chart(ctx, {
@@ -82,14 +83,22 @@ function renderChallenge(athletesData, monthNames) {
         options: {
             responsive: false,
             maintainAspectRatio: false,
-            layout: { padding: { bottom: parseInt(chartPadding) } },
+            layout: { padding: { bottom: 15, right: parseInt(paddingRight) } }, // right padding for images
             plugins: {
                 legend: { display: true, position: "bottom", labels: { font: { size: fontSize } } },
                 tooltip: { bodyFont: { size: fontSize }, titleFont: { size: fontSize } }
             },
             scales: {
-                x: { title: { display: true, text: "Day of Month", font: { size: fontSize } }, ticks: { font: { size: fontSize }, maxRotation: 0, minRotation: 0 } },
-                y: { min: 0, max: maxDistanceMi, title: { display: true, text: "Cumulative Distance (mi)", font: { size: fontSize } }, ticks: { font: { size: fontSize } } }
+                x: { 
+                    title: { display: true, text: "Day of Month", font: { size: fontSize } },
+                    ticks: { font: { size: fontSize }, maxRotation: 0, minRotation: 0 }
+                },
+                y: { 
+                    min: 0, 
+                    max: maxDistanceMi, 
+                    title: { display: true, text: "Cumulative Distance (mi)", font: { size: fontSize } }, 
+                    ticks: { font: { size: fontSize } } 
+                }
             }
         },
         plugins: [{
@@ -108,7 +117,8 @@ function renderChallenge(athletesData, monthNames) {
                         const size = window.innerWidth <= 600 ? 20 : 40;
                         ctx.save();
                         ctx.beginPath();
-                        ctx.arc(xPos, yPos, size / 2, 0, Math.PI * 2);
+                        ctx.arc(xPos, yPos, size / 2, 0, Math.PI * 2); // circular clipping
+                        ctx.closePath();
                         ctx.clip();
                         ctx.drawImage(img, xPos - size / 2, yPos - size / 2, size, size);
                         ctx.restore();
@@ -122,15 +132,18 @@ function renderChallenge(athletesData, monthNames) {
 // --- Toggle logic ---
 function initChallengeToggle() {
     const toggle = document.getElementById("challengeToggle");
+    const dailyContainer = document.getElementById("dailySelectorContainer");
+    const container = document.getElementById("container");
+    const challengeContainer = document.getElementById("challengeContainer");
+
     toggle.addEventListener("change", () => {
-        const container = document.getElementById("container"); // dashboard cards
-        const challengeContainer = document.getElementById("challengeContainer"); // monthly challenge
-        const dailyLine = document.getElementById("dailySelectorLine"); // daily distance line
         const on = toggle.checked;
+
+        // Hide Daily Distance Month when showing challenge
+        dailyContainer.style.display = on ? "none" : "block";
 
         container.style.display = on ? "none" : "flex";
         challengeContainer.style.display = on ? "block" : "none";
-        dailyLine.style.display = on ? "none" : "flex"; // hide only daily distance line
 
         const { athletesData, monthNames } = window.DASHBOARD.getData();
 
