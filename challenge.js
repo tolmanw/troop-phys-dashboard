@@ -25,22 +25,24 @@ function renderChallenge(athletesData, monthNames) {
 
     // --- Card styling ---
     card.style.width = "100%";
-    card.style.maxWidth = "1200px";  // wider card for better chart display
+    card.style.maxWidth = "1200px"; // wider card for better chart display
     card.style.margin = "0 auto";
     card.style.padding = "20px";
+    card.style.paddingBottom = "60px"; // extra space for x-axis labels and images
     card.style.background = "#1b1f25";
     card.style.borderRadius = "12px";
 
     // --- Responsive canvas sizing ---
     const screenWidth = window.innerWidth;
+
     if (screenWidth <= 600) {
         // Mobile
         canvas.width = card.clientWidth;
-        canvas.height = 400; // medium height
+        canvas.height = 450; // taller on mobile for readability
     } else {
         // Desktop / tablet
         canvas.width = card.clientWidth;
-        canvas.height = 550; // taller for readability
+        canvas.height = 650; // taller for labels and images
     }
 
     const currentMonthIndex = monthNames.length - 1;
@@ -51,7 +53,7 @@ function renderChallenge(athletesData, monthNames) {
         return {
             label: a.display_name,
             data: daily.map(d => +(cumulative += d * 0.621371).toFixed(2)), // km → mi
-            borderColor: `hsl(${Math.random()*360},70%,60%)`,
+            borderColor: `hsl(${Math.random() * 360},70%,60%)`,
             fill: false,
             tension: 0.3,
             pointRadius: 5,
@@ -77,10 +79,22 @@ function renderChallenge(athletesData, monthNames) {
         options: {
             responsive: false,
             maintainAspectRatio: false,
+            layout: {
+                padding: {
+                    bottom: 40 // extra space inside canvas for x-axis and images
+                }
+            },
             plugins: { legend: { display: true, position: "bottom" } },
             scales: {
-                x: { title: { display: true, text: "Day of Month" }, ticks: { maxRotation:0, minRotation:0 } },
-                y: { min:0, max: maxDistanceMi, title: { display:true, text:"Cumulative Distance (mi)" } }
+                x: {
+                    title: { display: true, text: "Day of Month" },
+                    ticks: { maxRotation: 0, minRotation: 0 }
+                },
+                y: {
+                    min: 0,
+                    max: maxDistanceMi,
+                    title: { display: true, text: "Cumulative Distance (mi)" }
+                }
             }
         },
         plugins: [{
@@ -96,7 +110,7 @@ function renderChallenge(athletesData, monthNames) {
                     const img = new Image();
                     img.src = a.profile;
                     img.onload = () => {
-                        const size = window.innerWidth <= 600 ? 16 : 32;
+                        const size = window.innerWidth <= 600 ? 20 : 40; // slightly larger for visibility
                         ctx.drawImage(img, xPos - size / 2, yPos - size / 2, size, size);
                     };
                 });
