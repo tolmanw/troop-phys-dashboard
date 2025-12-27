@@ -38,6 +38,7 @@ function renderChallenge(athletesData, monthNames) {
         };
     });
 
+    // Check for empty data
     const hasData = datasets.some(d => d.data.length > 0);
     if (!hasData) {
         canvas.remove();
@@ -83,7 +84,7 @@ function renderChallenge(athletesData, monthNames) {
         }]
     });
 
-    // Fix stretching: resize after showing container
+    // Force chart to resize after showing container to fix stretching
     setTimeout(() => {
         if (challengeChart) challengeChart.resize();
     }, 50);
