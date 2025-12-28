@@ -12,10 +12,10 @@ function getSettings() {
         athleteImgSize: isMobile ? 20 : 40,
         chartHeight: isMobile ? 340 : 500,
         chartPadding: isMobile ? 10 : 20,
-        chartPaddingBottom: isMobile ? 50 : 20,
+        chartPaddingBottom: isMobile ? 20 : 20,
         paddingRight: isMobile ? 20 : 20,
         cardWidth: isMobile ? '95%' : '700px',
-        headerPaddingTop: isMobile ? 10 : 12,
+        headerPaddingTop: isMobile ? 12 : 12,
         headerFontSize: isMobile ? 12 : 16 // ← header font size control
     };
 }
