@@ -10,14 +10,14 @@ function getSettings() {
         isMobile,
         fontSize: isMobile ? 6 : 8,
         athleteImgSize: isMobile ? 20 : 40,
-        chartHeight: isMobile ? 340 : 500,
+        chartHeight: isMobile ? 340 : 440,
         chartPadding: isMobile ? 10 : 20,
         chartPaddingBottom: isMobile ? 20 : 20,
         paddingRight: isMobile ? 20 : 20,
         cardWidth: isMobile ? '95%' : '700px',
         headerPaddingTop: isMobile ? 12 : 12,
         headerFontSize: isMobile ? 12 : 16, // header font size control
-        containerTopOffset: isMobile ? 24 : 24 // top offset for both cards
+        cardTopOffset: isMobile ? 16 : 24 // top offset applied to each card
     };
 }
 
@@ -65,15 +65,19 @@ function renderChallenge(athletesData, monthNames) {
         cardWidth,
         headerPaddingTop,
         headerFontSize,
-        containerTopOffset
+        cardTopOffset
     } = getSettings();
 
-    // --- Container top offset ---
-    container.style.marginTop = containerTopOffset + "px";
-
     // --- Card + canvas styling ---
-    card.style.width = cardWidth;
-    card.style.margin = "0";
+    [card, summaryCard].forEach((c, i) => {
+        c.style.width = cardWidth;
+        c.style.marginTop = i === 0 ? cardTopOffset + "px" : "12px"; // chart card top offset, summary card smaller margin
+        c.style.padding = isMobile ? "10px" : "12px";
+        c.style.background = "#1b1f25";
+        c.style.borderRadius = "15px";
+        c.style.textAlign = "left";
+    });
+
     card.style.padding = `
         ${headerPaddingTop}px
         ${chartPadding}px
@@ -81,8 +85,6 @@ function renderChallenge(athletesData, monthNames) {
         ${chartPadding}px
     `;
     card.style.height = chartHeight + "px";
-    card.style.background = "#1b1f25";
-    card.style.borderRadius = "15px";
 
     const title = card.querySelector("h2");
     title.style.marginTop = "0";
@@ -92,14 +94,7 @@ function renderChallenge(athletesData, monthNames) {
     canvas.style.width = "100%";
     canvas.style.height = "100%";
 
-    // --- Summary card styling ---
-    summaryCard.style.width = cardWidth; // same width as chart card
-    summaryCard.style.marginTop = "12px";
-    summaryCard.style.padding = isMobile ? "10px" : "12px";
-    summaryCard.style.background = "#1b1f25";
-    summaryCard.style.borderRadius = "15px";
-    summaryCard.style.textAlign = "left"; // left aligned
-
+    // --- Summary header styling ---
     summaryTitle.style.margin = "0 0 8px 0";
     summaryTitle.style.fontSize = headerFontSize + "px"; // match chart header font size
     summaryTitle.style.color = "#e6edf3";
