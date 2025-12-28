@@ -120,7 +120,7 @@ function renderChallenge(athletesData, monthNames) {
             scales: {
                 x: {
                     title: {
-                        display: true,
+                        display: false,
                         text: "Day of Month",
                         font: { size: fontSize }
                     },
