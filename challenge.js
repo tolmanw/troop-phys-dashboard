@@ -11,11 +11,12 @@ function getSettings() {
         fontSize: isMobile ? 6 : 8,
         athleteImgSize: isMobile ? 20 : 40,
         chartHeight: isMobile ? 340 : 500,
-        chartPadding: isMobile ? 10 : 20,
-        chartPaddingBottom: isMobile ? 50 : 50,
+        chartPadding: isMobile ? 10 : 10,
+        chartPaddingBottom: isMobile ? 50 : 80,
         paddingRight: isMobile ? 20 : 20,
         cardWidth: isMobile ? '95%' : '700px',
-        headerPaddingTop: isMobile ? 6 : 12 // ← NEW: control header vertical position
+        headerPaddingTop: isMobile ? 6 : 10,
+        headerFontSize: isMobile ? 12 : 16 // ← header font size control
     };
 }
 
@@ -52,7 +53,8 @@ function renderChallenge(athletesData, monthNames) {
         chartPaddingBottom,
         paddingRight,
         cardWidth,
-        headerPaddingTop
+        headerPaddingTop,
+        headerFontSize
     } = getSettings();
 
     // --- Card + canvas styling ---
@@ -71,6 +73,7 @@ function renderChallenge(athletesData, monthNames) {
     const title = card.querySelector("h2");
     title.style.marginTop = "0";
     title.style.marginBottom = isMobile ? "6px" : "10px";
+    title.style.fontSize = headerFontSize + "px";
 
     canvas.style.width = "100%";
     canvas.style.height = "100%";
