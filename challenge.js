@@ -11,9 +11,9 @@ function getSettings() {
         fontSize: isMobile ? 6 : 8,
         athleteImgSize: isMobile ? 20 : 40,
         chartHeight: isMobile ? 340 : 450,
-        chartPadding: isMobile ? 10 : 15,
+        chartPadding: isMobile ? 10 : 10,
         chartPaddingBottom: isMobile ? 50 : 50,
-        paddingRight: isMobile ? 20 : 60,
+        paddingRight: isMobile ? 20 : 30,
         cardWidth: isMobile ? '95%' : '700px'
     };
 }
