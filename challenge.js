@@ -14,7 +14,7 @@ function getSettings() {
         chartPadding: isMobile ? 10 : 20,
         chartPaddingBottom: isMobile ? 20 : 20,
         paddingRight: isMobile ? 20 : 20,
-        cardWidth: isMobile ? "96%" : "700px",
+        cardWidth: isMobile ? "100%" : "700px",
         headerPaddingTop: 12,
         headerFontSize: isMobile ? 12 : 16
     };
