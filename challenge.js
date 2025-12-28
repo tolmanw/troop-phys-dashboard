@@ -87,7 +87,7 @@ function renderChallenge(athletesData, monthNames) {
     canvas.style.width = "100%";
     canvas.style.height = "100%";
 
-    // --- Summary card styling (MATCHES chart card width & padding) ---
+    // --- Summary card styling ---
     summaryCard.style.width = cardWidth;
     summaryCard.style.margin = "12px 0 0 0";
     summaryCard.style.boxSizing = "border-box";
@@ -256,8 +256,10 @@ function initChallengeToggle() {
         const on = toggle.checked;
         container.style.display = on ? "none" : "flex";
         challengeContainer.style.display = on ? "block" : "none";
-        if (monthSelector) monthSelector.style.display = on ? "none" : "inline-block";
-        if (monthLabel) monthLabel.style.display = on ? "none" : "inline-block";
+
+        // ---- FIX: keep spacing consistent ----
+        if (monthSelector) monthSelector.style.visibility = on ? "hidden" : "visible";
+        if (monthLabel) monthLabel.style.visibility = on ? "hidden" : "visible";
 
         const { athletesData, monthNames } = window.DASHBOARD.getData();
 
