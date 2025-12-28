@@ -21,9 +21,9 @@ function getSettings() {
     return {
         fontSize: isMobile ? 6 : 8,
         athleteImgSize: isMobile ? 20 : 40,
-        chartHeight: isMobile ? 350 : 400, // used for card height
-        chartPadding: isMobile ? 12 : 15,
-        paddingRight: isMobile ? 30 : 40,
+        chartHeight: isMobile ? 400 : 400, // used for card height
+        chartPadding: isMobile ? 8 : 15,
+        paddingRight: isMobile ? 35 : 60,
     };
 }
 
