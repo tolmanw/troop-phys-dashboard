@@ -55,11 +55,11 @@ function renderChallenge(athletesData, monthNames) {
 
     // --- Card + canvas styling ---
     card.style.width = cardWidth;
-    card.style.margin = "0 auto";
+    card.style.margin = "0";
     card.style.padding = `${chartPadding}px`;
     card.style.height = chartHeight + "px";
     card.style.background = "#1b1f25";
-    card.style.borderRadius = "20px";
+    card.style.borderRadius = "15px";
 
     canvas.style.width = "100%";
     canvas.style.height = "100%";
