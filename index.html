@@ -179,7 +179,11 @@ select, input[type=checkbox] {
 <label>Daily Distance Month:</label>
 <select id="dailyMonthSelector"></select>
 <br>
-<label><input type="checkbox" id="challengeToggle"> Show Monthly Challenge</label>
+<label class="toggle-switch">
+    <input type="checkbox" id="challengeToggle">
+    <span class="slider"></span>
+    Show Monthly Challenge
+</label>
 
 <div id="container"></div>
 <div id="challengeContainer" style="display:none;"></div>
