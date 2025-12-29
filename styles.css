@@ -76,3 +76,45 @@ canvas {
   max-width: 800px;         /* optional max width for large screens */
   display: block;            /* ensures proper layout */
 }
+
+/* --- Toggle Switch --- */
+.toggle-switch {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+.toggle-switch input {
+    display: none;
+}
+
+.toggle-switch .slider {
+    position: relative;
+    width: 42px;
+    height: 22px;
+    background-color: #555;
+    border-radius: 22px;
+    transition: background-color 0.25s ease;
+}
+
+.toggle-switch .slider::before {
+    content: "";
+    position: absolute;
+    width: 18px;
+    height: 18px;
+    top: 2px;
+    left: 2px;
+    background-color: #e6edf3;
+    border-radius: 50%;
+    transition: transform 0.25s ease;
+}
+
+.toggle-switch input:checked + .slider {
+    background-color: #2da44e;
+}
+
+.toggle-switch input:checked + .slider::before {
+    transform: translateX(20px);
+}
