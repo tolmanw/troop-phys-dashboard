@@ -33,6 +33,11 @@ function renderChallenge(athletesData, monthNames) {
 
     const container = document.getElementById("challengeContainer");
     container.innerHTML = `
+        <div class="challenge-card challenge-rules-card">
+            <h3>Challenge Rules</h3>
+            <div class="challenge-rules"></div>
+        </div>
+
         <div class="challenge-card">
             <h2>Monthly Challenge</h2>
             <canvas id="challengeChartCanvas"></canvas>
@@ -44,7 +49,11 @@ function renderChallenge(athletesData, monthNames) {
         </div>
     `;
 
-    const card = container.querySelector(".challenge-card");
+    const rulesCard = container.querySelector(".challenge-rules-card");
+    const rulesTitle = rulesCard.querySelector("h3");
+    const rulesBody = rulesCard.querySelector(".challenge-rules");
+
+    const card = container.querySelector(".challenge-card:nth-of-type(2)");
     const canvas = document.getElementById("challengeChartCanvas");
     const ctx = canvas.getContext("2d");
 
@@ -64,6 +73,26 @@ function renderChallenge(athletesData, monthNames) {
         headerPaddingTop,
         headerFontSize
     } = getSettings();
+
+    // --- Rules card styling (MATCHES summary card) ---
+    rulesCard.style.width = cardWidth;
+    rulesCard.style.margin = "0 0 12px 0";
+    rulesCard.style.boxSizing = "border-box";
+    rulesCard.style.padding = `
+        ${isMobile ? 10 : 12}px
+        ${chartPadding}px
+    `;
+    rulesCard.style.background = "#1b1f25";
+    rulesCard.style.borderRadius = "15px";
+
+    rulesTitle.style.margin = "0 0 8px 0";
+    rulesTitle.style.fontSize = headerFontSize + "px";
+    rulesTitle.style.color = "#e6edf3";
+
+    rulesBody.style.minHeight = "40px";
+    rulesBody.style.fontSize = fontSize + "px";
+    rulesBody.style.color = "#e6edf3";
+    rulesBody.style.opacity = "0.85";
 
     // --- Chart card styling ---
     card.style.width = cardWidth;
@@ -257,7 +286,6 @@ function initChallengeToggle() {
         container.style.display = on ? "none" : "flex";
         challengeContainer.style.display = on ? "block" : "none";
 
-        // ---- FIX: keep spacing consistent ----
         if (monthSelector) monthSelector.style.visibility = on ? "hidden" : "visible";
         if (monthLabel) monthLabel.style.visibility = on ? "hidden" : "visible";
 
