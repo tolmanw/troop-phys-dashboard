@@ -2,6 +2,7 @@ import os
 import json
 import requests
 from datetime import datetime, timedelta, timezone
+import pytz  # needed for UK timezone
 
 # --- Environment variables ---
 CLIENT_ID = os.environ['STRAVA_CLIENT_ID']
@@ -151,18 +152,22 @@ for username, info in refresh_tokens.items():
 
     found_athletes.append(alias)
 
-# --- Save JSON ---
+# --- Save JSON in UK timezone ---
+uk_tz = pytz.timezone("Europe/London")
+last_synced_uk = datetime.now(uk_tz).strftime("%d-%m-%Y %H:%M")
+
 os.makedirs("data", exist_ok=True)
 with open("data/athletes.json", "w") as f:
     json.dump(
         {
             "athletes": athletes_out,
             "month_names": month_names,
-            "last_synced": datetime.now(timezone.utc).strftime("%d-%m-%Y %H:%M")
+            "last_synced": last_synced_uk
         },
         f,
         indent=2
     )
+
 print("athletes.json updated successfully.")
 print(f"Found athletes: {found_athletes}")
 print(f"Skipped athletes: {skipped_athletes}")
