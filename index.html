@@ -272,6 +272,15 @@ function destroyChartIfExists(id){
 async function loadData() {
     const response = await fetch("data/athletes.json");
     const data = await response.json();
+
+    // Display last synced timestamp
+    const lastSyncedEl = document.getElementById("lastSynced");
+    if (data.last_synced) {
+        lastSyncedEl.textContent = `Last synced: ${data.last_synced}`;
+    } else {
+        lastSyncedEl.textContent = "Last synced: unknown";
+    }
+
     athletesData = data.athletes;
     monthNames = data.month_names.map(m => m.substr(0,3));
 
