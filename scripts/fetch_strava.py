@@ -2,7 +2,6 @@ import os
 import json
 import requests
 from datetime import datetime, timedelta, timezone
-import pytz  # needed for UK timezone
 
 # --- Environment variables ---
 CLIENT_ID = os.environ['STRAVA_CLIENT_ID']
@@ -71,6 +70,21 @@ def days_in_month(dt):
     next_month = dt.replace(day=28) + timedelta(days=4)
     return (next_month - timedelta(days=next_month.day)).day
 
+# --- UK time without pytz ---
+def uk_now():
+    now_utc = datetime.now(timezone.utc)
+    year = now_utc.year
+    # Last Sunday in March
+    dst_start = datetime(year, 3, 31, 1, 0, tzinfo=timezone.utc)
+    while dst_start.weekday() != 6:
+        dst_start -= timedelta(days=1)
+    # Last Sunday in October
+    dst_end = datetime(year, 10, 31, 1, 0, tzinfo=timezone.utc)
+    while dst_end.weekday() != 6:
+        dst_end -= timedelta(days=1)
+    offset = timedelta(hours=1) if dst_start <= now_utc < dst_end else timedelta(hours=0)
+    return now_utc + offset
+
 # --- Determine last three months ---
 prev_ts, month_starts = get_last_three_month_starts()
 month_names = [m.strftime("%B %Y") for m in month_starts]
@@ -98,16 +112,10 @@ for username, info in refresh_tokens.items():
         skipped_athletes.append(username)
         continue
 
-    # --- Fresh authoritative arrays ---
     monthly_distance = [0.0] * 3
     monthly_time_min = [0.0] * 3
-
-    daily_distance = [
-        [0.0] * days_in_month(m) for m in month_starts
-    ]
-    daily_time_min = [
-        [0.0] * days_in_month(m) for m in month_starts
-    ]
+    daily_distance = [[0.0] * days_in_month(m) for m in month_starts]
+    daily_time_min = [[0.0] * days_in_month(m) for m in month_starts]
 
     processed_activities = set()
 
@@ -152,17 +160,14 @@ for username, info in refresh_tokens.items():
 
     found_athletes.append(alias)
 
-# --- Save JSON in UK timezone ---
-uk_tz = pytz.timezone("Europe/London")
-last_synced_uk = datetime.now(uk_tz).strftime("%d-%m-%Y %H:%M")
-
+# --- Save JSON ---
 os.makedirs("data", exist_ok=True)
 with open("data/athletes.json", "w") as f:
     json.dump(
         {
             "athletes": athletes_out,
             "month_names": month_names,
-            "last_synced": last_synced_uk
+            "last_synced": uk_now().strftime("%d-%m-%Y %H:%M")  # UK time
         },
         f,
         indent=2
