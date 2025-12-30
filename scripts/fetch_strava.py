@@ -57,14 +57,30 @@ def get_last_three_month_starts():
 
 def fetch_activities(access_token, after_ts):
     url = "https://www.strava.com/api/v3/athlete/activities"
-    params = {"after": after_ts, "per_page": 200}
     headers = {"Authorization": f"Bearer {access_token}"}
-    response = requests.get(url, headers=headers, params=params)
-    if response.status_code != 200:
-        print("Error fetching activities:", response.status_code, response.text)
-        return []
-    activities = response.json()
-    return activities if isinstance(activities, list) else []
+
+    all_activities = []
+    page = 1
+
+    while True:
+        params = {
+            "after": after_ts,
+            "per_page": 200,
+            "page": page
+        }
+        response = requests.get(url, headers=headers, params=params)
+        if response.status_code != 200:
+            print("Error fetching activities:", response.status_code, response.text)
+            break
+
+        activities = response.json()
+        if not activities:
+            break
+
+        all_activities.extend(activities)
+        page += 1
+
+    return all_activities
 
 def days_in_month(dt):
     next_month = dt.replace(day=28) + timedelta(days=4)
@@ -95,10 +111,9 @@ for username, info in refresh_tokens.items():
         skipped_athletes.append(username)
         continue
 
-    activities = fetch_activities(access_token, 0)  # fetch all history to preserve older months
+    activities = fetch_activities(access_token, 0)
     activities = [a for a in activities if a.get("type") in activity_types]
 
-    # Prepare existing data if present
     alias = USERNAME_ALIASES_NORMALIZED.get(username.lower())
     if not alias:
         print(f"Skipping '{username}': no alias defined")
@@ -111,7 +126,6 @@ for username, info in refresh_tokens.items():
     old_monthly_distance = old_athlete_data.get("monthly_distances", [])
     old_monthly_time = old_athlete_data.get("monthly_time", [])
 
-    # Initialize arrays for last three months if missing
     monthly_distance = old_monthly_distance[-3:] if old_monthly_distance else [0.0]*3
     monthly_time_min = old_monthly_time[-3:] if old_monthly_time else [0.0]*3
     daily_distance = old_daily_distance[-3:] if old_daily_distance else []
@@ -121,7 +135,6 @@ for username, info in refresh_tokens.items():
         daily_distance.append([0.0]*days_in_month(month_starts[len(daily_distance)]))
         daily_time_min.append([0.0]*days_in_month(month_starts[len(daily_time_min)]))
 
-    # Fill in new activity data
     for act in activities:
         dt = datetime.strptime(act["start_date_local"], "%Y-%m-%dT%H:%M:%S%z")
         dist_km = act.get("distance",0)/1000
@@ -134,20 +147,18 @@ for username, info in refresh_tokens.items():
                 daily_distance[idx][day_idx] += dist_km
                 daily_time_min[idx][day_idx] += time_min
 
-    # Fetch profile
     athlete_url = "https://www.strava.com/api/v3/athlete"
     headers = {"Authorization": f"Bearer {access_token}"}
     profile_data = requests.get(athlete_url, headers=headers).json()
     profile_img = profile_data.get("profile","")
 
-    # Save merged data
     athletes_out[alias] = {
         "display_name": alias,
         "profile": profile_img,
         "monthly_distances": [round(d,2) for d in monthly_distance],
         "monthly_time": [round(t) for t in monthly_time_min],
         "daily_distance_km": [[round(d,2) for d in month] for month in daily_distance],
-        "daily_time_min": [[round(t) for t in month] for month in daily_time_min]
+        "daily_time_min": [[round(t,2) for t in month] for month in daily_time_min]
     }
     found_athletes.append(alias)
 
