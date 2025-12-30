@@ -276,9 +276,9 @@ async function loadData() {
     // Display last synced timestamp
     const lastSyncedEl = document.getElementById("lastSynced");
     if (data.last_synced) {
-        lastSyncedEl.textContent = `Last synced: ${data.last_synced}`;
+        lastSyncedEl.textContent = `Last sync with Strava: ${data.last_synced}`;
     } else {
-        lastSyncedEl.textContent = "Last synced: unknown";
+        lastSyncedEl.textContent = "Last sync with Strava: unknown";
     }
 
     athletesData = data.athletes;
