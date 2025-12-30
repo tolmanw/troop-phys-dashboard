@@ -81,7 +81,7 @@ canvas {
 #dailyMonthSelector {
     appearance: none;          /* remove default arrow */
     -webkit-appearance: none;
-    background-color: #1b1f25; /* match card color */
+    background-color: red; /* match card color */
     color: #e6edf3;            /* text color */
     border: 1px solid #555;    /* subtle border */
     border-radius: 22px;       /* pill shape like toggle */
