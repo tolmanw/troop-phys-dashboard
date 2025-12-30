@@ -126,8 +126,12 @@ for username, info in refresh_tokens.items():
     # --- Fill in activity data ---
     for act in activities:
         dt = datetime.strptime(act["start_date_local"], "%Y-%m-%dT%H:%M:%S%z")
-        dist_km = act.get("distance",0)/1000
-        time_min = act.get("moving_time",0)/60
+        dist_km = act.get("distance", 0) / 1000
+        time_min = act.get("moving_time", 0) / 60
+
+        # --- DEBUG: Print summary of this activity ---
+        print(f"[DEBUG] {alias} | {dt.date()} | {act.get('name','Unnamed')} | {act.get('type')} | {dist_km:.2f} km | {time_min:.1f} min")
+
         for idx, start in enumerate(month_starts):
             if dt.year == start.year and dt.month == start.month:
                 monthly_distance[idx] += dist_km
