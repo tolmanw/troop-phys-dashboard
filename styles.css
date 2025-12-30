@@ -72,63 +72,45 @@ canvas {
 
 /* Fixed medium size for Monthly Challenge chart */
 #challengeContainer .challenge-card canvas {
-  width: 100% !important;    /* full width of the card */
-  height: 300px !important;  /* medium fixed height */
-  max-width: 800px;         /* optional max width for large screens */
-  display: block;            /* ensures proper layout */
+  width: 100% !important;
+  height: 300px !important;
+  max-width: 800px;
+  display: block;
 }
 
 /* --- Toggle-like Month Selector --- */
 .toggle-like {
-    display: inline-flex;
-    align-items: center;
-    gap: 10px;
-    cursor: pointer;
-    font-size: 14px;
-    margin-bottom: 8px;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  font-size: 14px;
+  margin-bottom: 8px;
 }
 
 .toggle-like select {
-    appearance: none;
-    -webkit-appearance: none;
-    background-color: #1b1f25;
-    color: #e6edf3;
-    border: 1px solid #555;
-    border-radius: 22px;        /* same pill shape */
-    padding: 4px 28px 4px 12px; /* room for arrow */
-    height: 22px;              /* EXACT match to toggle */
-    line-height: 1;
-    cursor: pointer;
+  appearance: none;
+  -webkit-appearance: none;
 
-    background-image: url("data:image/svg+xml,%3Csvg fill='white' height='12' viewBox='0 0 24 24' width='12' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M7 10l5 5 5-5z'/%3E%3C/svg%3E");
-    background-repeat: no-repeat;
-    background-position: right 8px center;
-    background-size: 12px;
+  background-color: #1b1f25;
+  color: #e6edf3;
+
+  border: 1px solid #555;
+  border-radius: 22px;
+
+  padding: 4px 28px 4px 12px;
+  height: 22px;
+  line-height: 1;
+
+  cursor: pointer;
+
+  background-image: url("data:image/svg+xml,%3Csvg fill='white' height='12' viewBox='0 0 24 24' width='12' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M7 10l5 5 5-5z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 8px center;
+  background-size: 12px;
 }
 
 .toggle-like select:focus {
-    outline: none;
-    border-color: #2da44e; /* same green as toggle ON */
+  outline: none;
+  border-color: #2da44e;
 }
-
-/* FORCE pill-style Daily Month selector (desktop + mobile) */
-.toggle-like select#dailyMonthSelector {
-    appearance: none !important;
-    -webkit-appearance: none !important;
-    background-color: #1b1f25 !important;
-    color: #e6edf3 !important;
-    border: 1px solid #555 !important;
-    border-radius: 22px !important;
-    padding: 4px 28px 4px 12px !important;
-    height: 22px !important;
-    line-height: 1 !important;
-    cursor: pointer !important;
-
-    background-image: url("data:image/svg+xml,%3Csvg fill='white' height='12' viewBox='0 0 24 24' width='12' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M7 10l5 5 5-5z'/%3E%3C/svg%3E") !important;
-    background-repeat: no-repeat !important;
-    background-position: right 8px center !important;
-    background-size: 12px !important;
-}
-
-
-
