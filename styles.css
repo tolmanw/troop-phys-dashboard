@@ -25,7 +25,7 @@ h1 {
   margin-top: 10px;
 }
 
-/* Generic selects EXCEPT daily month selector */
+/* Generic selects except daily month selector */
 select:not(#dailyMonthSelector) {
   padding: 6px;
   background: #333;
@@ -78,7 +78,67 @@ canvas {
   display: block;
 }
 
-/* --- Toggle-like Month Selector --- */
+/* --- Toggle Switch --- */
+.toggle-switch {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  font-size: 14px;
+  margin-bottom: 8px;
+}
+
+.toggle-switch input {
+  display: none;
+}
+
+.toggle-switch .slider {
+  position: relative;
+  width: 42px;
+  height: 22px;
+  background-color: #555;
+  border-radius: 22px;
+  transition: background-color 0.25s ease;
+}
+
+.toggle-switch .slider::before {
+  content: "";
+  position: absolute;
+  width: 18px;
+  height: 18px;
+  top: 2px;
+  left: 2px;
+  background-color: #e6edf3;
+  border-radius: 50%;
+  transition: transform 0.25s ease;
+}
+
+.toggle-switch input:checked + .slider {
+  background-color: #2da44e;
+}
+
+.toggle-switch input:checked + .slider::before {
+  transform: translateX(20px);
+}
+
+/* Optional mobile scaling for toggle */
+@media (max-width: 600px) {
+  .toggle-switch {
+    font-size: 12px;
+  }
+  .toggle-switch .slider {
+    width: 36px;
+    height: 18px;
+  }
+  .toggle-switch .slider::before {
+    width: 14px;
+    height: 14px;
+    top: 2px;
+    left: 2px;
+  }
+}
+
+/* --- Toggle-like pill-style dropdown --- */
 .toggle-like {
   display: inline-flex;
   align-items: center;
@@ -88,29 +148,63 @@ canvas {
   margin-bottom: 8px;
 }
 
-.toggle-like select {
-  appearance: none;
-  -webkit-appearance: none;
-
-  background-color: #1b1f25;
-  color: #e6edf3;
-
-  border: 1px solid #555;
+/* Wrapper for pill styling */
+.select-wrapper {
+  position: relative;
+  display: inline-block;
+  height: 22px;             /* match toggle switch height */
   border-radius: 22px;
-
-  padding: 4px 28px 4px 12px;
-  height: 22px;
-  line-height: 1;
-
-  cursor: pointer;
-
-  background-image: url("data:image/svg+xml,%3Csvg fill='white' height='12' viewBox='0 0 24 24' width='12' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M7 10l5 5 5-5z'/%3E%3C/svg%3E");
-  background-repeat: no-repeat;
-  background-position: right 8px center;
-  background-size: 12px;
+  background-color: #1b1f25;
+  border: 1px solid #555;
+  overflow: hidden;
 }
 
-.toggle-like select:focus {
+/* Transparent select inside wrapper */
+.select-wrapper select {
+  appearance: none;
+  -webkit-appearance: none;
+  border: none;
+  background: transparent;
+  color: #e6edf3;
+  padding: 0 28px 0 12px;
+  height: 100%;
+  line-height: 22px;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+/* Arrow for dropdown */
+.select-wrapper::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  right: 8px;
+  transform: translateY(-50%);
+  width: 12px;
+  height: 12px;
+  background-image: url("data:image/svg+xml,%3Csvg fill='white' height='12' viewBox='0 0 24 24' width='12' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M7 10l5 5 5-5z'/%3E%3C/svg%3E");
+  background-size: contain;
+  background-repeat: no-repeat;
+  pointer-events: none;
+}
+
+/* Focus state */
+.select-wrapper select:focus {
   outline: none;
   border-color: #2da44e;
+}
+
+/* Mobile adjustments */
+@media (max-width: 600px) {
+  .select-wrapper {
+    height: 18px;
+  }
+  .select-wrapper select {
+    line-height: 18px;
+    font-size: 12px;
+  }
+  .select-wrapper::after {
+    width: 10px;
+    height: 10px;
+  }
 }
