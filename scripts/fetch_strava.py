@@ -95,12 +95,12 @@ for username, info in refresh_tokens.items():
         skipped_athletes.append(username)
         continue
 
-    # --- Fetch only activities since first tracked month ---
+    # --- Fetch activities since first month ---
     after_ts = int(month_starts[0].timestamp())
     activities = fetch_activities(access_token, after_ts)
     activities = [a for a in activities if a.get("type") in activity_types]
 
-    # --- Prepare existing data ---
+    # --- Prepare alias ---
     alias = USERNAME_ALIASES_NORMALIZED.get(username.lower())
     if not alias:
         print(f"Skipping '{username}': no alias defined")
@@ -113,7 +113,7 @@ for username, info in refresh_tokens.items():
     old_monthly_distance = old_athlete_data.get("monthly_distances", [])
     old_monthly_time = old_athlete_data.get("monthly_time", [])
 
-    # --- Initialize arrays for last three months ---
+    # --- Initialize arrays ---
     monthly_distance = old_monthly_distance[-3:] if old_monthly_distance else [0.0]*3
     monthly_time_min = old_monthly_time[-3:] if old_monthly_time else [0.0]*3
     daily_distance = old_daily_distance[-3:] if old_daily_distance else []
@@ -123,14 +123,20 @@ for username, info in refresh_tokens.items():
         daily_distance.append([0.0]*days_in_month(month_starts[len(daily_distance)]))
         daily_time_min.append([0.0]*days_in_month(month_starts[len(daily_time_min)]))
 
-    # --- Fill in activity data ---
+    # --- Process activities, track unique IDs ---
+    processed_activities = set()
     for act in activities:
-        dt = datetime.strptime(act["start_date_local"], "%Y-%m-%dT%H:%M:%S%z")
-        dist_km = act.get("distance", 0) / 1000
-        time_min = act.get("moving_time", 0) / 60
+        act_id = act.get("id")
+        if act_id in processed_activities:
+            continue
+        processed_activities.add(act_id)
 
-        # --- DEBUG: Print summary of this activity ---
-        print(f"[DEBUG] {alias} | {dt.date()} | {act.get('name','Unnamed')} | {act.get('type')} | {dist_km:.2f} km | {time_min:.1f} min")
+        dt = datetime.strptime(act["start_date_local"], "%Y-%m-%dT%H:%M:%S%z")
+        dist_km = act.get("distance",0)/1000
+        time_min = act.get("moving_time",0)/60  # store minutes
+
+        # Debug output
+        print(f"[DEBUG] {alias} | {dt.strftime('%Y-%m-%d')} | {act.get('name')} | {act.get('type')} | {dist_km:.2f} km | {time_min:.1f} min")
 
         for idx, start in enumerate(month_starts):
             if dt.year == start.year and dt.month == start.month:
