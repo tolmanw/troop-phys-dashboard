@@ -52,19 +52,6 @@ function renderChallenge(athletesData, monthNames) {
     const rulesCard = container.querySelector(".challenge-rules-card");
     const rulesTitle = rulesCard.querySelector("h3");
     const rulesBody = rulesCard.querySelector(".challenge-rules");
-
-    rulesBody.innerHTML = `
-    <div style="
-        display:flex;
-        flex-direction:column;
-        gap:6px;
-        line-height:1.4;
-    ">
-        <div>🚴‍♂️ <strong>Bike</strong>: 1 mile = <strong>0.25 points</strong></div>
-        <div>🏃‍♂️ <strong>Run</strong>: 1 mile = <strong>1 point</strong></div>
-        <div>🏊‍♂️ <strong>Swim</strong>: 1 mile = <strong>4 points</strong></div>
-    </div>
-`;
     const card = container.querySelector(".challenge-card:nth-of-type(2)");
     const canvas = document.getElementById("challengeChartCanvas");
     const ctx = canvas.getContext("2d");
