@@ -53,6 +53,15 @@ function renderChallenge(athletesData, monthNames) {
     const rulesTitle = rulesCard.querySelector("h3");
     const rulesBody = rulesCard.querySelector(".challenge-rules");
 
+    // Add the point rules
+    rulesBody.innerHTML = `
+        <div style="display:flex;flex-direction:column;gap:6px;line-height:1.4;">
+            <div>🚴‍♂️ <strong>Bike</strong>: 1 mile = <strong>0.25 points</strong></div>
+            <div>🏃‍♂️ <strong>Run</strong>: 1 mile = <strong>1 point</strong></div>
+            <div>🏊‍♂️ <strong>Swim</strong>: 1 mile = <strong>4 points</strong></div>
+        </div>
+    `;
+
     const card = container.querySelector(".challenge-card:nth-of-type(2)");
     const canvas = document.getElementById("challengeChartCanvas");
     const ctx = canvas.getContext("2d");
@@ -74,14 +83,11 @@ function renderChallenge(athletesData, monthNames) {
         headerFontSize
     } = getSettings();
 
-    // --- Rules card styling (MATCHES summary card) ---
+    // --- Rules card styling ---
     rulesCard.style.width = cardWidth;
     rulesCard.style.margin = "0 0 12px 0";
     rulesCard.style.boxSizing = "border-box";
-    rulesCard.style.padding = `
-        ${isMobile ? 10 : 12}px
-        ${chartPadding}px
-    `;
+    rulesCard.style.padding = `${isMobile ? 10 : 12}px ${chartPadding}px`;
     rulesCard.style.background = "#1b1f25";
     rulesCard.style.borderRadius = "15px";
 
@@ -98,12 +104,7 @@ function renderChallenge(athletesData, monthNames) {
     card.style.width = cardWidth;
     card.style.margin = "0";
     card.style.boxSizing = "border-box";
-    card.style.padding = `
-        ${headerPaddingTop}px
-        ${chartPadding}px
-        ${chartPadding}px
-        ${chartPadding}px
-    `;
+    card.style.padding = `${headerPaddingTop}px ${chartPadding}px ${chartPadding}px ${chartPadding}px`;
     card.style.height = chartHeight + "px";
     card.style.background = "#1b1f25";
     card.style.borderRadius = "15px";
@@ -120,10 +121,7 @@ function renderChallenge(athletesData, monthNames) {
     summaryCard.style.width = cardWidth;
     summaryCard.style.margin = "12px 0 0 0";
     summaryCard.style.boxSizing = "border-box";
-    summaryCard.style.padding = `
-        ${isMobile ? 10 : 12}px
-        ${chartPadding}px
-    `;
+    summaryCard.style.padding = `${isMobile ? 10 : 12}px ${chartPadding}px`;
     summaryCard.style.background = "#1b1f25";
     summaryCard.style.borderRadius = "15px";
 
@@ -170,7 +168,7 @@ function renderChallenge(athletesData, monthNames) {
     const maxDistanceMi =
         Math.ceil(Math.max(...datasets.flatMap(d => d.data))) + 1;
 
-    // --- Summary content ---
+    // --- Summary content (athlete totals) ---
     const totals = datasets
         .map(d => ({
             label: d.label,
@@ -286,6 +284,7 @@ function initChallengeToggle() {
         container.style.display = on ? "none" : "flex";
         challengeContainer.style.display = on ? "block" : "none";
 
+        // Hide month label and selector but keep layout
         if (monthSelector) monthSelector.style.visibility = on ? "hidden" : "visible";
         if (monthLabel) monthLabel.style.visibility = on ? "hidden" : "visible";
 
