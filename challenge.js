@@ -157,7 +157,6 @@ function renderChallenge(athletesData, monthNames) {
 
         // --- Fixed cumulative points calculation ---
         const dailyPoints = daily.map((d, i) => {
-            if (i + 1 > currentDay) return null; // stop plotting beyond today
             let dayPoints = 0;
             d.activities.forEach(act => {
                 const miles = (act.distance_km || 0) * 0.621371; // km -> miles
