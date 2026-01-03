@@ -135,11 +135,16 @@ function renderChallenge(athletesData, monthNames) {
     summary.style.fontSize = fontSize + "px";
     summary.style.color = "#e6edf3";
 
-    // --- Prepare datasets ---
-    const currentMonthIndex = monthNames.length - 1;
+    // --- Chart logic (updated for points) ---
+    const pointsPerActivity = {
+        "Swim": 4,       // 1 mile = 4 points
+        "Run": 1,        // 1 mile = 1 point
+        "Bike": 0.25,    // 1 mile = 0.25 points
+        "Weights": 0.1   // 10 min = 1 point -> 1 min = 0.1 point
+    };
 
     const datasets = Object.values(athletesData).map(a => {
-        const daily = a.daily_distance_km[currentMonthIndex] || [];
+        const daily = a.daily || []; // array of daily activities
         let cumulative = 0;
 
         if (!athleteColors[a.display_name]) {
@@ -147,9 +152,24 @@ function renderChallenge(athletesData, monthNames) {
                 `hsl(${Math.floor(Math.random() * 360)}, 100%, 50%)`;
         }
 
+        const data = daily.map(dayActs => {
+            let dayPoints = 0;
+            dayActs.forEach(act => {
+                if (pointsPerActivity[act.type]) {
+                    if (act.type === "Weights") {
+                        dayPoints += (act.duration_min || 0) * pointsPerActivity[act.type];
+                    } else {
+                        dayPoints += (act.distance_km || 0) * pointsPerActivity[act.type];
+                    }
+                }
+            });
+            cumulative += dayPoints;
+            return +cumulative.toFixed(2);
+        });
+
         return {
             label: a.display_name,
-            data: daily.map(d => +(cumulative += d * 0.621371).toFixed(2)),
+            data,
             borderColor: athleteColors[a.display_name],
             borderWidth: 3,
             tension: 0.3,
@@ -164,11 +184,9 @@ function renderChallenge(athletesData, monthNames) {
         return;
     }
 
-    const labels = datasets[0].data.map((_, i) => i + 1);
-    const maxDistanceMi =
-        Math.ceil(Math.max(...datasets.flatMap(d => d.data))) + 1;
+    const labels = datasets[0]?.data.map((_, i) => i + 1) || [];
+    const maxPoints = Math.ceil(Math.max(...datasets.flatMap(d => d.data))) + 1;
 
-    // --- Athlete totals ---
     const totals = datasets
         .map(d => ({
             label: d.label,
@@ -178,7 +196,6 @@ function renderChallenge(athletesData, monthNames) {
         .sort((a, b) => b.total - a.total);
 
     const avatarSize = isMobile ? 16 : 20;
-
     summary.innerHTML = totals.map(t => {
         const athlete = Object.values(athletesData)
             .find(a => a.display_name === t.label);
@@ -194,12 +211,11 @@ function renderChallenge(athletesData, monthNames) {
                 <img src="${athlete?.profile || ""}"
                      style="width:${avatarSize}px;height:${avatarSize}px;border-radius:50%;object-fit:cover;">
                 <span style="color:${t.color}">${t.label}</span>
-                <span style="opacity:0.7">${t.total.toFixed(1)} mi</span>
+                <span style="opacity:0.7">${t.total.toFixed(1)} pts</span>
             </div>
         `;
     }).join("");
 
-    // --- Chart ---
     challengeChart = new Chart(ctx, {
         type: "line",
         data: { labels, datasets },
@@ -207,33 +223,28 @@ function renderChallenge(athletesData, monthNames) {
             responsive: true,
             maintainAspectRatio: false,
             layout: {
-                padding: {
-                    bottom: chartPaddingBottom,
-                    right: paddingRight
-                }
+                padding: { bottom: chartPaddingBottom, right: paddingRight }
             },
             plugins: {
                 legend: { display: false },
                 tooltip: {
+                    callbacks: {
+                        label: ctx => `${ctx.dataset.label}: ${ctx.raw} pts`
+                    },
                     bodyFont: { size: fontSize },
                     titleFont: { size: fontSize }
                 }
             },
             scales: {
                 x: {
-                    ticks: {
-                        font: { size: fontSize },
-                        padding: isMobile ? 10 : 6,
-                        maxRotation: 0,
-                        minRotation: 0
-                    }
+                    ticks: { font: { size: fontSize }, padding: isMobile ? 10 : 6, maxRotation: 0, minRotation: 0 }
                 },
                 y: {
                     min: 0,
-                    max: maxDistanceMi,
+                    max: maxPoints,
                     title: {
                         display: true,
-                        text: "Cumulative Distance (miles)",
+                        text: "Cumulative Points",
                         font: { size: fontSize }
                     },
                     ticks: { font: { size: fontSize } }
@@ -244,7 +255,6 @@ function renderChallenge(athletesData, monthNames) {
             id: "athleteImages",
             afterDatasetsDraw(chart) {
                 const { ctx, scales: { x, y } } = chart;
-
                 Object.values(athletesData).forEach((a, i) => {
                     const d = chart.data.datasets[i];
                     if (!d?.data.length) return;
