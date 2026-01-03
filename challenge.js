@@ -50,7 +50,6 @@ function renderChallenge(athletesData, monthNames) {
     `;
 
     const rulesCard = container.querySelector(".challenge-rules-card");
-    const rulesTitle = rulesCard.querySelector("h3");
     const rulesBody = rulesCard.querySelector(".challenge-rules");
 
     const card = container.querySelector(".challenge-card:nth-of-type(2)");
@@ -58,7 +57,6 @@ function renderChallenge(athletesData, monthNames) {
     const ctx = canvas.getContext("2d");
 
     const summaryCard = container.querySelector(".challenge-summary-card");
-    const summaryTitle = summaryCard.querySelector("h3");
     const summary = summaryCard.querySelector(".challenge-summary");
 
     const {
@@ -77,39 +75,32 @@ function renderChallenge(athletesData, monthNames) {
     // --- Rules card styling ---
     rulesCard.style.width = cardWidth;
     rulesCard.style.margin = "0 0 12px 0";
-    rulesCard.style.boxSizing = "border-box";
     rulesCard.style.padding = `${isMobile ? 10 : 12}px ${chartPadding}px`;
     rulesCard.style.background = "#1b1f25";
     rulesCard.style.borderRadius = "15px";
 
-    rulesTitle.style.margin = "0 0 8px 0";
-    rulesTitle.style.fontSize = headerFontSize + "px";
-    rulesTitle.style.color = "#e6edf3";
-
+    rulesCard.querySelector("h3").style.fontSize = headerFontSize + "px";
+    rulesBody.style.fontSize = fontSize + "px";
+    rulesBody.style.color = "#e6edf3";
+    rulesBody.style.opacity = "0.85";
     rulesBody.innerHTML = `
         <div style="display:flex;flex-direction:column;gap:6px;line-height:1.4;">
             <div>🏊‍♂️ <strong>Swim</strong>: 1 mile = <strong>4 points</strong></div>
             <div>🏃‍♂️ <strong>Run</strong>: 1 mile = <strong>1 point</strong></div>
-            <div>🚴‍♂️ <strong>Bike</strong>: 1 mile = <strong>0.25 points</strong></div>
+            <div>🚴‍♂️ <strong>Ride</strong>: 1 mile = <strong>0.25 points</strong></div>
             <div>🏋️ <strong>Weights</strong>: 10 mins = <strong>1 point</strong></div>
         </div>
     `;
-    rulesBody.style.minHeight = "40px";
-    rulesBody.style.fontSize = fontSize + "px";
-    rulesBody.style.color = "#e6edf3";
-    rulesBody.style.opacity = "0.85";
 
     // --- Chart card styling ---
     card.style.width = cardWidth;
     card.style.margin = "0";
-    card.style.boxSizing = "border-box";
     card.style.padding = `${headerPaddingTop}px ${chartPadding}px ${chartPadding}px ${chartPadding}px`;
     card.style.height = chartHeight + "px";
     card.style.background = "#1b1f25";
     card.style.borderRadius = "15px";
 
     const title = card.querySelector("h2");
-    title.style.margin = "0 0 8px 0";
     title.style.fontSize = headerFontSize + "px";
     title.style.color = "#e6edf3";
 
@@ -119,22 +110,18 @@ function renderChallenge(athletesData, monthNames) {
     // --- Summary card styling ---
     summaryCard.style.width = cardWidth;
     summaryCard.style.margin = "12px 0 0 0";
-    summaryCard.style.boxSizing = "border-box";
     summaryCard.style.padding = `${isMobile ? 10 : 12}px ${chartPadding}px`;
     summaryCard.style.background = "#1b1f25";
     summaryCard.style.borderRadius = "15px";
 
-    summaryTitle.style.margin = "0 0 8px 0";
-    summaryTitle.style.fontSize = headerFontSize + "px";
-    summaryTitle.style.color = "#e6edf3";
-
+    summaryCard.querySelector("h3").style.fontSize = headerFontSize + "px";
     summary.style.display = "flex";
     summary.style.flexDirection = "column";
     summary.style.gap = "4px";
     summary.style.fontSize = fontSize + "px";
     summary.style.color = "#e6edf3";
 
-    // --- Points per activity ---
+    // --- Prepare datasets for cumulative points ---
     const pointsPerActivity = {
         Swim: 4,
         Run: 1,
@@ -142,36 +129,46 @@ function renderChallenge(athletesData, monthNames) {
         "Weight Training": 0.1
     };
 
-    const now = new Date();
-    const currentDay = now.getDate(); // days to show
-    const labels = Array.from({ length: currentDay }, (_, i) => i + 1);
+    const today = new Date();
+    const monthStartDate = new Date(today.getFullYear(), today.getMonth(), 1);
+    const daysInMonth = athletesData[Object.keys(athletesData)[0]].daily.length;
+
+    // X-axis labels: all days
+    const labels = Array.from({ length: daysInMonth }, (_, i) => i + 1);
 
     const datasets = Object.values(athletesData).map(a => {
-        const daily = a.daily || [];
         let cumulative = 0;
+        const dailyPoints = a.daily.map((d, idx) => {
+            const date = new Date(d.date);
+            let points = 0;
 
-        if (!athleteColors[a.display_name]) {
-            athleteColors[a.display_name] =
-                `hsl(${Math.floor(Math.random() * 360)}, 100%, 50%)`;
-        }
-
-        const dailyPoints = daily.slice(0, currentDay).map(d => {
-            let dayPoints = 0;
-            if (d.activities.length) {
+            if (date <= today) {
                 d.activities.forEach(act => {
                     const type = act.type;
-                    const miles = act.distance_km * 0.621371;
                     if (pointsPerActivity[type]) {
                         if (type === "Weight Training") {
-                            dayPoints += act.time_min * pointsPerActivity[type];
+                            points += (act.time_min || 0) * pointsPerActivity[type];
                         } else {
-                            dayPoints += miles * pointsPerActivity[type];
+                            const miles = (act.distance_km || 0) * 0.621371;
+                            points += miles * pointsPerActivity[type];
                         }
                     }
                 });
+                cumulative += points;
+                return +cumulative.toFixed(2);
+            } else {
+                return null; // future days
             }
-            return +(cumulative += dayPoints).toFixed(2);
         });
+
+        // Ensure line starts at 0
+        if (dailyPoints[0] === null || dailyPoints[0] > 0) {
+            dailyPoints[0] = 0;
+        }
+
+        if (!athleteColors[a.display_name]) {
+            athleteColors[a.display_name] = `hsl(${Math.floor(Math.random() * 360)}, 100%, 50%)`;
+        }
 
         return {
             label: a.display_name,
@@ -180,35 +177,25 @@ function renderChallenge(athletesData, monthNames) {
             borderWidth: 3,
             tension: 0.3,
             fill: false,
+            spanGaps: false,
             pointRadius: 0
         };
     });
-
-    const maxPoints = Math.ceil(Math.max(...datasets.flatMap(d => d.data), 5)) + 1;
 
     // --- Athlete totals ---
     const totals = datasets
         .map(d => ({
             label: d.label,
             color: d.borderColor,
-            total: d.data.at(-1) || 0
+            total: d.data.filter(v => v !== null).at(-1) || 0
         }))
         .sort((a, b) => b.total - a.total);
 
     const avatarSize = isMobile ? 16 : 20;
-
     summary.innerHTML = totals.map(t => {
-        const athlete = Object.values(athletesData)
-            .find(a => a.display_name === t.label);
-
+        const athlete = Object.values(athletesData).find(a => a.display_name === t.label);
         return `
-            <div style="
-                display:flex;
-                align-items:center;
-                gap:6px;
-                margin-bottom:4px;
-                white-space:nowrap;
-            ">
+            <div style="display:flex;align-items:center;gap:6px;margin-bottom:4px;white-space:nowrap;">
                 <img src="${athlete?.profile || ""}"
                      style="width:${avatarSize}px;height:${avatarSize}px;border-radius:50%;object-fit:cover;">
                 <span style="color:${t.color}">${t.label}</span>
@@ -236,18 +223,15 @@ function renderChallenge(athletesData, monthNames) {
                 x: {
                     ticks: {
                         font: { size: fontSize },
-                        padding: isMobile ? 10 : 6,
                         maxRotation: 0,
                         minRotation: 0,
-                        callback: function(val, index) {
-                            // show every other day
-                            return index % 2 === 0 ? this.getLabelForValue(val) : "";
+                        callback: function(value, index) {
+                            return index % 2 === 0 ? this.getLabelForValue(value) : "";
                         }
                     }
                 },
                 y: {
                     min: 0,
-                    max: maxPoints,
                     title: { display: true, text: "Cumulative Points", font: { size: fontSize } },
                     ticks: { font: { size: fontSize } }
                 }
@@ -260,9 +244,13 @@ function renderChallenge(athletesData, monthNames) {
                 Object.values(athletesData).forEach((a, i) => {
                     const d = chart.data.datasets[i];
                     if (!d?.data.length) return;
-                    const idx = d.data.length - 1;
-                    let xPos = x.getPixelForValue(idx + 1);
-                    let yPos = y.getPixelForValue(d.data[idx]);
+
+                    // find last non-null point
+                    const lastIdx = d.data.map((v, idx) => (v !== null ? idx : -1)).filter(v => v >= 0).at(-1);
+                    if (lastIdx === undefined) return;
+
+                    let xPos = x.getPixelForValue(lastIdx + 1);
+                    let yPos = y.getPixelForValue(d.data[lastIdx]);
                     const size = athleteImgSize;
                     xPos = Math.min(xPos, chart.width - size / 2 - paddingRight);
                     const img = new Image();
