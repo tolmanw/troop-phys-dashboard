@@ -238,22 +238,22 @@ select, input[type=checkbox] {
 <img id="logo" src="logo.jpeg" alt="Logo">
 
 <div class="controls-stack">
-  <!-- Month selector -->
-  <div class="control-item">
-    <label class="toggle-like">
-      <select id="dailyMonthSelector"></select>
-      <span class="month-label">Daily Distance Month</span>
-    </label>
-  </div>
 
-  <!-- Challenge toggle -->
-  <div class="control-item">
-    <label class="toggle-switch">
-      <input type="checkbox" id="challengeToggle">
-      <span class="slider"></span>
-      <span class="toggle-label">Show Monthly Challenge</span>
+    <!-- Daily Distance Month Selector -->
+    <label class="toggle-like control-item">
+        <select id="dailyMonthSelector"></select>
+        <span class="month-label-wrapper">
+            <span class="month-label">Daily Distance Month</span>
+        </span>
     </label>
-  </div>
+
+    <!-- Show Monthly Challenge Toggle -->
+    <label class="toggle-switch control-item">
+        <input type="checkbox" id="challengeToggle">
+        <span class="slider"></span>
+        <span class="toggle-label">Show Monthly Challenge</span>
+    </label>
+
 </div>
 
 <div id="container"></div>
