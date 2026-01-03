@@ -186,19 +186,17 @@ for username, info in refresh_tokens.items():
                 time_min = act.get("moving_time", 0) / 60
                 daily_stats[day_idx]["distance_km"] += dist_km
                 daily_stats[day_idx]["time_min"] += time_min
-                daily_stats[day_idx]["activities"].append(act.get("name", ""))
+                daily_stats[day_idx]["activities"].append({
+                    "name": act.get("name", ""),
+                    "type": act.get("type", ""),
+                    "distance_km": round(dist_km, 2),
+                    "time_min": round(time_min, 1)
+                })
 
     challenge_out[alias] = {
         "display_name": alias,
         "profile": profile_img,
-        "daily": [
-            {
-                "date": d["date"],
-                "distance_km": round(d["distance_km"], 2),
-                "time_min": round(d["time_min"], 1),
-                "activities": d["activities"]
-            } for d in daily_stats
-        ]
+        "daily": daily_stats
     }
 
 # --- Save athletes.json ---
