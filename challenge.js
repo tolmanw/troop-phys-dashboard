@@ -1,3 +1,4 @@
+this code need to pull activity type and return the chart like before 
 let challengeChart = null;
 
 // --- Global neon color cache ---
@@ -157,15 +158,14 @@ function renderChallenge(athletesData, monthNames) {
             let dayPoints = 0;
             if (d.activities.length) {
                 d.activities.forEach(act => {
-                    const type = act.type || act.name || "";
-                    if (type.toLowerCase().includes("swim")) {
-                        dayPoints += (act.distance_km || 0) * pointsPerActivity.Swim;
-                    } else if (type.toLowerCase().includes("run")) {
-                        dayPoints += (act.distance_km || 0) * pointsPerActivity.Run;
-                    } else if (type.toLowerCase().includes("ride") || type.toLowerCase().includes("bike")) {
-                        dayPoints += (act.distance_km || 0) * pointsPerActivity.Bike;
-                    } else if (type.toLowerCase().includes("weight")) {
-                        dayPoints += (act.time_min || 0) * pointsPerActivity.Weights;
+                    if (act.toLowerCase().includes("swim")) {
+                        dayPoints += (d.distance_km || 0) * pointsPerActivity.Swim;
+                    } else if (act.toLowerCase().includes("run")) {
+                        dayPoints += (d.distance_km || 0) * pointsPerActivity.Run;
+                    } else if (act.toLowerCase().includes("bike")) {
+                        dayPoints += (d.distance_km || 0) * pointsPerActivity.Bike;
+                    } else if (act.toLowerCase().includes("weight")) {
+                        dayPoints += (d.time_min || 0) * pointsPerActivity.Weights;
                     }
                 });
             }
@@ -275,3 +275,43 @@ function renderChallenge(athletesData, monthNames) {
         }]
     });
 }
+
+// --- Toggle logic ---
+function initChallengeToggle() {
+    const toggle = document.getElementById("challengeToggle");
+    const monthSelector = document.getElementById("dailyMonthSelector");
+    const monthLabel = document.querySelector(".month-label");
+
+    toggle.addEventListener("change", () => {
+        const container = document.getElementById("container");
+        const challengeContainer = document.getElementById("challengeContainer");
+        const on = toggle.checked;
+        container.style.display = on ? "none" : "flex";
+        challengeContainer.style.display = on ? "block" : "none";
+        if (monthSelector) monthSelector.style.visibility = on ? "hidden" : "visible";
+        if (monthLabel) monthLabel.style.visibility = on ? "hidden" : "visible";
+
+        const { athletesData, monthNames } = window.DASHBOARD.getData();
+        if (on) {
+            window.DASHBOARD.destroyCharts();
+            renderChallenge(athletesData, monthNames);
+        } else {
+            destroyChallenge();
+            window.DASHBOARD.renderDashboard();
+        }
+    });
+}
+
+// --- Init ---
+document.addEventListener("DOMContentLoaded", () => {
+    if (window.DASHBOARD?.getData) {
+        initChallengeToggle();
+        window.addEventListener("resize", () => {
+            if (challengeChart) {
+                destroyChallenge();
+                const { athletesData, monthNames } = window.DASHBOARD.getData();
+                renderChallenge(athletesData, monthNames);
+            }
+        });
+    }
+});
