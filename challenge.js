@@ -1,4 +1,3 @@
-this code need to pull activity type and return the chart like before 
 let challengeChart = null;
 
 // --- Global neon color cache ---
