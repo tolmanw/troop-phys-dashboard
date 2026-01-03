@@ -13,7 +13,7 @@ refresh_tokens = json.loads(REFRESH_TOKENS_JSON)
 USERNAME_ALIASES = json.loads(ALIASES_JSON)
 USERNAME_ALIASES_NORMALIZED = {k.strip().lower(): v for k, v in USERNAME_ALIASES.items()}
 
-# --- Activity types ---
+# --- Activity types for main aggregation ---
 activity_types = [
     "Run", "Trail Run", "Walk", "Hike", "Virtual Run",
     "Ride", "Mountain Bike Ride", "Gravel Ride", "E-Bike Ride", "E-Mountain Bike Ride",
@@ -26,8 +26,8 @@ activity_types = [
     "Virtual Rowing"
 ]
 
-# --- Challenge activity types ---
-CHALLENGE_ACTIVITY_TYPES = ["Run", "Ride", "Swim"]
+# --- Keywords for challenge export ---
+CHALLENGE_KEYWORDS = ["Run", "Ride", "Swim", "Weight Training"]
 
 # --- Functions ---
 def refresh_access_token(refresh_token):
@@ -175,8 +175,14 @@ for username, info in refresh_tokens.items():
 
     found_athletes.append(alias)
 
-    # --- Prepare challenge_1.json ---
-    challenge_activities = [a for a in activities if a.get("type") in CHALLENGE_ACTIVITY_TYPES]
+    # --- Prepare challenge_1.json using keywords ---
+    challenge_activities = [
+        a for a in activities
+        if any(keyword in a.get("type", "") for keyword in CHALLENGE_KEYWORDS)
+    ]
+    print(f"[DEBUG] {alias} total activities fetched: {len(activities)}")
+    print(f"[DEBUG] {alias} challenge activities count: {len(challenge_activities)}")
+
     challenge_out[alias] = []
     for act in challenge_activities:
         dt = datetime.strptime(act["start_date_local"], "%Y-%m-%dT%H:%M:%S%z")
@@ -197,7 +203,7 @@ with open("data/athletes.json", "w") as f:
         {
             "athletes": athletes_out,
             "month_names": month_names,
-            "last_synced": uk_now().strftime("%d-%m-%Y %H:%M")  # UK time
+            "last_synced": uk_now().strftime("%d-%m-%Y %H:%M")
         },
         f,
         indent=2
