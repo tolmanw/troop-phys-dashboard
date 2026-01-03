@@ -1,33 +1,57 @@
-/* Stack rows vertically */
-.controls-stack {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
+/* =========================================================
+   Base body and typography
+   ========================================================= */
+body {
+    background: #0d1117;
+    color: #e6edf3;
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 20px;
+    font-size: 14px;
 }
 
-/* Each row: label + element horizontally */
+/* Page header */
+h1 {
+    font-size: 25px;
+    margin: 0 0 10px 0;
+}
+
+/* =========================================================
+   Controls stack (labels + select/toggle)
+   ========================================================= */
+.controls-stack {
+    display: flex;
+    flex-direction: column; /* vertical stack */
+    gap: 12px; /* space between rows */
+}
+
 .control-item {
     display: flex;
-    justify-content: space-between; /* label left, element right */
+    justify-content: space-between; /* label left, control right */
     align-items: center;
     width: 100%;
 }
 
-/* Labels */
 .control-label {
-    color: #eee;
     font-size: 14px;
-    min-width: 160px; /* ensures alignment */
+    min-width: 180px; /* aligns labels vertically */
 }
 
-/* Select */
+/* =========================================================
+   Form elements
+   ========================================================= */
 select {
     flex: 1; /* take remaining space */
     padding: 6px;
     font-size: 14px;
+    background: #333;
+    color: #fff;
+    border: 1px solid #444;
+    border-radius: 4px;
+    vertical-align: middle;
 }
 
-/* Toggle switch */
+/* Toggle switch styling */
 .toggle-switch {
     display: inline-flex;
     align-items: center;
@@ -35,7 +59,7 @@ select {
 }
 
 .toggle-switch input {
-    display: none;
+    display: none; /* hide checkbox */
 }
 
 .toggle-switch .slider {
@@ -67,21 +91,52 @@ select {
     transform: translateX(20px);
 }
 
-/* Mobile adjustments */
+/* =========================================================
+   Cards container and chart styling
+   ========================================================= */
+#container,
+#challengeContainer {
+    margin-top: 20px;
+}
+
+.card {
+    background: #1b1f25;
+    padding: 10px;
+    border-radius: 12px;
+    margin-bottom: 12px;
+}
+
+/* Chart canvas styling */
+canvas {
+    background: #1a1a1a;
+    border-radius: 10px;
+    width: 100% !important;
+    height: 300px !important;
+}
+
+/* =========================================================
+   Responsive adjustments for mobile ≤ 600px
+   ========================================================= */
 @media (max-width: 600px) {
     .control-label {
-        font-size: 12px;
         min-width: 120px;
+        font-size: 12px;
     }
+
     select {
         font-size: 12px;
+        padding: 4px;
     }
+
     .toggle-switch .slider {
         width: 36px;
         height: 18px;
     }
+
     .toggle-switch .slider::before {
         width: 14px;
         height: 14px;
+        top: 2px;
+        left: 2px;
     }
 }
