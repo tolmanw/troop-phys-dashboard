@@ -1,76 +1,47 @@
 /* =========================================================
-   Global base styles
-   ========================================================= */
-body {
-  background: #111;
-  color: #eee;
-  font-family: Arial, sans-serif;
-  margin: 0;
-  padding: 0;
-}
-
-/* Page-level heading (used by dashboard title) */
-h1 {
-  margin: 0;
-  font-size: 2rem;
-  color: #fff;
-}
-
-/* =========================================================
-   Form controls
+   Controls stack (vertical alignment)
    ========================================================= */
 
-/* Generic select styling (month selector, future selects) */
-select {
-  padding: 6px;
-  background: #333;
-  color: #fff;
-  border: 1px solid #444;
-  border-radius: 4px;
-  font-size: 14px;
-  cursor: pointer;
+.controls-stack {
+    display: flex;
+    flex-direction: column; /* stack each control-item vertically */
+    align-items: flex-start;
+    gap: 6px; /* vertical space between controls */
 }
 
-/* =========================================================
-   Chart canvas presentation
-   NOTE: Chart.js still controls sizing via JS
-   ========================================================= */
-
-/* Visual styling applied directly to all charts */
-canvas {
-  background: #1a1a1a;
-  padding: 10px;
-  border-radius: 10px;
+.control-item {
+    display: flex;
+    width: 100%; /* each control-item occupies full line */
 }
 
-/* Monthly Challenge chart sizing constraint */
-#challengeContainer .challenge-card canvas {
-  width: 100% !important;
-  height: 300px !important;
-  max-width: 800px;
-  display: block;
+/* Inner labels (select + text or toggle + text) */
+.controls-stack label {
+    display: flex;          /* keep children inline */
+    align-items: center;
+    gap: 6px;               /* spacing between child elements */
+    width: 100%;
 }
 
-/* =========================================================
-   Toggle switch (dashboard / challenge mode)
-   ========================================================= */
+/* Optional left margin for text */
+.month-label,
+.toggle-label {
+    margin-left: 10px;
+}
 
-/* Toggle container and label */
+/* Toggle styling (existing) */
 .toggle-switch {
-  display: inline-flex; /* horizontal alignment inside label */
+  display: inline-flex;
   align-items: center;
   gap: 10px;
   cursor: pointer;
   font-size: 14px;
-  margin-bottom: 8px;
+  margin-bottom: 0; /* spacing handled by controls-stack */
 }
 
-/* Hide native checkbox */
 .toggle-switch input {
   display: none;
 }
 
-/* Toggle track */
 .toggle-switch .slider {
   position: relative;
   width: 42px;
@@ -80,7 +51,6 @@ canvas {
   transition: background-color 0.25s ease;
 }
 
-/* Toggle knob */
 .toggle-switch .slider::before {
   content: "";
   position: absolute;
@@ -93,7 +63,6 @@ canvas {
   transition: transform 0.25s ease;
 }
 
-/* Toggle ON state */
 .toggle-switch input:checked + .slider {
   background-color: #2da44e;
 }
@@ -103,45 +72,16 @@ canvas {
 }
 
 /* =========================================================
-   Controls stack (vertical alignment for select + toggle)
+   Mobile adjustments
    ========================================================= */
-
-.controls-stack {
-    display: flex;
-    flex-direction: column; /* stack vertically */
-    align-items: flex-start; /* left align everything */
-    gap: 6px; /* vertical spacing between controls */
-}
-
-/* Ensure each label aligns its inner content horizontally */
-.controls-stack label {
-    display: flex;          /* inner elements inline (select + text / toggle + text) */
-    align-items: center;    /* vertical center within label */
-    gap: 6px;               /* space between element and text */
-    width: 100%;            /* prevent horizontal shrinking */
-}
-
-/* Optional: add consistent left margin for label text inside */
-.month-label,
-.toggle-label {
-    margin-left: 10px;
-}
-
-/* =========================================================
-   Mobile adjustments (≤ 600px)
-   ========================================================= */
-
 @media (max-width: 600px) {
-  /* Slightly smaller toggle on mobile */
   .toggle-switch {
     font-size: 12px;
   }
-
   .toggle-switch .slider {
     width: 36px;
     height: 18px;
   }
-
   .toggle-switch .slider::before {
     width: 14px;
     height: 14px;
