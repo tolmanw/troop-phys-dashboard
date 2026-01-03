@@ -1,41 +1,43 @@
-/* =========================================================
-   Controls stack (vertical alignment)
-   ========================================================= */
-
 .controls-stack {
     display: flex;
-    flex-direction: column; /* stack each control-item vertically */
+    flex-direction: column; /* stack vertically */
     align-items: flex-start;
-    gap: 6px; /* vertical space between controls */
+    gap: 6px; /* space between controls */
 }
 
 .control-item {
     display: flex;
-    width: 100%; /* each control-item occupies full line */
+    width: 100%; /* full width for stacking */
 }
 
-/* Inner labels (select + text or toggle + text) */
+/* Label alignment: horizontal inside label */
 .controls-stack label {
-    display: flex;          /* keep children inline */
+    display: flex;
     align-items: center;
-    gap: 6px;               /* spacing between child elements */
-    width: 100%;
+    gap: 6px;   /* spacing between element and text */
 }
 
-/* Optional left margin for text */
+/* Remove margin on span, instead use flex alignment */
 .month-label,
 .toggle-label {
-    margin-left: 10px;
+    margin-left: 0;  /* remove previous 10px */
+    line-height: 1;  /* align baseline with select / toggle */
+    display: inline-block;
 }
 
-/* Toggle styling (existing) */
+/* Adjust select to baseline alignment */
+select {
+    vertical-align: middle; /* aligns baseline with text */
+    padding: 6px;           /* keep original padding */
+}
+
+/* Toggle styling (unchanged) */
 .toggle-switch {
   display: inline-flex;
   align-items: center;
   gap: 10px;
   cursor: pointer;
   font-size: 14px;
-  margin-bottom: 0; /* spacing handled by controls-stack */
 }
 
 .toggle-switch input {
@@ -86,5 +88,8 @@
     width: 14px;
     height: 14px;
     top: 2px;
+  }
+  select {
+    font-size: 12px;
   }
 }
