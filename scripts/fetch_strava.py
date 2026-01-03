@@ -26,8 +26,8 @@ activity_types = [
     "Virtual Rowing"
 ]
 
-# --- Keywords for challenge_1.json ---
-CHALLENGE_KEYWORDS = ["Run", "Ride", "Swim", "Weight Training"]
+# --- Keywords for challenge activities ---
+CHALLENGE_KEYWORDS_LOWER = ["run", "ride", "swim", "weight"]  # lowercase
 
 # --- Functions ---
 def refresh_access_token(refresh_token):
@@ -81,15 +81,12 @@ def days_in_month(dt):
     next_month = dt.replace(day=28) + timedelta(days=4)
     return (next_month - timedelta(days=next_month.day)).day
 
-# --- UK time without pytz ---
 def uk_now():
     now_utc = datetime.now(timezone.utc)
     year = now_utc.year
-    # Last Sunday in March
     dst_start = datetime(year, 3, 31, 1, 0, tzinfo=timezone.utc)
     while dst_start.weekday() != 6:
         dst_start -= timedelta(days=1)
-    # Last Sunday in October
     dst_end = datetime(year, 10, 31, 1, 0, tzinfo=timezone.utc)
     while dst_end.weekday() != 6:
         dst_end -= timedelta(days=1)
@@ -119,16 +116,6 @@ for username, info in refresh_tokens.items():
     after_ts = int(month_starts[0].timestamp())
     activities = fetch_activities(access_token, after_ts)
 
-    # --- Separate lists ---
-    # For athletes.json
-    agg_activities = [a for a in activities if a.get("type") in activity_types]
-
-    # For challenge_1.json
-    challenge_activities = [
-        a for a in activities
-        if any(keyword in a.get("type", "") for keyword in CHALLENGE_KEYWORDS)
-    ]
-
     alias = USERNAME_ALIASES_NORMALIZED.get(username.lower())
     if not alias:
         print(f"Skipping '{username}': no alias defined")
@@ -142,23 +129,16 @@ for username, info in refresh_tokens.items():
     daily_time_min = [[0.0] * days_in_month(m) for m in month_starts]
 
     processed_activities = set()
-
-    for act in agg_activities:
+    for act in activities:
+        if act.get("type") not in activity_types:
+            continue
         act_id = act.get("id")
         if act_id in processed_activities:
             continue
         processed_activities.add(act_id)
-
         dt = datetime.strptime(act["start_date_local"], "%Y-%m-%dT%H:%M:%S%z")
         dist_km = act.get("distance", 0) / 1000
         time_min = act.get("moving_time", 0) / 60
-
-        print(
-            f"[DEBUG] {alias} | {dt.strftime('%Y-%m-%d')} | "
-            f"{act.get('name')} | {act.get('type')} | "
-            f"{dist_km:.2f} km | {time_min:.1f} min"
-        )
-
         for idx, start in enumerate(month_starts):
             if dt.year == start.year and dt.month == start.month:
                 day_idx = dt.day - 1
@@ -184,23 +164,37 @@ for username, info in refresh_tokens.items():
 
     found_athletes.append(alias)
 
-    # --- Prepare challenge_1.json ---
-    print(f"[DEBUG] {alias} total fetched: {len(activities)}")
-    print(f"[DEBUG] {alias} athletes.json count: {len(agg_activities)}")
-    print(f"[DEBUG] {alias} challenge_1.json count: {len(challenge_activities)}")
+    # --- Aggregation for challenge_1.json ---
+    challenge_monthly_distance = [0.0] * 3
+    challenge_monthly_time = [0.0] * 3
+    challenge_daily_distance = [[0.0] * days_in_month(m) for m in month_starts]
+    challenge_daily_time = [[0.0] * days_in_month(m) for m in month_starts]
 
-    challenge_out[alias] = []
-    for act in challenge_activities:
+    for act in activities:
+        t = act.get("type", "").lower()
+        workout_type = act.get("workout_type")
+        is_weight = workout_type == 9
+        if not (any(kw in t for kw in CHALLENGE_KEYWORDS_LOWER) or is_weight):
+            continue
         dt = datetime.strptime(act["start_date_local"], "%Y-%m-%dT%H:%M:%S%z")
         dist_km = act.get("distance", 0) / 1000
         time_min = act.get("moving_time", 0) / 60
-        challenge_out[alias].append({
-            "date": dt.strftime("%Y-%m-%d"),
-            "type": act.get("type"),
-            "name": act.get("name"),
-            "distance_km": round(dist_km, 2),
-            "duration_min": round(time_min, 1)
-        })
+        for idx, start in enumerate(month_starts):
+            if dt.year == start.year and dt.month == start.month:
+                day_idx = dt.day - 1
+                challenge_monthly_distance[idx] += dist_km
+                challenge_monthly_time[idx] += time_min
+                challenge_daily_distance[idx][day_idx] += dist_km
+                challenge_daily_time[idx][day_idx] += time_min
+
+    challenge_out[alias] = {
+        "display_name": alias,
+        "profile": profile_img,
+        "monthly_distances": [round(d, 2) for d in challenge_monthly_distance],
+        "monthly_time": [round(t) for t in challenge_monthly_time],
+        "daily_distance_km": [[round(d, 2) for d in month] for month in challenge_daily_distance],
+        "daily_time_min": [[round(t, 2) for t in month] for month in challenge_daily_time]
+    }
 
 # --- Save athletes.json ---
 os.makedirs("data", exist_ok=True)
@@ -214,7 +208,6 @@ with open("data/athletes.json", "w") as f:
         f,
         indent=2
     )
-
 print("athletes.json updated successfully.")
 
 # --- Save challenge_1.json ---
@@ -222,12 +215,12 @@ with open("data/challenge_1.json", "w") as f:
     json.dump(
         {
             "athletes": challenge_out,
+            "month_names": month_names,
             "last_synced": uk_now().strftime("%d-%m-%Y %H:%M")
         },
         f,
         indent=2
     )
-
 print("challenge_1.json updated successfully.")
 print(f"Found athletes: {found_athletes}")
 print(f"Skipped athletes: {skipped_athletes}")
