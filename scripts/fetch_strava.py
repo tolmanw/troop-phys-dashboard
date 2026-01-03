@@ -13,7 +13,7 @@ refresh_tokens = json.loads(REFRESH_TOKENS_JSON)
 USERNAME_ALIASES = json.loads(ALIASES_JSON)
 USERNAME_ALIASES_NORMALIZED = {k.strip().lower(): v for k, v in USERNAME_ALIASES.items()}
 
-# --- Activity types for main aggregation ---
+# --- Activity types for athletes.json ---
 activity_types = [
     "Run", "Trail Run", "Walk", "Hike", "Virtual Run",
     "Ride", "Mountain Bike Ride", "Gravel Ride", "E-Bike Ride", "E-Mountain Bike Ride",
@@ -26,7 +26,7 @@ activity_types = [
     "Virtual Rowing"
 ]
 
-# --- Keywords for challenge export ---
+# --- Keywords for challenge_1.json ---
 CHALLENGE_KEYWORDS = ["Run", "Ride", "Swim", "Weight Training"]
 
 # --- Functions ---
@@ -118,7 +118,16 @@ for username, info in refresh_tokens.items():
 
     after_ts = int(month_starts[0].timestamp())
     activities = fetch_activities(access_token, after_ts)
-    activities = [a for a in activities if a.get("type") in activity_types]
+
+    # --- Separate lists ---
+    # For athletes.json
+    agg_activities = [a for a in activities if a.get("type") in activity_types]
+
+    # For challenge_1.json
+    challenge_activities = [
+        a for a in activities
+        if any(keyword in a.get("type", "") for keyword in CHALLENGE_KEYWORDS)
+    ]
 
     alias = USERNAME_ALIASES_NORMALIZED.get(username.lower())
     if not alias:
@@ -126,7 +135,7 @@ for username, info in refresh_tokens.items():
         skipped_athletes.append(username)
         continue
 
-    # --- Prepare monthly/daily aggregation for athletes.json ---
+    # --- Aggregation for athletes.json ---
     monthly_distance = [0.0] * 3
     monthly_time_min = [0.0] * 3
     daily_distance = [[0.0] * days_in_month(m) for m in month_starts]
@@ -134,7 +143,7 @@ for username, info in refresh_tokens.items():
 
     processed_activities = set()
 
-    for act in activities:
+    for act in agg_activities:
         act_id = act.get("id")
         if act_id in processed_activities:
             continue
@@ -175,13 +184,10 @@ for username, info in refresh_tokens.items():
 
     found_athletes.append(alias)
 
-    # --- Prepare challenge_1.json using keywords ---
-    challenge_activities = [
-        a for a in activities
-        if any(keyword in a.get("type", "") for keyword in CHALLENGE_KEYWORDS)
-    ]
-    print(f"[DEBUG] {alias} total activities fetched: {len(activities)}")
-    print(f"[DEBUG] {alias} challenge activities count: {len(challenge_activities)}")
+    # --- Prepare challenge_1.json ---
+    print(f"[DEBUG] {alias} total fetched: {len(activities)}")
+    print(f"[DEBUG] {alias} athletes.json count: {len(agg_activities)}")
+    print(f"[DEBUG] {alias} challenge_1.json count: {len(challenge_activities)}")
 
     challenge_out[alias] = []
     for act in challenge_activities:
