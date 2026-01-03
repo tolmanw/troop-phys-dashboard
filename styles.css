@@ -1,8 +1,12 @@
+/* =========================================================
+   Controls Stack (Dashboard Top Controls)
+   ========================================================= */
+
 .controls-stack {
     display: flex;
-    flex-direction: column; /* stack vertically */
+    flex-direction: column; /* stack each control vertically */
     align-items: flex-start;
-    gap: 6px; /* space between controls */
+    gap: 6px; /* vertical space between controls */
 }
 
 .control-item {
@@ -14,91 +18,107 @@
 .controls-stack label {
     display: flex;
     align-items: center;
-    gap: 6px;   /* spacing between element and text */
+    gap: 6px;   /* spacing between child elements (select/text or toggle/text) */
 }
 
-/* Move Daily Distance select + label to the right */
-.controls-stack .toggle-like {
-    padding-left: 30px; /* adjust this value to move more/less */
+/* Daily Distance Month: only move the text to the right */
+.controls-stack .month-label {
+    margin-left: 12px; /* adjusts only the text, not the select */
+    line-height: 1;
+    display: inline-block;
 }
 
-/* Remove margin on span, instead use flex alignment */
-.month-label,
-.toggle-label {
-    margin-left: 0;  /* remove previous 10px */
-    line-height: 1;  /* align baseline with select / toggle */
+/* Toggle label styling */
+.controls-stack .toggle-label {
+    margin-left: 0; /* no extra offset */
+    line-height: 1;
     display: inline-block;
 }
 
 /* Adjust select to baseline alignment */
 select {
-    vertical-align: middle; /* aligns baseline with text */
-    padding: 6px;           /* keep original padding */
-}
-
-/* Toggle styling (unchanged) */
-.toggle-switch {
-  display: inline-flex;
-  align-items: center;
-  gap: 10px;
-  cursor: pointer;
-  font-size: 14px;
-}
-
-.toggle-switch input {
-  display: none;
-}
-
-.toggle-switch .slider {
-  position: relative;
-  width: 42px;
-  height: 22px;
-  background-color: #555;
-  border-radius: 22px;
-  transition: background-color 0.25s ease;
-}
-
-.toggle-switch .slider::before {
-  content: "";
-  position: absolute;
-  width: 18px;
-  height: 18px;
-  top: 2px;
-  left: 2px;
-  background-color: #e6edf3;
-  border-radius: 50%;
-  transition: transform 0.25s ease;
-}
-
-.toggle-switch input:checked + .slider {
-  background-color: #2da44e;
-}
-
-.toggle-switch input:checked + .slider::before {
-  transform: translateX(20px);
+    vertical-align: middle;
+    padding: 6px;
 }
 
 /* =========================================================
-   Mobile adjustments
+   Toggle Switch (Dashboard / Challenge Mode)
+   ========================================================= */
+
+/* Toggle container */
+.toggle-switch {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px; /* space between slider and text */
+    cursor: pointer;
+    font-size: 14px;
+}
+
+/* Hide native checkbox */
+.toggle-switch input {
+    display: none;
+}
+
+/* Toggle track */
+.toggle-switch .slider {
+    position: relative;
+    width: 42px;
+    height: 22px;
+    background-color: #555;
+    border-radius: 22px;
+    transition: background-color 0.25s ease;
+}
+
+/* Toggle knob */
+.toggle-switch .slider::before {
+    content: "";
+    position: absolute;
+    width: 18px;
+    height: 18px;
+    top: 2px;
+    left: 2px;
+    background-color: #e6edf3;
+    border-radius: 50%;
+    transition: transform 0.25s ease;
+}
+
+/* Toggle ON state */
+.toggle-switch input:checked + .slider {
+    background-color: #2da44e;
+}
+
+.toggle-switch input:checked + .slider::before {
+    transform: translateX(20px);
+}
+
+/* =========================================================
+   Mobile adjustments (≤ 600px)
    ========================================================= */
 @media (max-width: 600px) {
+
+  /* Slightly smaller toggle on mobile */
   .toggle-switch {
     font-size: 12px;
   }
+
   .toggle-switch .slider {
     width: 36px;
     height: 18px;
   }
+
   .toggle-switch .slider::before {
     width: 14px;
     height: 14px;
     top: 2px;
   }
+
+  /* Smaller font for selects */
   select {
     font-size: 12px;
   }
-  /* Maintain indentation on mobile */
-  .controls-stack .toggle-like {
-    padding-left: 12px;
+
+  /* Maintain Daily Distance Month text offset */
+  .controls-stack .month-label {
+    margin-left: 8px; /* slightly smaller on mobile */
   }
 }
