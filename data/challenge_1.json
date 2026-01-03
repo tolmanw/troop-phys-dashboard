@@ -18,10 +18,15 @@
         },
         {
           "date": "2026-01-03",
-          "distance_km": 8.05,
+          "distance_km": 8.0467,
           "time_min": 80.0,
           "activities": [
-            "Run Test"
+            {
+              "name": "Run Test",
+              "type": "Run",
+              "distance_km": 8.05,
+              "time_min": 80.0
+            }
           ]
         },
         {
@@ -388,5 +393,5 @@
     }
   },
   "month": "January 2026",
-  "last_synced": "03-01-2026 21:17"
+  "last_synced": "03-01-2026 21:36"
 }
