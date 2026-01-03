@@ -10,16 +10,20 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      # Checkout repository
       - uses: actions/checkout@v4
 
+      # Set up Python 3.10
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
           python-version: '3.10'
 
+      # Install dependencies
       - name: Install dependencies
         run: pip install requests
 
+      # Run Strava fetch script
       - name: Run Strava fetch
         env:
           STRAVA_CLIENT_ID: ${{ secrets.STRAVA_CLIENT_ID }}
@@ -28,19 +32,21 @@ jobs:
           ATHLETE_ALIASES: ${{ secrets.ATHLETE_ALIASES }}
         run: python scripts/fetch_strava.py
 
+      # Commit updated JSON files safely
       - name: Commit updated JSON files
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          CHANGED=false
+        run: >
+          git config user.name "github-actions[bot]" &&
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com" &&
+          CHANGED=false &&
           for FILE in data/athletes.json data/challenge_1.json; do
             if [ -f "$FILE" ] && ! git diff --quiet "$FILE"; then
-              git add "$FILE"
-              CHANGED=true
-            fi
-          done
+              git add "$FILE";
+              CHANGED=true;
+            fi;
+          done &&
           if [ "$CHANGED" = true ]; then
-            git commit -m "Sync Strava data"
-            git push
+            git commit -m "Sync Strava data" &&
+            git push;
           else
-            echo "No changes to JSON files, skipping commit."
+            echo "No changes to JSON files, skipping commit.";
+          fi
