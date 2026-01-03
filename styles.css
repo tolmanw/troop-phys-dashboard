@@ -57,7 +57,7 @@ canvas {
 
 /* Toggle container and label */
 .toggle-switch {
-  display: inline-flex;
+  display: inline-flex; /* horizontal alignment inside label */
   align-items: center;
   gap: 10px;
   cursor: pointer;
@@ -102,11 +102,29 @@ canvas {
   transform: translateX(20px);
 }
 
+/* =========================================================
+   Controls stack (vertical alignment for select + toggle)
+   ========================================================= */
+
 .controls-stack {
     display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 6px;
+    flex-direction: column; /* stack vertically */
+    align-items: flex-start; /* left align everything */
+    gap: 6px; /* vertical spacing between controls */
+}
+
+/* Ensure each label aligns its inner content horizontally */
+.controls-stack label {
+    display: flex;          /* inner elements inline (select + text / toggle + text) */
+    align-items: center;    /* vertical center within label */
+    gap: 6px;               /* space between element and text */
+    width: 100%;            /* prevent horizontal shrinking */
+}
+
+/* Optional: add consistent left margin for label text inside */
+.month-label,
+.toggle-label {
+    margin-left: 10px;
 }
 
 /* =========================================================
@@ -130,5 +148,3 @@ canvas {
     top: 2px;
   }
 }
-
-
