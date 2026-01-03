@@ -155,11 +155,12 @@ function renderChallenge(athletesData, monthNames) {
                 `hsl(${Math.floor(Math.random() * 360)}, 100%, 50%)`;
         }
 
-        // --- FIX: cumulative points array with null for future days ---
+        // --- Cumulative points calculation ---
         const dailyPoints = daily.map((d, i) => {
+            if (i >= currentDay) return null; // stop plotting beyond today
             let dayPoints = 0;
             d.activities.forEach(act => {
-                const miles = (act.distance_km || 0) * 0.621371;
+                const miles = (act.distance_km || 0) * 0.621371; // km -> miles
                 const time_min = act.time_min || 0;
                 if (pointsPerActivity[act.type]) {
                     if (act.type === "Weight Training") {
@@ -170,8 +171,7 @@ function renderChallenge(athletesData, monthNames) {
                 }
             });
             cumulative += dayPoints;
-            // only show points up to today
-            return i + 1 <= currentDay ? +cumulative.toFixed(2) : null;
+            return +cumulative.toFixed(2);
         });
 
         return {
@@ -186,8 +186,12 @@ function renderChallenge(athletesData, monthNames) {
         };
     });
 
-    // --- Labels for all days in month ---
-    const labels = datasets[0]?.data.map((_, idx) => idx + 1) || [];
+    // --- Labels: all days in month ---
+    const labels = [];
+    if (datasets.length) {
+        const dailyLength = datasets[0].data.length;
+        for (let i = 1; i <= dailyLength; i++) labels.push(i);
+    }
 
     const maxPoints = Math.ceil(Math.max(...datasets.flatMap(d => d.data.filter(p => p !== null)))) + 1;
 
@@ -281,17 +285,19 @@ function initChallengeToggle() {
     if (!toggle) return;
 
     toggle.addEventListener("change", () => {
-        const container = document.getElementById("container");
+        const container = document.getElementById("container"); // main dashboard with labels/drop-downs
         const challengeContainer = document.getElementById("challengeContainer");
         const on = toggle.checked;
-        container.style.display = on ? "none" : "flex";
-        challengeContainer.style.display = on ? "block" : "none";
 
-        const { athletesData, monthNames } = window.DASHBOARD.getData();
         if (on) {
+            if (container) container.style.display = "none"; // hide dashboard
+            if (challengeContainer) challengeContainer.style.display = "block"; // show challenge
+            const { athletesData, monthNames } = window.DASHBOARD.getData();
             window.DASHBOARD.destroyCharts();
             renderChallenge(athletesData, monthNames);
         } else {
+            if (container) container.style.display = "flex"; // show dashboard
+            if (challengeContainer) challengeContainer.style.display = "none"; // hide challenge
             destroyChallenge();
             window.DASHBOARD.renderDashboard();
         }
