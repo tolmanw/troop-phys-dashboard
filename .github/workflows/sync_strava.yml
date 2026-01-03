@@ -37,16 +37,13 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-
           CHANGED=false
-
           for FILE in data/athletes.json data/challenge_1.json; do
             if [ -f "$FILE" ] && ! git diff --quiet "$FILE"; then
               git add "$FILE"
               CHANGED=true
             fi
           done
-
           if [ "$CHANGED" = true ]; then
             git commit -m "Sync Strava data"
             git push
