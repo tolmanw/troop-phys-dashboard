@@ -10,15 +10,18 @@
     gap: 6px; /* vertical space between controls */
 }
 
-/* Each control item: select + text or toggle */
+/* Each control item container */
 .control-item {
     display: flex;
-    align-items: center;
+    flex-direction: column; /* stack elements inside vertically */
+    align-items: flex-start;
+    width: 100%;
+    gap: 2px; /* space between select and label text */
 }
 
-/* Daily Distance text wrapper: moves only the text */
+/* Daily Distance Month: text only is indented */
 .month-label-wrapper {
-    margin-left: 12px; /* adjust to move text right */
+    margin-left: 12px; /* moves only the text right */
     display: inline-block;
 }
 
@@ -26,7 +29,7 @@
 .toggle-label {
     line-height: 1;
     display: inline-block;
-    margin-left: 6px; /* space between slider and text */
+    margin-left: 6px; /* small gap between slider and text */
 }
 
 /* Select baseline alignment */
@@ -38,22 +41,18 @@ select {
 /* =========================================================
    Toggle Switch
    ========================================================= */
-
-/* Toggle container */
 .toggle-switch {
     display: inline-flex;
     align-items: center;
-    gap: 6px; /* space between slider and text */
+    gap: 6px;
     cursor: pointer;
     font-size: 14px;
 }
 
-/* Hide native checkbox */
 .toggle-switch input {
     display: none;
 }
 
-/* Toggle track */
 .toggle-switch .slider {
     position: relative;
     width: 42px;
@@ -63,7 +62,6 @@ select {
     transition: background-color 0.25s ease;
 }
 
-/* Toggle knob */
 .toggle-switch .slider::before {
     content: "";
     position: absolute;
@@ -76,7 +74,6 @@ select {
     transition: transform 0.25s ease;
 }
 
-/* Toggle ON state */
 .toggle-switch input:checked + .slider {
     background-color: #2da44e;
 }
@@ -95,7 +92,7 @@ select {
     }
 
     .month-label-wrapper {
-        margin-left: 8px; /* smaller indent on mobile */
+        margin-left: 8px;
     }
 
     .toggle-switch {
