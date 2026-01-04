@@ -1,35 +1,4 @@
 let challengeChart = null;
-
-// --- Global neon color cache ---
-const athleteColors = {};
-
-// --- Mobile / desktop settings ---
-function getSettings() {
-    const isMobile = window.innerWidth <= 600;
-    return {
-        isMobile,
-        fontSize: isMobile ? 6 : 8,
-        athleteImgSize: isMobile ? 20 : 40,
-        chartHeight: isMobile ? 340 : 450,
-        chartPadding: isMobile ? 10 : 20,
-        chartPaddingBottom: isMobile ? 20 : 20,
-        paddingRight: isMobile ? 20 : 20,
-        cardWidth: isMobile ? "100%" : "700px",
-        headerPaddingTop: 12,
-        headerFontSize: isMobile ? 12 : 16
-    };
-}
-
-function destroyChallenge() {
-    if (challengeChart) {
-        challengeChart.destroy();
-        challengeChart = null;
-    }
-    const container = document.getElementById("challengeContainer");
-    if (container) container.innerHTML = "";
-}
-
-let challengeChart = null;
 const athleteColors = {};
 
 function getSettings() {
@@ -57,7 +26,7 @@ function destroyChallenge() {
     if (container) container.innerHTML = "";
 }
 
-function renderChallenge(athletesData, monthNames) {
+function renderChallenge(athletesData) {
     if (!athletesData) return;
 
     const container = document.getElementById("challengeContainer");
@@ -219,12 +188,11 @@ function renderChallenge(athletesData, monthNames) {
     });
 }
 
-// --- Toggle logic with month selector visibility ---
+// --- Toggle logic (initialize once) ---
 function initChallengeToggle() {
     const toggle = document.getElementById("challengeToggle");
-    const monthSelector = document.getElementById("dailyMonthSelector"); // add your month selector ID
-    const monthLabel = document.querySelector(".month-label"); // add your month label class
-
+    const monthSelector = document.getElementById("dailyMonthSelector");
+    const monthLabel = document.querySelector(".month-label");
     if (!toggle) return;
 
     toggle.addEventListener("change", () => {
@@ -232,35 +200,27 @@ function initChallengeToggle() {
         const challengeContainer = document.getElementById("challengeContainer");
         const on = toggle.checked;
 
-        // Dashboard & challenge visibility
         if (container) container.style.display = on ? "none" : "flex";
         if (challengeContainer) challengeContainer.style.display = on ? "block" : "none";
-
-        // Month selector & label visibility (keep layout space)
         if (monthSelector) monthSelector.style.visibility = on ? "hidden" : "visible";
         if (monthLabel) monthLabel.style.visibility = on ? "hidden" : "visible";
 
-        const { athletesData, monthNames } = window.DASHBOARD.getData();
-        if (on) {
-            window.DASHBOARD.destroyCharts();
-            renderChallenge(athletesData, monthNames);
-        } else {
-            destroyChallenge();
-            window.DASHBOARD.renderDashboard();
-        }
+        const { athletesData } = window.DASHBOARD.getData();
+        if (on) renderChallenge(athletesData);
+        else destroyChallenge();
     });
 }
 
 // --- Init ---
 document.addEventListener("DOMContentLoaded", () => {
-    if (window.DASHBOARD?.getData) {
-        initChallengeToggle();
-        window.addEventListener("resize", () => {
-            if (challengeChart) {
-                destroyChallenge();
-                const { athletesData, monthNames } = window.DASHBOARD.getData();
-                renderChallenge(athletesData, monthNames);
-            }
-        });
-    }
+    if (!window.DASHBOARD?.getData) return;
+    initChallengeToggle();
+
+    window.addEventListener("resize", () => {
+        if (challengeChart && document.getElementById("challengeContainer").style.display !== "none") {
+            destroyChallenge();
+            const { athletesData } = window.DASHBOARD.getData();
+            renderChallenge(athletesData);
+        }
+    });
 });
