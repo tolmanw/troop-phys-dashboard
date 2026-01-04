@@ -12,8 +12,8 @@ function getSettings() {
         athleteImgSize: isMobile ? 20 : 40,
         chartHeight: isMobile ? 340 : 450,
         chartPadding: isMobile ? 10 : 20,
-        chartPaddingBottom: isMobile ? 20 : 20,
-        paddingRight: isMobile ? 20 : 20,
+        chartPaddingBottom: 20,
+        paddingRight: 20,
         cardWidth: isMobile ? "100%" : "700px",
         headerPaddingTop: 12,
         headerFontSize: isMobile ? 12 : 16
@@ -62,11 +62,23 @@ function renderChallenge(athletesData, monthNames) {
     const summaryTitle = summaryCard.querySelector("h3");
     const summary = summaryCard.querySelector(".challenge-summary");
 
-    const { isMobile, fontSize, athleteImgSize, chartHeight, chartPadding, chartPaddingBottom, paddingRight, cardWidth, headerPaddingTop, headerFontSize } = getSettings();
+    const {
+        isMobile,
+        fontSize,
+        athleteImgSize,
+        chartHeight,
+        chartPadding,
+        chartPaddingBottom,
+        paddingRight,
+        cardWidth,
+        headerPaddingTop,
+        headerFontSize
+    } = getSettings();
 
     // --- Rules card styling ---
     rulesCard.style.width = cardWidth;
     rulesCard.style.margin = "0 0 12px 0";
+    rulesCard.style.boxSizing = "border-box";
     rulesCard.style.padding = `${isMobile ? 10 : 12}px ${chartPadding}px`;
     rulesCard.style.background = "#1b1f25";
     rulesCard.style.borderRadius = "15px";
@@ -83,6 +95,7 @@ function renderChallenge(athletesData, monthNames) {
             <div>🏋️ <strong>Weights</strong>: 10 mins = <strong>1 point</strong></div>
         </div>
     `;
+    rulesBody.style.minHeight = "40px";
     rulesBody.style.fontSize = fontSize + "px";
     rulesBody.style.color = "#e6edf3";
     rulesBody.style.opacity = "0.85";
@@ -90,7 +103,8 @@ function renderChallenge(athletesData, monthNames) {
     // --- Chart card styling ---
     card.style.width = cardWidth;
     card.style.margin = "0";
-    card.style.padding = `${headerPaddingTop}px ${chartPadding}px ${chartPadding}px`;
+    card.style.boxSizing = "border-box";
+    card.style.padding = `${headerPaddingTop}px ${chartPadding}px ${chartPadding}px ${chartPadding}px`;
     card.style.height = chartHeight + "px";
     card.style.background = "#1b1f25";
     card.style.borderRadius = "15px";
@@ -106,6 +120,7 @@ function renderChallenge(athletesData, monthNames) {
     // --- Summary card styling ---
     summaryCard.style.width = cardWidth;
     summaryCard.style.margin = "12px 0 0 0";
+    summaryCard.style.boxSizing = "border-box";
     summaryCard.style.padding = `${isMobile ? 10 : 12}px ${chartPadding}px`;
     summaryCard.style.background = "#1b1f25";
     summaryCard.style.borderRadius = "15px";
@@ -138,19 +153,17 @@ function renderChallenge(athletesData, monthNames) {
             athleteColors[a.display_name] = `hsl(${Math.floor(Math.random() * 360)}, 100%, 50%)`;
         }
 
-        // Use daily_summary to compute cumulative points
         const dailyPoints = (a.daily_summary || []).map((d, i) => {
-            if (i >= currentDay) return null;
             let dayPoints = 0;
             for (let act in d) {
                 if (act !== "date" && pointsPerActivity[act]) {
                     const val = d[act] || 0;
-                    if (act === "Weight Training") dayPoints += val * pointsPerActivity[act]; // already minutes
-                    else dayPoints += val * pointsPerActivity[act]; // miles
+                    if (act === "Weight Training") dayPoints += val * pointsPerActivity[act];
+                    else dayPoints += val * pointsPerActivity[act];
                 }
             }
             cumulative += dayPoints;
-            return +cumulative.toFixed(2);
+            return i < currentDay ? +cumulative.toFixed(2) : null;
         });
 
         return {
@@ -165,11 +178,13 @@ function renderChallenge(athletesData, monthNames) {
         };
     });
 
-    // --- Labels for days of the month ---
-    const labels = datasets.length ? datasets[0].data.map((_, i) => i + 1) : [];
-    const maxPoints = Math.ceil(Math.max(...datasets.flatMap(d => d.data.filter(p => p !== null)))) + 1;
+    // --- Labels for days ---
+    const labels = Array.from({ length: 31 }, (_, i) => i + 1);
 
-    // --- Athlete leaderboard ---
+    // --- Max Y ---
+    const maxPoints = Math.ceil(Math.max(...datasets.flatMap(d => d.data.filter(v => v !== null)))) + 1;
+
+    // --- Athlete totals for leaderboard ---
     const totals = datasets
         .map(d => ({ label: d.label, color: d.borderColor, total: d.data[d.data.length - 1] || 0 }))
         .sort((a, b) => b.total - a.total);
@@ -195,10 +210,18 @@ function renderChallenge(athletesData, monthNames) {
             responsive: true,
             maintainAspectRatio: false,
             layout: { padding: { bottom: chartPaddingBottom, right: paddingRight } },
-            plugins: { legend: { display: false }, tooltip: { bodyFont: { size: fontSize }, titleFont: { size: fontSize } } },
+            plugins: {
+                legend: { display: false },
+                tooltip: { bodyFont: { size: fontSize }, titleFont: { size: fontSize } }
+            },
             scales: {
                 x: { ticks: { font: { size: fontSize }, maxRotation: 0, minRotation: 0 } },
-                y: { min: 0, max: maxPoints, title: { display: true, text: "Cumulative Points", font: { size: fontSize } }, ticks: { font: { size: fontSize } } }
+                y: {
+                    min: 0,
+                    max: maxPoints,
+                    title: { display: true, text: "Cumulative Points", font: { size: fontSize } },
+                    ticks: { font: { size: fontSize } }
+                }
             }
         },
         plugins: [{
@@ -232,25 +255,24 @@ function renderChallenge(athletesData, monthNames) {
 // --- Toggle logic ---
 function initChallengeToggle() {
     const toggle = document.getElementById("challengeToggle");
-    const dashboardContainer = document.getElementById("container");
-    const challengeContainer = document.getElementById("challengeContainer");
     const monthSelector = document.getElementById("dailyMonthSelector");
     const monthLabel = document.querySelector(".month-label");
 
     if (!toggle) return;
 
     toggle.addEventListener("change", () => {
-        const isChallengeOn = toggle.checked;
+        const container = document.getElementById("container");
+        const challengeContainer = document.getElementById("challengeContainer");
+        const on = toggle.checked;
 
-        if (dashboardContainer) dashboardContainer.style.display = isChallengeOn ? "none" : "flex";
-        if (challengeContainer) challengeContainer.style.display = isChallengeOn ? "block" : "none";
+        if (container) container.style.display = on ? "none" : "flex";
+        if (challengeContainer) challengeContainer.style.display = on ? "block" : "none";
 
-        if (monthSelector) monthSelector.style.visibility = isChallengeOn ? "hidden" : "visible";
-        if (monthLabel) monthLabel.style.visibility = isChallengeOn ? "hidden" : "visible";
+        if (monthSelector) monthSelector.style.visibility = on ? "hidden" : "visible";
+        if (monthLabel) monthLabel.style.visibility = on ? "hidden" : "visible";
 
         const { athletesData, monthNames } = window.DASHBOARD.getData();
-
-        if (isChallengeOn) {
+        if (on) {
             window.DASHBOARD.destroyCharts();
             renderChallenge(athletesData, monthNames);
         } else {
