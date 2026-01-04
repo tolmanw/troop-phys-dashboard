@@ -38,9 +38,16 @@
         },
         {
           "date": "2026-01-04",
-          "distance_km": 0.0,
-          "time_min": 0.0,
-          "activities": []
+          "distance_km": 5.0056,
+          "time_min": 23.233333333333334,
+          "activities": [
+            {
+              "name": "Afternoon Run",
+              "type": "Run",
+              "distance_km": 5.01,
+              "time_min": 23.2
+            }
+          ]
         },
         {
           "date": "2026-01-05",
@@ -229,7 +236,7 @@
         },
         {
           "date": "2026-01-04",
-          "Run": 0,
+          "Run": 5.01,
           "Swim": 0,
           "Ride": 0,
           "Weight Training": 0
@@ -838,5 +845,5 @@
     }
   },
   "month": "January 2026",
-  "last_synced": "04-01-2026 14:18"
+  "last_synced": "04-01-2026 15:18"
 }
