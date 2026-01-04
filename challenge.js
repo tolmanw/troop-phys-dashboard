@@ -97,35 +97,38 @@ function renderChallenge(athletesData) {
     const today = new Date();
     const currentDay = today.getDate();
 
-    // --- Build datasets ---
-    const datasets = Object.values(athletesData).map(a => {
-        let cumulative = 0;
-        if (!athleteColors[a.display_name]) {
-            athleteColors[a.display_name] = `hsl(${Math.floor(Math.random() * 360)}, 100%, 50%)`;
-        }
+const datasets = Object.values(athletesData).map(a => {
+    let cumulative = 0;
+    if (!athleteColors[a.display_name]) {
+        athleteColors[a.display_name] = `hsl(${Math.floor(Math.random() * 360)}, 100%, 50%)`;
+    }
 
-        const dailyPoints = (a.daily_summary || []).map((d, i) => {
-            if (i >= currentDay) return null; // future days blank
-            let dayPoints = 0;
-            Object.keys(pointsPerActivity).forEach(act => {
-                const val = d[act] || 0;
-                dayPoints += val * pointsPerActivity[act];
-            });
-            cumulative += dayPoints;
-            return +cumulative.toFixed(2);
-        });
-
-        return {
-            label: a.display_name,
-            data: dailyPoints,
-            borderColor: athleteColors[a.display_name],
-            borderWidth: 3,
-            tension: 0.3,
-            fill: false,
-            pointRadius: 0,
-            spanGaps: true
-        };
+    const dailyPoints = (a.daily_summary || []).map((d, i) => {
+        if (i >= currentDay) return null; // future days blank
+        let dayPoints = 0;
+        // convert distances to points
+        dayPoints += (d.Swim || 0) * pointsPerActivity.Swim;
+        dayPoints += (d.Run || 0) * pointsPerActivity.Run;
+        dayPoints += (d.Ride || 0) * pointsPerActivity.Ride;
+        dayPoints += (d["Weight Training"] || 0) * pointsPerActivity["Weight Training"];
+        cumulative += dayPoints;
+        return +cumulative.toFixed(2);
     });
+
+    // Ensure we have all days in month
+    while (dailyPoints.length < 31) dailyPoints.push(null);
+
+    return {
+        label: a.display_name,
+        data: dailyPoints,
+        borderColor: athleteColors[a.display_name],
+        borderWidth: 3,
+        tension: 0.3,
+        fill: false,
+        pointRadius: 0,
+        spanGaps: true
+    };
+});
 
     const firstAthlete = Object.values(athletesData)[0];
     const numDays = firstAthlete?.daily_summary?.length || 30;
