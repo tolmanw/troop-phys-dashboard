@@ -68,134 +68,64 @@ function renderChallenge(athletesData, monthNames) {
             <h3>Challenge Rules</h3>
             <div class="challenge-rules"></div>
         </div>
-
         <div class="challenge-card">
             <h2>Monthly Challenge</h2>
             <canvas id="challengeChartCanvas"></canvas>
         </div>
-
         <div class="challenge-card challenge-summary-card">
             <h3>Totals</h3>
             <div class="challenge-summary"></div>
         </div>
     `;
 
-    const rulesCard = container.querySelector(".challenge-rules-card");
-    const rulesTitle = rulesCard.querySelector("h3");
-    const rulesBody = rulesCard.querySelector(".challenge-rules");
-
-    const card = container.querySelector(".challenge-card:nth-of-type(2)");
+    const rulesBody = container.querySelector(".challenge-rules");
     const canvas = document.getElementById("challengeChartCanvas");
     const ctx = canvas.getContext("2d");
+    const summary = container.querySelector(".challenge-summary");
 
-    const summaryCard = container.querySelector(".challenge-summary-card");
-    const summaryTitle = summaryCard.querySelector("h3");
-    const summary = summaryCard.querySelector(".challenge-summary");
+    const { isMobile, fontSize, chartHeight, chartPaddingBottom, paddingRight, athleteImgSize } = getSettings();
 
-    const {
-        isMobile,
-        fontSize,
-        athleteImgSize,
-        chartHeight,
-        chartPadding,
-        chartPaddingBottom,
-        paddingRight,
-        cardWidth,
-        headerPaddingTop,
-        headerFontSize
-    } = getSettings();
-
-    // --- Rules card styling ---
-    rulesCard.style.width = cardWidth;
-    rulesCard.style.margin = "0 0 12px 0";
-    rulesCard.style.boxSizing = "border-box";
-    rulesCard.style.padding = `${isMobile ? 10 : 12}px ${chartPadding}px`;
-    rulesCard.style.background = "#1b1f25";
-    rulesCard.style.borderRadius = "15px";
-
-    rulesTitle.style.margin = "0 0 8px 0";
-    rulesTitle.style.fontSize = headerFontSize + "px";
-    rulesTitle.style.color = "#e6edf3";
-
+    // --- Rules ---
     rulesBody.innerHTML = `
         <div style="display:flex;flex-direction:column;gap:6px;line-height:1.4;">
-            <div>🏊‍♂️ <strong>Swim</strong>: 1 mile = <strong>4 points</strong></div>
-            <div>🏃‍♂️ <strong>Run</strong>: 1 mile = <strong>1 point</strong></div>
-            <div>🚴‍♂️ <strong>Bike</strong>: 1 mile = <strong>0.25 points</strong></div>
-            <div>🏋️ <strong>Weights</strong>: 10 mins = <strong>1 point</strong></div>
+            <div>🏊‍♂️ <strong>Swim</strong>: 1 mile = 4 points</div>
+            <div>🏃‍♂️ <strong>Run</strong>: 1 mile = 1 point</div>
+            <div>🚴‍♂️ <strong>Bike</strong>: 1 mile = 0.25 points</div>
+            <div>🏋️ <strong>Weights</strong>: 10 mins = 1 point</div>
         </div>
     `;
-    rulesBody.style.minHeight = "40px";
     rulesBody.style.fontSize = fontSize + "px";
     rulesBody.style.color = "#e6edf3";
     rulesBody.style.opacity = "0.85";
 
-    // --- Chart card styling ---
-    card.style.width = cardWidth;
-    card.style.margin = "0";
-    card.style.boxSizing = "border-box";
-    card.style.padding = `${headerPaddingTop}px ${chartPadding}px ${chartPadding}px ${chartPadding}px`;
-    card.style.height = chartHeight + "px";
-    card.style.background = "#1b1f25";
-    card.style.borderRadius = "15px";
+    // --- Chart height ---
+    canvas.style.height = chartHeight + "px";
 
-    const title = card.querySelector("h2");
-    title.style.margin = "0 0 8px 0";
-    title.style.fontSize = headerFontSize + "px";
-    title.style.color = "#e6edf3";
-
-    canvas.style.width = "100%";
-    canvas.style.height = "100%";
-
-    // --- Summary card styling ---
-    summaryCard.style.width = cardWidth;
-    summaryCard.style.margin = "12px 0 0 0";
-    summaryCard.style.boxSizing = "border-box";
-    summaryCard.style.padding = `${isMobile ? 10 : 12}px ${chartPadding}px`;
-    summaryCard.style.background = "#1b1f25";
-    summaryCard.style.borderRadius = "15px";
-
-    summaryTitle.style.margin = "0 0 8px 0";
-    summaryTitle.style.fontSize = headerFontSize + "px";
-    summaryTitle.style.color = "#e6edf3";
-
-    summary.style.display = "flex";
-    summary.style.flexDirection = "column";
-    summary.style.gap = "4px";
-    summary.style.fontSize = fontSize + "px";
-    summary.style.color = "#e6edf3";
-
-    // --- Prepare datasets for cumulative points using daily_summary ---
+    // --- Point rules ---
     const pointsPerActivity = {
         Swim: 4,
         Run: 1,
         Ride: 0.25,
-        "Weight Training": 0.1
+        "Weight Training": 0.1 // 10 mins = 1 pt => 1 min = 0.1 pt
     };
 
     const today = new Date();
     const currentDay = today.getDate();
 
+    // --- Prepare datasets ---
     const datasets = Object.values(athletesData).map(a => {
         let cumulative = 0;
-
         if (!athleteColors[a.display_name]) {
             athleteColors[a.display_name] = `hsl(${Math.floor(Math.random() * 360)}, 100%, 50%)`;
         }
 
-        const dailyPoints = a.daily_summary.map((d, i) => {
-            if (i >= currentDay) return null;
-            const run = d.Run || 0;
-            const swim = d.Swim || 0;
-            const ride = d.Ride || 0;
-            const weights = d["Weight Training"] || 0;
-
-            const dayPoints =
-                run * pointsPerActivity.Run +
-                swim * pointsPerActivity.Swim +
-                ride * pointsPerActivity.Ride +
-                weights * pointsPerActivity["Weight Training"];
-
+        const dailyPoints = (a.daily_summary || []).map((d, i) => {
+            if (i >= currentDay) return null; // future days
+            let dayPoints = 0;
+            Object.keys(pointsPerActivity).forEach(type => {
+                const value = d[type] || 0;
+                dayPoints += value * pointsPerActivity[type];
+            });
             cumulative += dayPoints;
             return +cumulative.toFixed(2);
         });
@@ -212,7 +142,6 @@ function renderChallenge(athletesData, monthNames) {
         };
     });
 
-    // --- Labels ---
     const labels = datasets.length ? datasets[0].data.map((_, i) => i + 1) : [];
     const maxPoints = Math.ceil(Math.max(...datasets.flatMap(d => d.data.filter(p => p !== null)))) + 1;
 
@@ -222,7 +151,6 @@ function renderChallenge(athletesData, monthNames) {
         .sort((a, b) => b.total - a.total);
 
     const avatarSize = isMobile ? 16 : 20;
-
     summary.innerHTML = totals.map(t => {
         const athlete = Object.values(athletesData).find(a => a.display_name === t.label);
         return `
@@ -234,7 +162,7 @@ function renderChallenge(athletesData, monthNames) {
         `;
     }).join("");
 
-    // --- Chart ---
+    // --- Draw chart ---
     challengeChart = new Chart(ctx, {
         type: "line",
         data: { labels, datasets },
@@ -242,9 +170,12 @@ function renderChallenge(athletesData, monthNames) {
             responsive: true,
             maintainAspectRatio: false,
             layout: { padding: { bottom: chartPaddingBottom, right: paddingRight } },
-            plugins: { legend: { display: false }, tooltip: { bodyFont: { size: fontSize }, titleFont: { size: fontSize } } },
+            plugins: {
+                legend: { display: false },
+                tooltip: { bodyFont: { size: fontSize }, titleFont: { size: fontSize } }
+            },
             scales: {
-                x: { ticks: { font: { size: fontSize }, padding: isMobile ? 10 : 6, maxRotation: 0, minRotation: 0 } },
+                x: { ticks: { font: { size: fontSize }, maxRotation: 0, minRotation: 0 } },
                 y: { min: 0, max: maxPoints, title: { display: true, text: "Cumulative Points", font: { size: fontSize } }, ticks: { font: { size: fontSize } } }
             }
         },
@@ -275,7 +206,6 @@ function renderChallenge(athletesData, monthNames) {
         }]
     });
 }
-
 
 // --- Toggle logic with month selector visibility ---
 function initChallengeToggle() {
