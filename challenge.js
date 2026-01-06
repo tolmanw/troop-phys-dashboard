@@ -200,7 +200,7 @@ function renderChallenge(athletesData) {
 	const rulesBody = rulesCard.querySelector(".challenge-rules");
 	rulesBody.innerHTML = `
 		<div style="line-height:1.5;">
-			<div style="margin-bottom:8px; color: #c9d1d9;">Gain points for distance covered for Run, Ride, Swim or time doing a Workout (Weights Training, HIIT, Sport etc.)</div>
+			<div style="margin-bottom:8px; color: #c9d1d9;">Gain points for distance for a Run, Ride, Swim or gain points for time doing a Workout (Weights Training, HIIT, Sport etc.)</div>
 			<div style="margin-bottom:8px; color: #c9d1d9;">Ensure you tag your Strava activity to the same as below to record points on the chart.</div>
 			🏊 Swim: 1 mile = 4 pts<br>
 			🏃 Run: 1 mile = 1 pt<br>
