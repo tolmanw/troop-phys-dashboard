@@ -32,8 +32,15 @@ label {
     font-size: 14px;
 }
 
-select, input[type=checkbox] {
-    margin-bottom: 10px;
+select {
+    margin-bottom: 8px;
+    border-radius: 12px;
+    border: 1px solid #555;
+    padding: 3px 10px;
+    background-color: #555;
+    color: #e6edf3;
+    font-size: 12px;
+    appearance: none;
 }
 
 #container {
@@ -158,7 +165,7 @@ select, input[type=checkbox] {
 }
 
 .toggle-switch input:checked + .slider::before {
-    transform: translateX(27px);
+    transform: translateX(20px);
 }
 
 /* Optional: mobile scaling */
@@ -176,12 +183,15 @@ select, input[type=checkbox] {
         top: 2px;
         left: 2px;
     }
+    .toggle-switch input:checked + .slider::before {
+        transform: translateX(20px);
+    }
 }
 
 /* --- Mobile Overrides --- */
 @media (max-width: 600px) {
     :root {
-        --daily-width: 92%;       
+        --daily-width: 92%;
         --daily-height: 140px;
         --bottom-width: 30%;
         --bottom-height: 90px;
@@ -248,7 +258,7 @@ select, input[type=checkbox] {
 <label class="toggle-switch" style="font-size:14px; font-weight:500; color:#e6edf3;">
     <input type="checkbox" id="challengeToggle">
     <span class="slider"></span>
-    <span style="margin-left:10px;">Show Monthly Challenge</span>
+    <span style="margin-left:9px;">Show Monthly Challenge</span>
 </label>
 
 <div id="container"></div>
@@ -302,40 +312,50 @@ async function loadData() {
     renderDashboard();
 }
 
+// --- Updated daily chart function with rounded y-axis ---
 function updateDailyChart(alias, monthIndex){
     const athlete = athletesData[alias];
     const dailyDistanceMi = athlete.daily_distance_km[monthIndex].map(d => +(d*0.621371).toFixed(2));
     const chartId = `dailyChart-${alias}`;
     destroyChartIfExists(chartId);
 
-    const barColors = dailyDistanceMi.map(()=> "rgba(0,255,255,0.8)");
+    const barColors = dailyDistanceMi.map(() => "rgba(0,255,255,0.8)");
+
+    // Find max value and add 1 mile
+    const maxVal = Math.max(...dailyDistanceMi);
+    const suggestedMax = Math.ceil(maxVal + 1);
 
     CHARTS[chartId] = new Chart(document.getElementById(chartId), {
         type: "bar",
-        data:{
-            labels: dailyDistanceMi.map((_,i)=>i+1),
-            datasets:[{ data: dailyDistanceMi, backgroundColor: barColors, minBarLength:2, barThickness: getBarThickness() }]
+        data: {
+            labels: dailyDistanceMi.map((_,i) => i+1),
+            datasets: [{
+                data: dailyDistanceMi,
+                backgroundColor: barColors,
+                minBarLength: 2,
+                barThickness: getBarThickness()
+            }]
         },
-        options:{
-            responsive:true,
-            maintainAspectRatio:true,
-            plugins:{ legend:{ display:false } },
-            scales:{
-                x:{
-                    ticks:{
-                        autoSkip:false,
-                        maxRotation:0,
-                        minRotation:0,
-                        font:{ size: parseInt(getComputedStyle(document.documentElement).getPropertyValue('--font-size')) },
+        options: {
+            responsive: true,
+            maintainAspectRatio: true,
+            plugins: { legend: { display: false } },
+            scales: {
+                x: {
+                    ticks: {
+                        autoSkip: false,
+                        maxRotation: 0,
+                        minRotation: 0,
+                        font: { size: parseInt(getComputedStyle(document.documentElement).getPropertyValue('--font-size')) },
                         callback: function(value, index){
                             return (index % 2 === 0) ? this.getLabelForValue(value) : '';
                         }
                     }
                 },
-                y:{
-                    beginAtZero:true,
-                    suggestedMin: 0,
-                    ticks:{ font:{ size: parseInt(getComputedStyle(document.documentElement).getPropertyValue('--font-size')) } }
+                y: {
+                    beginAtZero: true,
+                    max: suggestedMax, // <-- dynamically set to max+1
+                    ticks: { font: { size: parseInt(getComputedStyle(document.documentElement).getPropertyValue('--font-size')) } }
                 }
             }
         }
@@ -350,11 +370,9 @@ function renderDashboard(){
     const container = document.getElementById("container");
     container.innerHTML = "";
 
-    // --- Fixed month indices for bottom charts ---
     const lastMonthIndex = monthNames.length - 1;
     const secondLastMonthIndex = lastMonthIndex - 1;
 
-    // Daily chart uses selected month
     const selectedMonthIndex = parseInt(document.getElementById("dailyMonthSelector").value);
 
     Object.entries(athletesData).forEach(([alias, athlete])=>{
@@ -403,7 +421,7 @@ function renderDashboard(){
 
         const barThickness = getBarThickness();
 
-        // --- Monthly Distance Chart ---
+        // Monthly Distance Chart
         CHARTS[`monthChart-${alias}`] = new Chart(document.getElementById(`monthChart-${alias}`), {
             type:"bar",
             data:{ labels: extraMonths, datasets:[{ data: [monthlyDistanceMi[secondLastMonthIndex], monthlyDistanceMi[lastMonthIndex]], backgroundColor:"rgba(50,180,255,0.7)", barThickness }] },
@@ -419,7 +437,7 @@ function renderDashboard(){
             }
         });
 
-        // --- Monthly Time Chart ---
+        // Monthly Time Chart
         const yMaxTime = Math.max(...extraTimeHours);
         const suggestedMaxTime = Math.ceil(yMaxTime / 5) * 5;
         CHARTS[`monthTimeChart-${alias}`] = new Chart(document.getElementById(`monthTimeChart-${alias}`), {
@@ -437,6 +455,7 @@ function renderDashboard(){
             }
         });
 
+        // Extra Phys Chart with goal line
         const goalLinePlugin = {
             id: 'goalLine',
             afterDatasetsDraw(chart) {
@@ -472,7 +491,7 @@ function renderDashboard(){
             plugins:[goalLinePlugin]
         });
 
-        // --- Daily chart ---
+        // Daily chart
         updateDailyChart(alias, selectedMonthIndex);
     });
 }
