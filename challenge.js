@@ -346,12 +346,21 @@ function initChallengeToggle() {
     const toggle = document.getElementById("challengeToggle");
     const dashboard = document.getElementById("container");
     const challenge = document.getElementById("challengeContainer");
-    if(!toggle) return;
+    const monthSelector = document.getElementById("dailyMonthSelector");
+    const monthLabel = document.querySelector(".month-label");
 
-    toggle.addEventListener("change", async ()=>{
-        if(toggle.checked){
-            dashboard.style.display="none";
-            challenge.style.display="block";
+    if (!toggle) return;
+
+    toggle.addEventListener("change", async () => {
+        const isChallengeOn = toggle.checked;
+
+        // --- Hide visually but keep layout ---
+        monthSelector.style.visibility = isChallengeOn ? "hidden" : "visible";
+        monthLabel.style.visibility = isChallengeOn ? "hidden" : "visible";
+
+        if (isChallengeOn) {
+            dashboard.style.display = "none";
+            challenge.style.display = "block";
             window.DASHBOARD.destroyCharts();
 
             // Load JSONs dynamically
@@ -360,14 +369,15 @@ function initChallengeToggle() {
             // Combine and render
             const athletesData = combineChallengeData(challengeJSONs);
             renderChallenge(athletesData);
-        }else{
+        } else {
             destroyChallenge();
-            challenge.style.display="none";
-            dashboard.style.display="flex";
+            challenge.style.display = "none";
+            dashboard.style.display = "flex";
             window.DASHBOARD.renderDashboard();
         }
     });
 }
+
 
 document.addEventListener("DOMContentLoaded",()=>{
     if(window.DASHBOARD?.getData){
