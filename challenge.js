@@ -6,8 +6,8 @@ function getSettings() {
     const isMobile = window.innerWidth <= 600;
     return {
         isMobile,
-        fontSize: isMobile ? 10 : 12,
-        athleteImgSize: isMobile ? 18 : 25,
+        fontSize: isMobile ? 9 : 12,
+        athleteImgSize: isMobile ? 20 : 25,
         chartHeight: 420,
         chartPadding: 16,
         chartPaddingBottom: 35,
