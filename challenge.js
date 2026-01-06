@@ -7,7 +7,7 @@ function getSettings() {
     return {
         isMobile,
         fontSize: isMobile ? 10 : 12,
-        athleteImgSize: isMobile ? 20 : 28,
+        athleteImgSize: isMobile ? 18 : 25,
         chartHeight: 420,
         chartPadding: 16,
         chartPaddingBottom: 24,
@@ -53,6 +53,9 @@ async function loadChallengeJSONs() {
 function combineChallengeData(jsons) {
     const athletes = {};
     const kmToMiles = km => km * 0.621371;
+
+    const today = new Date();
+    const currentDay = today.getDate(); // 1-indexed
     const daysInMonth = 31;
 
     // Collect all athlete IDs
@@ -65,17 +68,21 @@ function combineChallengeData(jsons) {
         athletes[id] = {
             display_name: null,
             profile: null,
-            daily_points: Array(daysInMonth).fill(0)
+            daily_points: Array(daysInMonth).fill(null), // <-- use null for future days
+            activities: []
         };
 
         let cumulative = 0;
         for (let day = 0; day < daysInMonth; day++) {
             let pointsToday = 0;
+            const dayData = {};
 
             // Run
             const runJson = jsons.Run?.athletes[id];
             if (runJson) {
-                pointsToday += kmToMiles(getDailyValue(runJson.daily_distance_km, day)) * 1;
+                const runPoints = kmToMiles(getDailyValue(runJson.daily_distance_km, day));
+                pointsToday += runPoints;
+                dayData.Run = runPoints;
                 athletes[id].display_name = runJson.display_name;
                 athletes[id].profile = runJson.profile;
             }
@@ -83,7 +90,9 @@ function combineChallengeData(jsons) {
             // Swim
             const swimJson = jsons.Swim?.athletes[id];
             if (swimJson) {
-                pointsToday += kmToMiles(getDailyValue(swimJson.daily_distance_km, day)) * 4;
+                const swimPoints = kmToMiles(getDailyValue(swimJson.daily_distance_km, day)) * 4;
+                pointsToday += swimPoints;
+                dayData.Swim = swimPoints;
                 athletes[id].display_name ||= swimJson.display_name;
                 athletes[id].profile ||= swimJson.profile;
             }
@@ -91,7 +100,9 @@ function combineChallengeData(jsons) {
             // Ride
             const rideJson = jsons.Ride?.athletes[id];
             if (rideJson) {
-                pointsToday += kmToMiles(getDailyValue(rideJson.daily_distance_km, day)) * 0.25;
+                const ridePoints = kmToMiles(getDailyValue(rideJson.daily_distance_km, day)) * 0.25;
+                pointsToday += ridePoints;
+                dayData.Ride = ridePoints;
                 athletes[id].display_name ||= rideJson.display_name;
                 athletes[id].profile ||= rideJson.profile;
             }
@@ -99,14 +110,32 @@ function combineChallengeData(jsons) {
             // Workout
             const workoutJson = jsons.Workout?.athletes[id];
             if (workoutJson) {
-                pointsToday += (getDailyValue(workoutJson.daily_minutes, day) / 10) * 1;
+                const workoutPoints = getDailyValue(workoutJson.daily_minutes, day) / 10;
+                pointsToday += workoutPoints;
+                dayData.Workout = workoutPoints;
                 athletes[id].display_name ||= workoutJson.display_name;
                 athletes[id].profile ||= workoutJson.profile;
             }
 
             cumulative += pointsToday;
-            athletes[id].daily_points[day] = +cumulative.toFixed(2);
+
+            // Only fill daily_points for days <= today
+            if (day < currentDay) {
+                athletes[id].daily_points[day] = +cumulative.toFixed(2);
+                dayData.Cumulative = +cumulative.toFixed(2);
+                athletes[id].activities.push(dayData);
+            } else {
+                athletes[id].daily_points[day] = null; // future days = null
+            }
         }
+    });
+
+    // --- Debug output ---
+    Object.entries(athletes).forEach(([id, athlete]) => {
+        console.group(`Athlete: ${athlete.display_name} (${id})`);
+        console.log("Profile:", athlete.profile);
+        console.table(athlete.activities); // rows = days, columns = activity points + cumulative
+        console.groupEnd();
     });
 
     return athletes;
@@ -198,21 +227,24 @@ function renderChallenge(athletesData) {
 
     // --- Prepare chart data ---
     const labels = Array.from({ length: 31 }, (_, i) => i + 1);
+
     const datasets = Object.values(athletesData).map(a => {
         if (!athleteColors[a.display_name]) athleteColors[a.display_name] = `hsl(${Math.random()*360},100%,50%)`;
         return {
             label: a.display_name,
             data: a.daily_points,
             borderColor: athleteColors[a.display_name],
-            borderWidth: 3,
-            tension: 0.3,
+            borderWidth: 2,
+            tension: 0,      // rigid lines
             fill: false,
             pointRadius: 0,
             spanGaps: true
         };
     });
 
-    const maxPoints = Math.ceil(Math.max(...datasets.flatMap(d=>d.data))) + 1;
+    // --- Compute maxPoints and step using nice multiples of 5 ---
+    const rawMax = Math.max(...datasets.flatMap(d => d.data.filter(v => v !== null)));
+    const { max: maxPoints, step: yStep } = getNiceAxisMultipleOf5(rawMax, 5);
 
     // --- Totals Card ---
     const summaryCard = container.querySelector(".challenge-summary-card");
@@ -250,13 +282,18 @@ function renderChallenge(athletesData) {
         type: "line",
         data: { labels, datasets },
         options: {
-            responsive:false,
-            maintainAspectRatio:false,
-            layout:{ padding:{ bottom: chartPaddingBottom, right: paddingRight }},
-            plugins:{ legend:{ display:false }},
-            scales:{
-                x:{ ticks:{ font:{ size: fontSize }}},
-                y:{ min:0, max:maxPoints, title:{ display:true, text:"Cumulative Points", font:{ size: fontSize }}, ticks:{ font:{ size: fontSize }}}
+            responsive: false,
+            maintainAspectRatio: false,
+            layout: { padding: { bottom: chartPaddingBottom, right: paddingRight } },
+            plugins: { legend: { display: false } },
+            scales: {
+                x: { ticks: { font: { size: fontSize } } },
+                y: {
+                    min: 0,
+                    max: maxPoints,
+                    ticks: { font: { size: fontSize }, stepSize: yStep },
+                    title: { display:true, text:"Cumulative Points", font:{ size: fontSize } }
+                }
             }
         },
         plugins:[{
@@ -274,12 +311,31 @@ function renderChallenge(athletesData) {
                     const yPos=y.getPixelForValue(ds.data[last]);
                     const img=new Image();
                     img.src=athlete.profile;
-                    img.onload=()=>{const size=athleteImgSize;ctx.save();ctx.beginPath();ctx.arc(xPos,yPos,size/2,0,Math.PI*2);ctx.clip();ctx.drawImage(img,xPos-size/2,yPos-size/2,size,size);ctx.restore();}
+                    img.onload=()=>{
+                        const size=athleteImgSize;
+                        ctx.save();
+                        ctx.beginPath();
+                        ctx.arc(xPos,yPos,size/2,0,Math.PI*2);
+                        ctx.clip();
+                        ctx.drawImage(img,xPos-size/2,yPos-size/2,size,size);
+                        ctx.restore();
+                    }
                 });
             }
         }]
     });
 }
+
+// --- Utility function for nice y-axis multiples ---
+function getNiceAxisMultipleOf5(value, desiredTicks = 5) {
+    if (value <= 0) return { max: 5, step: 5 };
+
+    let roughMax = Math.ceil(value / 5) * 5;
+    let step = Math.ceil(roughMax / desiredTicks / 5) * 5;
+
+    return { max: roughMax, step };
+}
+
 
 // --- Toggle ---
 function initChallengeToggle() {
