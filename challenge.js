@@ -197,15 +197,18 @@ function renderChallenge(athletesData) {
     rulesTitle.style.fontSize = headerFontSize + "px";
     rulesTitle.style.color = "#e6edf3";
 
-    const rulesBody = rulesCard.querySelector(".challenge-rules");
-    rulesBody.innerHTML = `
-        <div style="line-height:1.5;">
-            🏊 Swim: <strong>1 mile = 4 pts</strong><br>
-            🏃 Run: <strong>1 mile = 1 pt</strong><br>
-            🚴 Ride: <strong>1 mile = 0.25 pts</strong><br>
-            🏋️ Workout: <strong>10 min = 1 pt</strong>
-        </div>
-    `;
+	const rulesBody = rulesCard.querySelector(".challenge-rules");
+	rulesBody.innerHTML = `
+		<div style="line-height:1.5;">
+			<div style="margin-bottom:8px; color: #c9d1d9;">Gain points for distance covered for Run, Ride, Swim or time doing a Workout (Weights Training, HIIT, Sport etc.)</div>
+			<div style="margin-bottom:8px; color: #c9d1d9;">Ensure you tag your Strava activity to the same as below to record points on the chart.</div>
+			🏊 Swim: 1 mile = 4 pts<br>
+			🏃 Run: 1 mile = 1 pt<br>
+			🚴 Ride: 1 mile = 0.25 pts<br>
+			🏋️ Workout: 10 mins = 1 pt
+		</div>
+	`;
+
     rulesBody.style.fontSize = fontSize + "px";
     rulesBody.style.color = "#e6edf3";
     rulesBody.style.opacity = "0.85";
