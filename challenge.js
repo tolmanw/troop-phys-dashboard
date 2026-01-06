@@ -351,28 +351,35 @@ function initChallengeToggle() {
     const challenge = document.getElementById("challengeContainer");
     const monthSelector = document.getElementById("dailyMonthSelector");
     const monthLabel = document.querySelector(".month-label");
+    const logoEl = document.getElementById("logo");
+    const originalLogoSrc = logoEl.src; // store the original logo
 
     if (!toggle) return;
 
     toggle.addEventListener("change", async () => {
         const isChallengeOn = toggle.checked;
 
-        // --- Hide visually but keep layout ---
+        // --- Swap logo ---
+        logoEl.src = isChallengeOn ? "Jan_challenge_logo.png" : originalLogoSrc;
+
+        // --- Hide month selector and label when challenge is on ---
         monthSelector.style.visibility = isChallengeOn ? "hidden" : "visible";
         monthLabel.style.visibility = isChallengeOn ? "hidden" : "visible";
 
         if (isChallengeOn) {
+            // Show challenge, hide dashboard
             dashboard.style.display = "none";
             challenge.style.display = "block";
             window.DASHBOARD.destroyCharts();
 
-            // Load JSONs dynamically
+            // Load challenge JSONs
             const challengeJSONs = await loadChallengeJSONs();
 
             // Combine and render
             const athletesData = combineChallengeData(challengeJSONs);
             renderChallenge(athletesData);
         } else {
+            // Revert: hide challenge, show dashboard
             destroyChallenge();
             challenge.style.display = "none";
             dashboard.style.display = "flex";
@@ -380,7 +387,6 @@ function initChallengeToggle() {
         }
     });
 }
-
 
 document.addEventListener("DOMContentLoaded",()=>{
     if(window.DASHBOARD?.getData){
