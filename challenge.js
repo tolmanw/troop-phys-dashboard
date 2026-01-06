@@ -296,7 +296,7 @@ function renderChallenge(athletesData) {
                     min: 0,
                     max: maxPoints,
                     ticks: { font: { size: fontSize }, stepSize: yStep },
-                    title: { display:true, text:"Cumulative Points", font:{ size: fontSize } }
+                    title: { display:false, text:"Cumulative Points", font:{ size: fontSize } }
                 }
             }
         },
