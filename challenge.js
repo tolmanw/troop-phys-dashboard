@@ -294,7 +294,7 @@ function renderChallenge(athletesData) {
             layout: { padding: { bottom: chartPaddingBottom, right: paddingRight } },
             plugins: { legend: { display: false } },
             scales: {
-                x: { ticks: { font: { size: fontSize } } },
+                x: { ticks: { font: { size: fontSize }, maxRotation: 0, minRotation: 0 } },
                 y: {
                     min: 0,
                     max: maxPoints,
