@@ -108,14 +108,18 @@ function combineChallengeData(jsons) {
             }
 
             // Workout
-            const workoutJson = jsons.Workout?.athletes[id];
-            if (workoutJson) {
-                const workoutPoints = getDailyValue(workoutJson.daily_minutes, day) / 10;
-                pointsToday += workoutPoints;
-                dayData.Workout = workoutPoints;
-                athletes[id].display_name ||= workoutJson.display_name;
-                athletes[id].profile ||= workoutJson.profile;
-            }
+			// --- Workout points calculation ---
+			const workoutJson = jsons.Workout?.athletes[id];
+			if (workoutJson) {
+				// Nested array access for this JSON
+				const val = (workoutJson.daily_time_min && workoutJson.daily_time_min[0]?.[day]) || 0;
+				const workoutPoints = val / 10; // 10 mins = 1 pt
+				pointsToday += workoutPoints;
+				dayData.Workout = workoutPoints;
+
+				athletes[id].display_name ||= workoutJson.display_name;
+				athletes[id].profile ||= workoutJson.profile;
+			}
 
             cumulative += pointsToday;
 
