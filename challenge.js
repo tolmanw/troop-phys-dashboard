@@ -160,12 +160,12 @@ function renderChallenge(athletesData) {
         </div>
 
         <div class="challenge-card challenge-chart-card">
-            <h2>January Phys Challenge - Gain Train</h2>
+            <h2>Challenge Point Chart</h2>
             <canvas id="challengeChartCanvas"></canvas>
         </div>
 
         <div class="challenge-card challenge-summary-card">
-            <h3>Totals</h3>
+            <h3>Total Points</h3>
             <div class="challenge-summary"></div>
         </div>
     `;
