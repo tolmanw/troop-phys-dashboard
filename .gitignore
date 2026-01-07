@@ -1,0 +1,10 @@
+# Playground files to never push
+index.html
+challenge.js
+styles.css
+data/
+*.bat
+
+# Local node stuff
+node_modules/
+.env
