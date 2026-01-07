@@ -43,7 +43,7 @@
     "T01222": {
       "display_name": "T01222",
       "profile": "https://dgalywyr863hv.cloudfront.net/pictures/athletes/9144588/5045824/4/large.jpg",
-      "monthly_distances": 0.0,
+      "monthly_distances": 16.09,
       "daily_distance_km": [
         [
           0.0,
@@ -51,7 +51,7 @@
           0.0,
           0.0,
           0.0,
-          0.0,
+          16.09,
           0.0,
           0.0,
           0.0,
@@ -84,5 +84,5 @@
   "month_names": [
     "January 2026"
   ],
-  "last_synced": "07-01-2026 14:53"
+  "last_synced": "07-01-2026 14:57"
 }
