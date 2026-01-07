@@ -1,7 +1,88 @@
 {
-  "athletes": {},
+  "athletes": {
+    "T02388": {
+      "display_name": "T02388",
+      "profile": "https://dgalywyr863hv.cloudfront.net/pictures/athletes/15478346/24115300/2/large.jpg",
+      "monthly_time": 150,
+      "daily_time_min": [
+        [
+          0,
+          30,
+          30,
+          0,
+          90,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
+      ]
+    },
+    "T01222": {
+      "display_name": "T01222",
+      "profile": "https://dgalywyr863hv.cloudfront.net/pictures/athletes/9144588/5045824/4/large.jpg",
+      "monthly_time": 0,
+      "daily_time_min": [
+        [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
+      ]
+    }
+  },
   "month_names": [
     "January 2026"
   ],
-  "last_synced": "07-01-2026 14:48"
+  "last_synced": "07-01-2026 14:53"
 }
