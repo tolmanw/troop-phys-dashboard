@@ -254,35 +254,51 @@ function renderChallenge(athletesData) {
     const { max: maxPoints, step: yStep } = getNiceAxisMultipleOf5(rawMax, 5);
 
     // --- Totals Card ---
-    const summaryCard = container.querySelector(".challenge-summary-card");
-    summaryCard.style.width = cardWidth;
-    summaryCard.style.margin = "12px 0 0 0";
-    summaryCard.style.boxSizing = "border-box";
-    summaryCard.style.padding = `${isMobile ? 16 : 20}px ${chartPadding}px`;
-    summaryCard.style.background = "#1b1f25";
-    summaryCard.style.borderRadius = "15px";
-
-    const summaryTitle = summaryCard.querySelector("h3");
-    summaryTitle.style.margin = "0 0 12px 0";
-    summaryTitle.style.fontSize = headerFontSize + "px";
-    summaryTitle.style.color = "#e6edf3";
-
-    const summary = summaryCard.querySelector(".challenge-summary");
-    summary.style.display = "flex";
-    summary.style.flexDirection = "column";
-    summary.style.gap = "6px";
-    summary.style.fontSize = fontSize + "px";
-    summary.style.color = "#e6edf3";
-
-    summary.innerHTML = datasets.map((d,i)=>{
-        const athlete = Object.values(athletesData)[i];
-        const total = d.data.filter(v=>typeof v==="number").pop() || 0;
-        return `<div style="display:flex;align-items:center;gap:8px;">
-            <img src="${athlete.profile}" style="width:22px;height:22px;border-radius:50%;">
-            <span style="color:${d.borderColor}">${d.label}</span>
-            <span style="opacity:0.7">${total.toFixed(1)} pts</span>
-        </div>`;
-    }).join("");
+	const summaryCard = container.querySelector(".challenge-summary-card");
+	summaryCard.style.width = cardWidth;
+	summaryCard.style.margin = "12px 0 0 0";
+	summaryCard.style.boxSizing = "border-box";
+	summaryCard.style.padding = `${isMobile ? 16 : 20}px ${chartPadding}px`;
+	summaryCard.style.background = "#1b1f25";
+	summaryCard.style.borderRadius = "15px";
+	
+	const summaryTitle = summaryCard.querySelector("h3");
+	summaryTitle.style.margin = "0 0 12px 0";
+	summaryTitle.style.fontSize = headerFontSize + "px";
+	summaryTitle.style.color = "#e6edf3";
+	
+	const summary = summaryCard.querySelector(".challenge-summary");
+	summary.style.display = "flex";
+	summary.style.flexDirection = "column";
+	summary.style.gap = "6px";
+	summary.style.fontSize = fontSize + "px";
+	summary.style.color = "#e6edf3";
+	
+	// --- Build leaderboard data ---
+	const athleteEntries = Object.values(athletesData).map(a => {
+	    const total =
+	        a.daily_points.filter(v => typeof v === "number").pop() || 0;
+	
+	    return {
+	        athlete: a,
+	        total,
+	        color: athleteColors[a.display_name]
+	    };
+	});
+	
+	// --- Sort highest → lowest ---
+	athleteEntries.sort((a, b) => b.total - a.total);
+	
+	// --- Render leaderboard ---
+	summary.innerHTML = athleteEntries.map(({ athlete, total, color }) => {
+	    return `
+	        <div style="display:flex;align-items:center;gap:8px;">
+	            <img src="${athlete.profile}" style="width:22px;height:22px;border-radius:50%;">
+	            <span style="color:${color}">${athlete.display_name}</span>
+	            <span style="opacity:0.7">${total.toFixed(1)} pts</span>
+	        </div>
+	    `;
+	}).join("");
 
     // --- Chart.js with athlete images ---
     challengeChart = new Chart(ctx, {
