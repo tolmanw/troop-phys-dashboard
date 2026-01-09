@@ -163,7 +163,7 @@
     "GO6856": {
       "display_name": "GO6856",
       "profile": "https://graph.facebook.com/1618376504/picture?height=256&width=256",
-      "monthly_distances": 8.04,
+      "monthly_distances": 12.75,
       "daily_distance_km": [
         [
           0.0,
@@ -174,7 +174,7 @@
           0.0,
           6.77,
           0.0,
-          0.0,
+          4.71,
           0.0,
           0.0,
           0.0,
@@ -439,10 +439,50 @@
           0.0
         ]
       ]
+    },
+    "CO3727": {
+      "display_name": "CO3727",
+      "profile": "https://lh3.googleusercontent.com/a/ACg8ocLg0lRffCM8EItO6hjvi301GHTrphpTSpX69mHJim3FgxBLImU=s96-c",
+      "monthly_distances": 0.0,
+      "daily_distance_km": [
+        [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ]
+      ]
     }
   },
   "month_names": [
     "January 2026"
   ],
-  "last_synced": "09-01-2026 15:23"
+  "last_synced": "09-01-2026 16:25"
 }
