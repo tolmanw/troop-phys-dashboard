@@ -399,10 +399,50 @@
           0
         ]
       ]
+    },
+    "SH6615": {
+      "display_name": "SH6615",
+      "profile": "avatar/athlete/large.png",
+      "monthly_time": 75,
+      "daily_time_min": [
+        [
+          0,
+          45,
+          30,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
+      ]
     }
   },
   "month_names": [
     "January 2026"
   ],
-  "last_synced": "09-01-2026 13:37"
+  "last_synced": "09-01-2026 14:04"
 }
