@@ -283,7 +283,7 @@
     "MC8439": {
       "display_name": "MC8439",
       "profile": "https://dgalywyr863hv.cloudfront.net/pictures/athletes/126010892/29827253/2/large.jpg",
-      "monthly_distances": 44.32,
+      "monthly_distances": 49.82,
       "daily_distance_km": [
         [
           0.0,
@@ -297,7 +297,7 @@
           3.04,
           5.01,
           10.01,
-          0.0,
+          5.5,
           0.0,
           0.0,
           0.0,
@@ -604,5 +604,5 @@
   "month_names": [
     "January 2026"
   ],
-  "last_synced": "12-01-2026 21:20"
+  "last_synced": "12-01-2026 22:19"
 }
