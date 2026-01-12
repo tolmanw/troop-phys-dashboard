@@ -559,10 +559,50 @@
           0.0
         ]
       ]
+    },
+    "GA8821": {
+      "display_name": "GA8821",
+      "profile": "https://dgalywyr863hv.cloudfront.net/pictures/athletes/30645001/9185272/1/large.jpg",
+      "monthly_distances": 0.0,
+      "daily_distance_km": [
+        [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ]
+      ]
     }
   },
   "month_names": [
     "January 2026"
   ],
-  "last_synced": "12-01-2026 14:25"
+  "last_synced": "12-01-2026 15:10"
 }
