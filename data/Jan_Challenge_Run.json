@@ -523,7 +523,7 @@
     "PE6710": {
       "display_name": "PE6710",
       "profile": "https://lh3.googleusercontent.com/a/ACg8ocKEIfkP9p_Eb_1fhJLnzRw8gm0CsRwJ0a9_4UfNyK3mDSuZUVoA=s96-c",
-      "monthly_distances": 8.05,
+      "monthly_distances": 16.11,
       "daily_distance_km": [
         [
           0.0,
@@ -546,7 +546,7 @@
           0.0,
           8.05,
           0.0,
-          0.0,
+          8.06,
           0.0,
           0.0,
           0.0,
@@ -604,5 +604,5 @@
   "month_names": [
     "January 2026"
   ],
-  "last_synced": "21-01-2026 20:30"
+  "last_synced": "21-01-2026 21:27"
 }
