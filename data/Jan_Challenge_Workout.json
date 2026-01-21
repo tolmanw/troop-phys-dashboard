@@ -362,7 +362,7 @@
     },
     "WI5110": {
       "display_name": "WI5110",
-      "profile": "avatar/athlete/large.png",
+      "profile": "https://dgalywyr863hv.cloudfront.net/pictures/athletes/32825129/14026312/1/large.jpg",
       "monthly_time": 0,
       "daily_time_min": [
         [
@@ -604,5 +604,5 @@
   "month_names": [
     "January 2026"
   ],
-  "last_synced": "21-01-2026 11:23"
+  "last_synced": "21-01-2026 12:26"
 }
