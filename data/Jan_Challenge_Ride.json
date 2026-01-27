@@ -3,7 +3,7 @@
     "T02388": {
       "display_name": "T02388",
       "profile": "https://dgalywyr863hv.cloudfront.net/pictures/athletes/15478346/24115300/2/large.jpg",
-      "monthly_distances": 7.87,
+      "monthly_distances": 12.19,
       "daily_distance_km": [
         [
           0.0,
@@ -32,7 +32,7 @@
           0.0,
           0.0,
           0.0,
-          0.0,
+          4.32,
           0.0,
           0.0,
           0.0,
@@ -604,5 +604,5 @@
   "month_names": [
     "January 2026"
   ],
-  "last_synced": "27-01-2026 08:33"
+  "last_synced": "27-01-2026 09:32"
 }
