@@ -215,5 +215,3 @@ for act_type, data in challenge_jan_data.items():
 
 print(f"Found athletes: {found_athletes}")
 print(f"Skipped athletes: {skipped_athletes}")
-
-I want to add in to collect February, and March data as well, ready for the next challenges so Feb_Challenge_Ride etc.
