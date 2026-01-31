@@ -443,7 +443,7 @@
     "CO3727": {
       "display_name": "CO3727",
       "profile": "https://lh3.googleusercontent.com/a/ACg8ocLg0lRffCM8EItO6hjvi301GHTrphpTSpX69mHJim3FgxBLImU=s96-c",
-      "monthly_distances": 25.94,
+      "monthly_distances": 30.31,
       "daily_distance_km": [
         [
           0.0,
@@ -476,7 +476,7 @@
           6.83,
           0.0,
           0.0,
-          0.0
+          4.38
         ]
       ]
     },
@@ -604,5 +604,5 @@
   "month_names": [
     "Jan 2026"
   ],
-  "last_synced": "31-01-2026 15:23"
+  "last_synced": "31-01-2026 16:27"
 }
