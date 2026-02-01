@@ -2,8 +2,8 @@
   "athletes": {
     "T02388": {
       "display_name": "T02388",
-      "profile": "https://dgalywyr863hv.cloudfront.net/pictures/athletes/15478346/24115300/2/large.jpg",
-      "monthly_distances": 24.72,
+      "profile": "",
+      "monthly_distances": 0.0,
       "daily_distance_km": [
         [
           0.0,
@@ -27,14 +27,14 @@
           0.0,
           0.0,
           0.0,
-          7.87,
           0.0,
           0.0,
           0.0,
           0.0,
-          8.53,
           0.0,
-          8.33,
+          0.0,
+          0.0,
+          0.0,
           0.0,
           0.0
         ]
@@ -42,7 +42,7 @@
     },
     "WE2339": {
       "display_name": "WE2339",
-      "profile": "https://dgalywyr863hv.cloudfront.net/pictures/athletes/51494809/13782919/1/large.jpg",
+      "profile": "",
       "monthly_distances": 0.0,
       "daily_distance_km": [
         [
@@ -82,7 +82,7 @@
     },
     "MA6404": {
       "display_name": "MA6404",
-      "profile": "https://dgalywyr863hv.cloudfront.net/pictures/athletes/6693142/2518556/2/large.jpg",
+      "profile": "",
       "monthly_distances": 0.0,
       "daily_distance_km": [
         [
@@ -122,8 +122,8 @@
     },
     "JB4407": {
       "display_name": "JB4407",
-      "profile": "https://graph.facebook.com/1909778415930379/picture?height=256&width=256",
-      "monthly_distances": 9.09,
+      "profile": "",
+      "monthly_distances": 0.0,
       "daily_distance_km": [
         [
           0.0,
@@ -133,15 +133,15 @@
           0.0,
           0.0,
           0.0,
-          2.34,
-          2.89,
           0.0,
           0.0,
           0.0,
           0.0,
           0.0,
           0.0,
-          3.85,
+          0.0,
+          0.0,
+          0.0,
           0.0,
           0.0,
           0.0,
@@ -162,8 +162,8 @@
     },
     "GO6856": {
       "display_name": "GO6856",
-      "profile": "https://graph.facebook.com/1618376504/picture?height=256&width=256",
-      "monthly_distances": 199.33,
+      "profile": "",
+      "monthly_distances": 0.0,
       "daily_distance_km": [
         [
           0.0,
@@ -173,28 +173,28 @@
           0.0,
           0.0,
           0.0,
-          28.67,
-          28.39,
-          0.0,
-          0.0,
-          29.67,
-          28.28,
           0.0,
           0.0,
           0.0,
           0.0,
           0.0,
           0.0,
-          28.22,
           0.0,
           0.0,
           0.0,
           0.0,
           0.0,
           0.0,
-          27.89,
           0.0,
-          28.21,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
           0.0,
           0.0
         ]
@@ -202,7 +202,7 @@
     },
     "MI7984": {
       "display_name": "MI7984",
-      "profile": "https://dgalywyr863hv.cloudfront.net/pictures/athletes/64959060/16261149/6/large.jpg",
+      "profile": "",
       "monthly_distances": 0.0,
       "daily_distance_km": [
         [
@@ -242,7 +242,7 @@
     },
     "SH5067": {
       "display_name": "SH5067",
-      "profile": "https://dgalywyr863hv.cloudfront.net/pictures/athletes/78169490/26581843/5/large.jpg",
+      "profile": "",
       "monthly_distances": 0.0,
       "daily_distance_km": [
         [
@@ -282,8 +282,8 @@
     },
     "MC8439": {
       "display_name": "MC8439",
-      "profile": "https://dgalywyr863hv.cloudfront.net/pictures/athletes/126010892/29827253/2/large.jpg",
-      "monthly_distances": 41.69,
+      "profile": "",
+      "monthly_distances": 0.0,
       "daily_distance_km": [
         [
           0.0,
@@ -295,26 +295,26 @@
           0.0,
           0.0,
           0.0,
-          5.33,
-          0.0,
-          0.0,
-          6.02,
-          0.0,
-          5.98,
           0.0,
           0.0,
           0.0,
           0.0,
-          5.97,
-          0.0,
-          6.56,
           0.0,
           0.0,
           0.0,
-          5.89,
           0.0,
           0.0,
-          5.94,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
           0.0,
           0.0
         ]
@@ -322,7 +322,7 @@
     },
     "MI6344": {
       "display_name": "MI6344",
-      "profile": "https://dgalywyr863hv.cloudfront.net/pictures/athletes/101476051/30394628/1/large.jpg",
+      "profile": "",
       "monthly_distances": 0.0,
       "daily_distance_km": [
         [
@@ -362,7 +362,7 @@
     },
     "WI5110": {
       "display_name": "WI5110",
-      "profile": "https://dgalywyr863hv.cloudfront.net/pictures/athletes/32825129/14026312/1/large.jpg",
+      "profile": "",
       "monthly_distances": 0.0,
       "daily_distance_km": [
         [
@@ -402,7 +402,7 @@
     },
     "SH6615": {
       "display_name": "SH6615",
-      "profile": "https://dgalywyr863hv.cloudfront.net/pictures/athletes/134224107/42732138/1/large.jpg",
+      "profile": "",
       "monthly_distances": 0.0,
       "daily_distance_km": [
         [
@@ -442,7 +442,7 @@
     },
     "CO3727": {
       "display_name": "CO3727",
-      "profile": "https://lh3.googleusercontent.com/a/ACg8ocLg0lRffCM8EItO6hjvi301GHTrphpTSpX69mHJim3FgxBLImU=s96-c",
+      "profile": "",
       "monthly_distances": 0.0,
       "daily_distance_km": [
         [
@@ -482,7 +482,7 @@
     },
     "SC1707": {
       "display_name": "SC1707",
-      "profile": "https://lh3.googleusercontent.com/a/ACg8ocJo7OqJH0WqElpFJdoFySO_XLDygjuw_NbMi1SbBjdtd8vxxA=s96-c",
+      "profile": "",
       "monthly_distances": 0.0,
       "daily_distance_km": [
         [
@@ -522,7 +522,7 @@
     },
     "PE6710": {
       "display_name": "PE6710",
-      "profile": "https://lh3.googleusercontent.com/a/ACg8ocKEIfkP9p_Eb_1fhJLnzRw8gm0CsRwJ0a9_4UfNyK3mDSuZUVoA=s96-c",
+      "profile": "",
       "monthly_distances": 0.0,
       "daily_distance_km": [
         [
@@ -562,7 +562,7 @@
     },
     "GA8821": {
       "display_name": "GA8821",
-      "profile": "https://dgalywyr863hv.cloudfront.net/pictures/athletes/30645001/9185272/1/large.jpg",
+      "profile": "",
       "monthly_distances": 0.0,
       "daily_distance_km": [
         [
@@ -604,5 +604,5 @@
   "month_names": [
     "January 2026"
   ],
-  "last_synced": "30-01-2026 12:54"
+  "last_synced": "01-02-2026 22:23"
 }
