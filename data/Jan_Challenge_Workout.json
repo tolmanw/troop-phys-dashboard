@@ -3,32 +3,11 @@
     "Run": {
       "GA8821": {
         "display_name": "GA8821",
-        "profile": "https://dgalywyr863hv.cloudfront.net/pictures/athletes/30645001/9185272/1/large.jpg",
-        "monthly_distances": 64.01,
+        "profile": "",
+        "monthly_distances": 0.0,
         "daily_distance_km": [
           [
             0.0,
-            6.78,
-            0.0,
-            0.0,
-            0.0,
-            10.65,
-            0.0,
-            3.5,
-            3.68,
-            0.0,
-            0.0,
-            0.0,
-            9.01,
-            0.0,
-            3.74,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            9.18,
-            0.0,
-            5.46,
             0.0,
             0.0,
             0.0,
@@ -37,7 +16,28 @@
             0.0,
             0.0,
             0.0,
-            12.01
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0
           ]
         ]
       }
@@ -45,7 +45,7 @@
     "Ride": {
       "GA8821": {
         "display_name": "GA8821",
-        "profile": "https://dgalywyr863hv.cloudfront.net/pictures/athletes/30645001/9185272/1/large.jpg",
+        "profile": "",
         "monthly_distances": 0.0,
         "daily_distance_km": [
           [
@@ -87,7 +87,7 @@
     "Swim": {
       "GA8821": {
         "display_name": "GA8821",
-        "profile": "https://dgalywyr863hv.cloudfront.net/pictures/athletes/30645001/9185272/1/large.jpg",
+        "profile": "",
         "monthly_distances": 0.0,
         "daily_distance_km": [
           [
@@ -129,36 +129,36 @@
     "Workout": {
       "GA8821": {
         "display_name": "GA8821",
-        "profile": "https://dgalywyr863hv.cloudfront.net/pictures/athletes/30645001/9185272/1/large.jpg",
-        "monthly_time": 310,
+        "profile": "",
+        "monthly_time": 0,
         "daily_time_min": [
           [
             0,
             0,
             0,
             0,
-            25,
-            0,
-            30,
-            0,
-            0,
-            0,
-            45,
-            30,
-            0,
-            0,
-            0,
-            60,
             0,
             0,
             0,
             0,
-            30,
-            0,
-            60,
             0,
             0,
-            30,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
             0,
             0,
             0,
@@ -172,5 +172,5 @@
   "month_names": [
     "January 2026"
   ],
-  "last_synced": "01-02-2026 19:07"
+  "last_synced": "01-02-2026 19:14"
 }
