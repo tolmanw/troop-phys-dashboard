@@ -26,10 +26,6 @@ activity_types = [
     "Virtual Rowing"
 ]
 
-DISTANCE_TYPES = ["Run", "Ride", "Swim"]
-TIME_TYPES = ["Workout"]
-ALL_TYPES = DISTANCE_TYPES + TIME_TYPES
-
 # --- Functions ---
 def refresh_access_token(refresh_token):
     response = requests.post(
@@ -46,6 +42,19 @@ def refresh_access_token(refresh_token):
         print("Error refreshing token:", data)
         return None
     return data["access_token"]
+
+def get_last_three_month_starts():
+    now = datetime.now(timezone.utc)
+    month_starts = []
+    for i in range(2, -1, -1):
+        month = now.month - i
+        year = now.year
+        if month <= 0:
+            month += 12
+            year -= 1
+        month_starts.append(datetime(year, month, 1, tzinfo=timezone.utc))
+    timestamps = [int(d.timestamp()) for d in month_starts]
+    return timestamps, month_starts
 
 def fetch_activities(access_token, after_ts):
     url = "https://www.strava.com/api/v3/athlete/activities"
@@ -82,20 +91,17 @@ def uk_now():
     return now_utc + offset
 
 # --- Determine last three months for athletes.json ---
-now_uk = uk_now()
-prev_ts, month_starts = [int(datetime(now_uk.year, now_uk.month, 1, tzinfo=timezone.utc).timestamp())], [datetime(now_uk.year, now_uk.month, 1, tzinfo=timezone.utc)]
+prev_ts, month_starts = get_last_three_month_starts()
 month_names = [m.strftime("%B %Y") for m in month_starts]
 
 athletes_out = {}
 found_athletes = []
 skipped_athletes = []
 
-# --- Define months for per-activity JSONs ---
-MONTHS_2026 = [
-    (1, "Jan"), (2, "Feb"), (3, "Mar"), (4, "Apr"),
-    (5, "May"), (6, "Jun"), (7, "Jul"), (8, "Aug"),
-    (9, "Sep"), (10, "Oct"), (11, "Nov"), (12, "Dec")
-]
+# --- Define distance/time types ---
+DISTANCE_TYPES = ["Run", "Ride", "Swim"]
+TIME_TYPES = ["Workout"]
+ALL_TYPES = DISTANCE_TYPES + TIME_TYPES
 
 # --- Main loop over athletes ---
 for username, info in refresh_tokens.items():
@@ -111,7 +117,7 @@ for username, info in refresh_tokens.items():
         skipped_athletes.append(username)
         continue
 
-    # --- athletes.json aggregation (current + last two months) ---
+    # --- athletes.json aggregation (unchanged) ---
     after_ts_current = int(month_starts[0].timestamp())
     activities = fetch_activities(access_token, after_ts_current)
     activities = [a for a in activities if a.get("type") in activity_types]
@@ -127,9 +133,11 @@ for username, info in refresh_tokens.items():
         if act_id in processed_activities:
             continue
         processed_activities.add(act_id)
+
         dt = datetime.strptime(act["start_date_local"], "%Y-%m-%dT%H:%M:%S%z")
         dist_km = act.get("distance", 0) / 1000
         time_min = act.get("moving_time", 0) / 60
+
         for idx, start in enumerate(month_starts):
             if dt.year == start.year and dt.month == start.month:
                 day_idx = dt.day - 1
@@ -139,62 +147,21 @@ for username, info in refresh_tokens.items():
                 daily_time_min[idx][day_idx] += time_min
 
     athlete_url = "https://www.strava.com/api/v3/athlete"
-    profile_img = requests.get(athlete_url, headers={"Authorization": f"Bearer {access_token}"}).json().get("profile", "")
+    headers = {"Authorization": f"Bearer {access_token}"}
+    profile_data = requests.get(athlete_url, headers=headers).json()
+    profile_img = profile_data.get("profile", "")
 
     athletes_out[alias] = {
         "display_name": alias,
         "profile": profile_img,
-        "monthly_distances": [round(d,2) for d in monthly_distance],
+        "monthly_distances": [round(d, 2) for d in monthly_distance],
         "monthly_time": [round(t) for t in monthly_time_min],
-        "daily_distance_km": [[round(d,2) for d in month] for month in daily_distance],
-        "daily_time_min": [[round(t,2) for t in month] for month in daily_time_min]
+        "daily_distance_km": [[round(d, 2) for d in month] for month in daily_distance],
+        "daily_time_min": [[round(t, 2) for t in month] for month in daily_time_min]
     }
     found_athletes.append(alias)
 
-    # --- Generate per-activity JSONs for each month ---
-    for month_num, month_abbr in MONTHS_2026:
-        month_start_dt = datetime(2026, month_num, 1, tzinfo=timezone.utc)
-        after_month_ts = int(month_start_dt.timestamp())
-        days_in_this_month = days_in_month(month_start_dt)
-        challenge_data = {act_type:{} for act_type in ALL_TYPES}
-
-        month_activities = fetch_activities(access_token, after_month_ts)
-
-        for act_type in ALL_TYPES:
-            daily_array = [0.0] * days_in_this_month
-            for act in month_activities:
-                if act.get("type") != act_type:
-                    continue
-                dt = datetime.strptime(act["start_date_local"], "%Y-%m-%dT%H:%M:%S%z")
-                if dt.year != 2026 or dt.month != month_num:
-                    continue
-                idx = dt.day - 1
-                if act_type in DISTANCE_TYPES:
-                    daily_array[idx] += act.get("distance", 0) / 1000
-                else:
-                    daily_array[idx] += act.get("moving_time", 0) / 60
-            monthly_total = sum(daily_array)
-            monthly_field = "monthly_distances" if act_type in DISTANCE_TYPES else "monthly_time"
-            daily_field = "daily_distance_km" if act_type in DISTANCE_TYPES else "daily_time_min"
-            challenge_data[act_type][alias] = {
-                "display_name": alias,
-                "profile": profile_img,
-                monthly_field: round(monthly_total, 2) if act_type in DISTANCE_TYPES else int(monthly_total),
-                daily_field: [ [round(v,2) if act_type in DISTANCE_TYPES else int(v) for v in daily_array] ]
-            }
-
-        # Save JSON
-        os.makedirs("data", exist_ok=True)
-        filename = f"data/{month_abbr}_Challenge_{act_type}.json"
-        with open(filename, "w") as f:
-            json.dump({
-                "athletes": challenge_data,
-                "month_names": [f"{month_start_dt.strftime('%B 2026')}"],
-                "last_synced": uk_now().strftime("%d-%m-%Y %H:%M")
-            }, f, indent=2)
-        print(f"{filename} updated successfully.")
-
-# --- Save athletes.json ---
+# --- Save athletes.json (unchanged) ---
 os.makedirs("data", exist_ok=True)
 with open("data/athletes.json", "w") as f:
     json.dump({
@@ -203,5 +170,69 @@ with open("data/athletes.json", "w") as f:
         "last_synced": uk_now().strftime("%d-%m-%Y %H:%M")
     }, f, indent=2)
 print("athletes.json updated successfully.")
+
+# --- CURRENT MONTH PER-ACTIVITY JSONS (Feb, Mar, etc.) ---
+now_uk = uk_now()
+CURRENT_YEAR = now_uk.year
+CURRENT_MONTH = now_uk.month
+current_month_start = datetime(CURRENT_YEAR, CURRENT_MONTH, 1, tzinfo=timezone.utc)
+after_current_month_ts = int(current_month_start.timestamp())
+days_in_current_month = days_in_month(current_month_start)
+
+challenge_current_data = {act_type: {} for act_type in ALL_TYPES}
+
+for username, info in refresh_tokens.items():
+    access_token = refresh_access_token(info["refresh_token"])
+    if not access_token:
+        continue
+
+    alias = USERNAME_ALIASES_NORMALIZED.get(username.lower())
+    if not alias:
+        continue
+
+    current_month_activities = fetch_activities(access_token, after_current_month_ts)
+
+    athlete_url = "https://www.strava.com/api/v3/athlete"
+    headers = {"Authorization": f"Bearer {access_token}"}
+    profile_data = requests.get(athlete_url, headers=headers).json()
+    profile_img = profile_data.get("profile", "")
+
+    for act_type in ALL_TYPES:
+        daily_array = [0.0] * days_in_current_month
+        for act in current_month_activities:
+            if act.get("type") != act_type:
+                continue
+            dt = datetime.strptime(act["start_date_local"], "%Y-%m-%dT%H:%M:%S%z")
+            if dt.year != CURRENT_YEAR or dt.month != CURRENT_MONTH:
+                continue
+            idx = dt.day - 1
+            if act_type in DISTANCE_TYPES:
+                daily_array[idx] += act.get("distance", 0) / 1000
+            else:
+                daily_array[idx] += act.get("moving_time", 0) / 60
+
+        monthly_total = sum(daily_array)
+        monthly_field = "monthly_distances" if act_type in DISTANCE_TYPES else "monthly_time"
+        daily_field = "daily_distance_km" if act_type in DISTANCE_TYPES else "daily_time_min"
+
+        challenge_current_data[act_type][alias] = {
+            "display_name": alias,
+            "profile": profile_img,
+            monthly_field: round(monthly_total, 2) if act_type in DISTANCE_TYPES else int(monthly_total),
+            daily_field: [[round(v,2) if act_type in DISTANCE_TYPES else int(v) for v in daily_array]]
+        }
+
+month_name_str = current_month_start.strftime("%B %Y")
+for act_type, data in challenge_current_data.items():
+    filename = f"data/{month_name_str}_Challenge_{act_type}.json"
+    os.makedirs("data", exist_ok=True)
+    with open(filename, "w") as f:
+        json.dump({
+            "athletes": data,
+            "month_names": [month_name_str],
+            "last_synced": uk_now().strftime("%d-%m-%Y %H:%M")
+        }, f, indent=2)
+    print(f"{filename} updated successfully.")
+
 print(f"Found athletes: {found_athletes}")
 print(f"Skipped athletes: {skipped_athletes}")
