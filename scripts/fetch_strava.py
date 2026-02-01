@@ -171,13 +171,16 @@ with open("data/athletes.json", "w") as f:
     }, f, indent=2)
 print("athletes.json updated successfully.")
 
-# --- CURRENT MONTH PER-ACTIVITY JSONS (Feb, Mar, etc.) ---
+# --- CURRENT MONTH PER-ACTIVITY JSONS (dynamic: Feb, Mar, etc.) ---
 now_uk = uk_now()
 CURRENT_YEAR = now_uk.year
 CURRENT_MONTH = now_uk.month
 current_month_start = datetime(CURRENT_YEAR, CURRENT_MONTH, 1, tzinfo=timezone.utc)
 after_current_month_ts = int(current_month_start.timestamp())
 days_in_current_month = days_in_month(current_month_start)
+
+# Month abbreviation for filenames
+MONTH_ABBR = current_month_start.strftime("%b")  # Jan, Feb, Mar, etc.
 
 challenge_current_data = {act_type: {} for act_type in ALL_TYPES}
 
@@ -190,7 +193,8 @@ for username, info in refresh_tokens.items():
     if not alias:
         continue
 
-    current_month_activities = fetch_activities(access_token, after_current_month_ts)
+    # Fetch activities after month start
+    month_activities = fetch_activities(access_token, after_current_month_ts)
 
     athlete_url = "https://www.strava.com/api/v3/athlete"
     headers = {"Authorization": f"Bearer {access_token}"}
@@ -199,10 +203,11 @@ for username, info in refresh_tokens.items():
 
     for act_type in ALL_TYPES:
         daily_array = [0.0] * days_in_current_month
-        for act in current_month_activities:
+        for act in month_activities:
             if act.get("type") != act_type:
                 continue
             dt = datetime.strptime(act["start_date_local"], "%Y-%m-%dT%H:%M:%S%z")
+            # Only include activities in this month
             if dt.year != CURRENT_YEAR or dt.month != CURRENT_MONTH:
                 continue
             idx = dt.day - 1
@@ -222,14 +227,14 @@ for username, info in refresh_tokens.items():
             daily_field: [[round(v,2) if act_type in DISTANCE_TYPES else int(v) for v in daily_array]]
         }
 
-month_name_str = current_month_start.strftime("%B %Y")
+# Save JSONs with abbreviated month in filename
 for act_type, data in challenge_current_data.items():
-    filename = f"data/{month_name_str}_Challenge_{act_type}.json"
+    filename = f"data/{MONTH_ABBR}_Challenge_{act_type}.json"  # e.g., Feb_Challenge_Run.json
     os.makedirs("data", exist_ok=True)
     with open(filename, "w") as f:
         json.dump({
             "athletes": data,
-            "month_names": [month_name_str],
+            "month_names": [current_month_start.strftime("%B %Y")],
             "last_synced": uk_now().strftime("%d-%m-%Y %H:%M")
         }, f, indent=2)
     print(f"{filename} updated successfully.")
