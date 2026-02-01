@@ -98,25 +98,23 @@ athletes_out = {}
 found_athletes = []
 skipped_athletes = []
 
-# --- Current month setup for per-activity JSONs (FIXED) ---
+# --- Current month setup for per-activity JSONs (fixed) ---
 now_uk = uk_now()
+CURRENT_YEAR = now_uk.year
+CURRENT_MONTH = now_uk.month
 
-now_utc = datetime.now(timezone.utc)
-CURRENT_YEAR = now_utc.year
-CURRENT_MONTH = now_utc.month
+# Start of current month at 00:00 UTC, minus 1-second buffer to ensure inclusion of first-day activities
+current_month_start_utc = datetime(CURRENT_YEAR, CURRENT_MONTH, 1, tzinfo=timezone.utc)
+after_current_month_ts = int(current_month_start_utc.timestamp()) - 1
 
-current_month_start = now_utc.replace(
-    day=1, hour=0, minute=0, second=0, microsecond=0
-)
-after_current_month_ts = int(current_month_start.timestamp())
-
-days_in_current_month = days_in_month(current_month_start)
-MONTH_ABBR = now_uk.strftime("%b")
+days_in_current_month = days_in_month(current_month_start_utc)
+MONTH_ABBR = now_uk.strftime("%b")  # e.g., "Feb"
 
 DISTANCE_TYPES = ["Run", "Ride", "Swim"]
 TIME_TYPES = ["Workout"]
 ALL_TYPES = DISTANCE_TYPES + TIME_TYPES
 
+# Prepare current month per-activity data
 challenge_month_data = {act_type: {} for act_type in ALL_TYPES}
 
 # --- Main loop over athletes ---
@@ -127,6 +125,7 @@ for username, info in refresh_tokens.items():
         skipped_athletes.append(username)
         continue
 
+    # --- Fetch activities for athletes.json (current + last two months) ---
     after_ts_current = int(month_starts[0].timestamp())
     activities = fetch_activities(access_token, after_ts_current)
     activities = [a for a in activities if a.get("type") in activity_types]
@@ -137,6 +136,7 @@ for username, info in refresh_tokens.items():
         skipped_athletes.append(username)
         continue
 
+    # --- athletes.json aggregation ---
     monthly_distance = [0.0] * 3
     monthly_time_min = [0.0] * 3
     daily_distance = [[0.0] * days_in_month(m) for m in month_starts]
@@ -161,6 +161,7 @@ for username, info in refresh_tokens.items():
                 daily_distance[idx][day_idx] += dist_km
                 daily_time_min[idx][day_idx] += time_min
 
+    # --- Fetch athlete profile ---
     athlete_url = "https://www.strava.com/api/v3/athlete"
     headers = {"Authorization": f"Bearer {access_token}"}
     profile_data = requests.get(athlete_url, headers=headers).json()
@@ -170,12 +171,13 @@ for username, info in refresh_tokens.items():
         "display_name": alias,
         "profile": profile_img,
         "monthly_distances": [round(d, 2) for d in monthly_distance],
-        "monthly_time": [round(t, 2) for t in monthly_time_min],
+        "monthly_time": [round(t) for t in monthly_time_min],
         "daily_distance_km": [[round(d, 2) for d in month] for month in daily_distance],
         "daily_time_min": [[round(t, 2) for t in month] for month in daily_time_min]
     }
     found_athletes.append(alias)
 
+    # --- Fetch activities for current month per-activity JSONs ---
     current_month_activities = fetch_activities(access_token, after_current_month_ts)
 
     for act_type in ALL_TYPES:
@@ -191,11 +193,9 @@ for username, info in refresh_tokens.items():
                 daily_array[idx] += act.get("distance", 0) / 1000
             else:
                 daily_array[idx] += act.get("moving_time", 0) / 60
-
         monthly_total = sum(daily_array)
         monthly_field = "monthly_distances" if act_type in DISTANCE_TYPES else "monthly_time"
         daily_field = "daily_distance_km" if act_type in DISTANCE_TYPES else "daily_time_min"
-
         challenge_month_data[act_type][alias] = {
             "display_name": alias,
             "profile": profile_img,
@@ -211,7 +211,6 @@ with open("data/athletes.json", "w") as f:
         "month_names": month_names,
         "last_synced": now_uk.strftime("%d-%m-%Y %H:%M")
     }, f, indent=2)
-
 print("athletes.json updated successfully.")
 
 # --- Save current month per-activity JSONs ---
@@ -223,7 +222,6 @@ for act_type, data in challenge_month_data.items():
             "month_names": [f"{MONTH_ABBR} {CURRENT_YEAR}"],
             "last_synced": now_uk.strftime("%d-%m-%Y %H:%M")
         }, f, indent=2)
-
     print(f"{filename} updated successfully.")
 
 print(f"Found athletes: {found_athletes}")
