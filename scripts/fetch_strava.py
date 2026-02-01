@@ -26,6 +26,11 @@ activity_types = [
     "Virtual Rowing"
 ]
 
+# --- Distance/Time types ---
+DISTANCE_TYPES = ["Run", "Ride", "Swim"]
+TIME_TYPES = ["Workout"]
+ALL_TYPES = DISTANCE_TYPES + TIME_TYPES
+
 # --- Functions ---
 def refresh_access_token(refresh_token):
     response = requests.post(
@@ -42,19 +47,6 @@ def refresh_access_token(refresh_token):
         print("Error refreshing token:", data)
         return None
     return data["access_token"]
-
-def get_last_three_month_starts():
-    now = datetime.now(timezone.utc)
-    month_starts = []
-    for i in range(2, -1, -1):
-        month = now.month - i
-        year = now.year
-        if month <= 0:
-            month += 12
-            year -= 1
-        month_starts.append(datetime(year, month, 1, tzinfo=timezone.utc))
-    timestamps = [int(d.timestamp()) for d in month_starts]
-    return timestamps, month_starts
 
 def fetch_activities(access_token, after_ts):
     url = "https://www.strava.com/api/v3/athlete/activities"
@@ -81,6 +73,7 @@ def days_in_month(dt):
 def uk_now():
     now_utc = datetime.now(timezone.utc)
     year = now_utc.year
+    # UK DST starts last Sunday in March, ends last Sunday in October
     dst_start = datetime(year, 3, 31, 1, 0, tzinfo=timezone.utc)
     while dst_start.weekday() != 6:
         dst_start -= timedelta(days=1)
@@ -90,6 +83,19 @@ def uk_now():
     offset = timedelta(hours=1) if dst_start <= now_utc < dst_end else timedelta(hours=0)
     return now_utc + offset
 
+def get_last_three_month_starts():
+    now = datetime.now(timezone.utc)
+    month_starts = []
+    for i in range(2, -1, -1):
+        month = now.month - i
+        year = now.year
+        if month <= 0:
+            month += 12
+            year -= 1
+        month_starts.append(datetime(year, month, 1, tzinfo=timezone.utc))
+    timestamps = [int(d.timestamp()) for d in month_starts]
+    return timestamps, month_starts
+
 # --- Determine last three months for athletes.json ---
 prev_ts, month_starts = get_last_three_month_starts()
 month_names = [m.strftime("%B %Y") for m in month_starts]
@@ -98,11 +104,7 @@ athletes_out = {}
 found_athletes = []
 skipped_athletes = []
 
-DISTANCE_TYPES = ["Run", "Ride", "Swim"]
-TIME_TYPES = ["Workout"]
-ALL_TYPES = DISTANCE_TYPES + TIME_TYPES
-
-# --- Main loop for athletes.json aggregation ---
+# --- Main loop for athletes.json aggregation (unchanged) ---
 for username, info in refresh_tokens.items():
     print(f"Processing athlete '{username}'")
     access_token = refresh_access_token(info["refresh_token"])
@@ -110,16 +112,15 @@ for username, info in refresh_tokens.items():
         skipped_athletes.append(username)
         continue
 
+    after_ts_current = int(month_starts[0].timestamp())
+    activities = fetch_activities(access_token, after_ts_current)
+    activities = [a for a in activities if a.get("type") in activity_types]
+
     alias = USERNAME_ALIASES_NORMALIZED.get(username.lower())
     if not alias:
         print(f"Skipping '{username}': no alias defined")
         skipped_athletes.append(username)
         continue
-
-    # --- Fetch activities for last three months ---
-    after_ts_current = int(month_starts[0].timestamp())
-    activities = fetch_activities(access_token, after_ts_current)
-    activities = [a for a in activities if a.get("type") in activity_types]
 
     monthly_distance = [0.0] * 3
     monthly_time_min = [0.0] * 3
@@ -170,14 +171,14 @@ with open("data/athletes.json", "w") as f:
     }, f, indent=2)
 print("athletes.json updated successfully.")
 
-# --- CURRENT MONTH PER-ACTIVITY JSONs (dynamic) ---
+# --- CURRENT MONTH PER-ACTIVITY JSONS ---
 now_uk = uk_now()
 CURRENT_YEAR = now_uk.year
 CURRENT_MONTH = now_uk.month
-current_month_start = datetime(CURRENT_YEAR, CURRENT_MONTH, 1, tzinfo=timezone.utc)
-after_current_month_ts = int(current_month_start.timestamp())
-days_in_current_month = days_in_month(current_month_start)
-MONTH_ABBR = current_month_start.strftime("%b")  # e.g., Feb, Mar
+current_month_start_uk = datetime(CURRENT_YEAR, CURRENT_MONTH, 1)
+# adjust for UK timezone/DST
+after_current_month_ts = int((current_month_start_uk - timedelta(hours=0)).replace(tzinfo=timezone.utc).timestamp())
+days_in_current_month = days_in_month(current_month_start_uk)
 
 challenge_current_data = {act_type: {} for act_type in ALL_TYPES}
 
@@ -190,7 +191,8 @@ for username, info in refresh_tokens.items():
     if not alias:
         continue
 
-    month_activities = fetch_activities(access_token, after_current_month_ts)
+    current_month_activities = fetch_activities(access_token, after_current_month_ts)
+    current_month_activities = [a for a in current_month_activities if a.get("type") in ALL_TYPES]
 
     athlete_url = "https://www.strava.com/api/v3/athlete"
     headers = {"Authorization": f"Bearer {access_token}"}
@@ -199,7 +201,7 @@ for username, info in refresh_tokens.items():
 
     for act_type in ALL_TYPES:
         daily_array = [0.0] * days_in_current_month
-        for act in month_activities:
+        for act in current_month_activities:
             if act.get("type") != act_type:
                 continue
             dt = datetime.strptime(act["start_date_local"], "%Y-%m-%dT%H:%M:%S%z")
@@ -222,14 +224,14 @@ for username, info in refresh_tokens.items():
             daily_field: [[round(v, 2) if act_type in DISTANCE_TYPES else int(v) for v in daily_array]]
         }
 
-# --- Save current month per-activity JSONs ---
+month_abbr = current_month_start_uk.strftime("%b")  # Feb -> Feb, Mar -> Mar
 for act_type, data in challenge_current_data.items():
-    filename = f"data/{MONTH_ABBR}_Challenge_{act_type}.json"
+    filename = f"data/{month_abbr}_Challenge_{act_type}.json"
     os.makedirs("data", exist_ok=True)
     with open(filename, "w") as f:
         json.dump({
             "athletes": data,
-            "month_names": [current_month_start.strftime("%B %Y")],
+            "month_names": [current_month_start_uk.strftime("%B %Y")],
             "last_synced": uk_now().strftime("%d-%m-%Y %H:%M")
         }, f, indent=2)
     print(f"{filename} updated successfully.")
