@@ -1,3 +1,4 @@
+
 import os
 import json
 import requests
@@ -98,16 +99,16 @@ athletes_out = {}
 found_athletes = []
 skipped_athletes = []
 
-# --- New FEBRUARY-per-activity JSON setup ---
-FEBRUARY_YEAR = 2026
-FEBRUARY_MONTH = 2
-FEBRUARY_start = datetime(FEBRUARY_YEAR, FEBRUARY_MONTH, 2, tzinfo=timezone.utc)
-after_FEBRUARY_ts = int(FEBRUARY_start.timestamp())
-days_in_FEBRUARY = 28
+# --- New January-per-activity JSON setup ---
+JANUARY_YEAR = 2026
+JANUARY_MONTH = 1
+january_start = datetime(JANUARY_YEAR, JANUARY_MONTH, 1, tzinfo=timezone.utc)
+after_january_ts = int(january_start.timestamp())
+days_in_january = 31
 DISTANCE_TYPES = ["Run", "Ride", "Swim"]
 TIME_TYPES = ["Workout"]
 ALL_TYPES = DISTANCE_TYPES + TIME_TYPES
-challenge_feb_data = {act_type: {} for act_type in ALL_TYPES}
+challenge_jan_data = {act_type: {} for act_type in ALL_TYPES}
 
 # --- Main loop over athletes ---
 for username, info in refresh_tokens.items():
@@ -167,15 +168,15 @@ for username, info in refresh_tokens.items():
     }
     found_athletes.append(alias)
 
-    # --- New per-activity FEBRUARY JSONs ---
-    feb_activities = fetch_activities(access_token, after_FEBRUARY_ts)
+    # --- New per-activity January JSONs ---
+    jan_activities = fetch_activities(access_token, after_january_ts)
     for act_type in ALL_TYPES:
-        daily_array = [0.0] * days_in_FEBRUARY
-        for act in feb_activities:
+        daily_array = [0.0] * days_in_january
+        for act in jan_activities:
             if act.get("type") != act_type:
                 continue
             dt = datetime.strptime(act["start_date_local"], "%Y-%m-%dT%H:%M:%S%z")
-            if dt.year != FEBRUARY_YEAR or dt.month != FEBRUARY_MONTH:
+            if dt.year != JANUARY_YEAR or dt.month != JANUARY_MONTH:
                 continue
             idx = dt.day - 1
             if act_type in DISTANCE_TYPES:
@@ -185,7 +186,7 @@ for username, info in refresh_tokens.items():
         monthly_total = sum(daily_array)
         monthly_field = "monthly_distances" if act_type in DISTANCE_TYPES else "monthly_time"
         daily_field = "daily_distance_km" if act_type in DISTANCE_TYPES else "daily_time_min"
-        challenge_feb_data[act_type][alias] = {
+        challenge_jan_data[act_type][alias] = {
             "display_name": alias,
             "profile": profile_img,
             monthly_field: round(monthly_total, 2) if act_type in DISTANCE_TYPES else int(monthly_total),
@@ -202,13 +203,13 @@ with open("data/athletes.json", "w") as f:
     }, f, indent=2)
 print("athletes.json updated successfully.")
 
-# --- Save new FEBRUARY-per-activity JSONs ---
-for act_type, data in challenge_feb_data.items():
-    filename = f"data/feb_Challenge_{act_type}.json"
+# --- Save new January-per-activity JSONs ---
+for act_type, data in challenge_jan_data.items():
+    filename = f"data/Jan_Challenge_{act_type}.json"
     with open(filename, "w") as f:
         json.dump({
             "athletes": data,
-            "month_names": ["FEBRUARY 2026"],
+            "month_names": ["January 2026"],
             "last_synced": uk_now().strftime("%d-%m-%Y %H:%M")
         }, f, indent=2)
     print(f"{filename} updated successfully.")
