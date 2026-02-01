@@ -43,19 +43,6 @@ def refresh_access_token(refresh_token):
         return None
     return data["access_token"]
 
-def get_last_three_month_starts():
-    now = datetime.now(timezone.utc)
-    month_starts = []
-    for i in range(2, -1, -1):
-        month = now.month - i
-        year = now.year
-        if month <= 0:
-            month += 12
-            year -= 1
-        month_starts.append(datetime(year, month, 1, tzinfo=timezone.utc))
-    timestamps = [int(d.timestamp()) for d in month_starts]
-    return timestamps, month_starts
-
 def fetch_activities(access_token, after_ts):
     url = "https://www.strava.com/api/v3/athlete/activities"
     activities = []
@@ -90,28 +77,49 @@ def uk_now():
     offset = timedelta(hours=1) if dst_start <= now_utc < dst_end else timedelta(hours=0)
     return now_utc + offset
 
-# --- Determine last three months for athletes.json ---
+# --- Last three months for athletes.json ---
+def get_last_three_month_starts():
+    now = datetime.now(timezone.utc)
+    month_starts = []
+    for i in range(2, -1, -1):
+        month = now.month - i
+        year = now.year
+        if month <= 0:
+            month += 12
+            year -= 1
+        month_starts.append(datetime(year, month, 1, tzinfo=timezone.utc))
+    return [int(d.timestamp()) for d in month_starts], month_starts
+
 prev_ts, month_starts = get_last_three_month_starts()
 month_names = [m.strftime("%B %Y") for m in month_starts]
 
+# --- Athlete setup ---
 athletes_out = {}
 found_athletes = []
 skipped_athletes = []
-
-# --- Current month setup for per-activity JSONs ---
-now_uk = uk_now()
-CURRENT_YEAR = now_uk.year
-CURRENT_MONTH = now_uk.month
-current_month_start = datetime(CURRENT_YEAR, CURRENT_MONTH, 1, tzinfo=timezone.utc)
-after_current_month_ts = int(current_month_start.timestamp())
-days_in_current_month = days_in_month(current_month_start)
-MONTH_ABBR = now_uk.strftime("%b")  # e.g., "Jan", "Feb"
 
 DISTANCE_TYPES = ["Run", "Ride", "Swim"]
 TIME_TYPES = ["Workout"]
 ALL_TYPES = DISTANCE_TYPES + TIME_TYPES
 
-# --- Prepare current month per-activity data ---
+# --- Create month info dict for all 12 months ---
+year_now = uk_now().year
+months_info = {}
+for m in range(1, 13):
+    month_start = datetime(year_now, m, 1, tzinfo=timezone.utc)
+    months_info[m] = {
+        "start": month_start,
+        "after_ts": int(month_start.timestamp()),
+        "days": days_in_month(month_start),
+        "abbr": month_start.strftime("%b"),
+        "name": month_start.strftime("%B")
+    }
+
+# --- Determine current month ---
+now_uk = uk_now()
+CURRENT_MONTH = now_uk.month
+CURRENT_YEAR = now_uk.year
+current_month_info = months_info[CURRENT_MONTH]
 challenge_month_data = {act_type: {} for act_type in ALL_TYPES}
 
 # --- Main loop over athletes ---
@@ -122,7 +130,7 @@ for username, info in refresh_tokens.items():
         skipped_athletes.append(username)
         continue
 
-    # --- Fetch activities for athletes.json (current + last two months) ---
+    # --- Fetch last three months for athletes.json ---
     after_ts_current = int(month_starts[0].timestamp())
     activities = fetch_activities(access_token, after_ts_current)
     activities = [a for a in activities if a.get("type") in activity_types]
@@ -145,11 +153,9 @@ for username, info in refresh_tokens.items():
         if act_id in processed_activities:
             continue
         processed_activities.add(act_id)
-
         dt = datetime.strptime(act["start_date_local"], "%Y-%m-%dT%H:%M:%S%z")
         dist_km = act.get("distance", 0) / 1000
         time_min = act.get("moving_time", 0) / 60
-
         for idx, start in enumerate(month_starts):
             if dt.year == start.year and dt.month == start.month:
                 day_idx = dt.day - 1
@@ -174,11 +180,10 @@ for username, info in refresh_tokens.items():
     }
     found_athletes.append(alias)
 
-    # --- Fetch activities for current month JSONs only ---
-    current_month_activities = fetch_activities(access_token, after_current_month_ts)
-
+    # --- Fetch current month activities for per-activity JSONs ---
+    current_month_activities = fetch_activities(access_token, current_month_info["after_ts"])
     for act_type in ALL_TYPES:
-        daily_array = [0.0] * days_in_current_month
+        daily_array = [0.0] * current_month_info["days"]
         for act in current_month_activities:
             if act.get("type") != act_type:
                 continue
@@ -212,11 +217,11 @@ print("athletes.json updated successfully.")
 
 # --- Save current month per-activity JSONs ---
 for act_type, data in challenge_month_data.items():
-    filename = f"data/{MONTH_ABBR}_Challenge_{act_type}.json"
+    filename = f"data/{current_month_info['abbr']}_Challenge_{act_type}.json"
     with open(filename, "w") as f:
         json.dump({
             "athletes": data,
-            "month_names": [f"{MONTH_ABBR} {CURRENT_YEAR}"],
+            "month_names": [f"{current_month_info['name']} {CURRENT_YEAR}"],
             "last_synced": uk_now().strftime("%d-%m-%Y %H:%M")
         }, f, indent=2)
     print(f"{filename} updated successfully.")
