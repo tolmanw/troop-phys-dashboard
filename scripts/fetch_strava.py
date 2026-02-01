@@ -98,16 +98,18 @@ athletes_out = {}
 found_athletes = []
 skipped_athletes = []
 
-# --- Current month setup for per-activity JSONs ---
+# --- Current month setup for per-activity JSONs (FIXED) ---
 now_uk = uk_now()
-CURRENT_YEAR = now_uk.year
-CURRENT_MONTH = now_uk.month
 
-current_month_start = now_uk.replace(
+now_utc = datetime.now(timezone.utc)
+CURRENT_YEAR = now_utc.year
+CURRENT_MONTH = now_utc.month
+
+current_month_start = now_utc.replace(
     day=1, hour=0, minute=0, second=0, microsecond=0
-).astimezone(timezone.utc)
-
+)
 after_current_month_ts = int(current_month_start.timestamp())
+
 days_in_current_month = days_in_month(current_month_start)
 MONTH_ABBR = now_uk.strftime("%b")
 
