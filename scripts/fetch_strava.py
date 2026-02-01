@@ -103,24 +103,18 @@ now_uk = uk_now()
 CURRENT_YEAR = now_uk.year
 CURRENT_MONTH = now_uk.month
 
-# 🔧 FIX: derive month start from uk_now(), then convert to UTC
 current_month_start = now_uk.replace(
-    day=1,
-    hour=0,
-    minute=0,
-    second=0,
-    microsecond=0
+    day=1, hour=0, minute=0, second=0, microsecond=0
 ).astimezone(timezone.utc)
 
 after_current_month_ts = int(current_month_start.timestamp())
 days_in_current_month = days_in_month(current_month_start)
-MONTH_ABBR = now_uk.strftime("%b")  # e.g., "Jan", "Feb"
+MONTH_ABBR = now_uk.strftime("%b")
 
 DISTANCE_TYPES = ["Run", "Ride", "Swim"]
 TIME_TYPES = ["Workout"]
 ALL_TYPES = DISTANCE_TYPES + TIME_TYPES
 
-# Prepare current month per-activity data
 challenge_month_data = {act_type: {} for act_type in ALL_TYPES}
 
 # --- Main loop over athletes ---
@@ -131,7 +125,6 @@ for username, info in refresh_tokens.items():
         skipped_athletes.append(username)
         continue
 
-    # --- Fetch activities for athletes.json (current + last two months) ---
     after_ts_current = int(month_starts[0].timestamp())
     activities = fetch_activities(access_token, after_ts_current)
     activities = [a for a in activities if a.get("type") in activity_types]
@@ -142,7 +135,6 @@ for username, info in refresh_tokens.items():
         skipped_athletes.append(username)
         continue
 
-    # --- athletes.json aggregation (unchanged) ---
     monthly_distance = [0.0] * 3
     monthly_time_min = [0.0] * 3
     daily_distance = [[0.0] * days_in_month(m) for m in month_starts]
@@ -167,7 +159,6 @@ for username, info in refresh_tokens.items():
                 daily_distance[idx][day_idx] += dist_km
                 daily_time_min[idx][day_idx] += time_min
 
-    # --- Fetch athlete profile ---
     athlete_url = "https://www.strava.com/api/v3/athlete"
     headers = {"Authorization": f"Bearer {access_token}"}
     profile_data = requests.get(athlete_url, headers=headers).json()
@@ -179,11 +170,10 @@ for username, info in refresh_tokens.items():
         "monthly_distances": [round(d, 2) for d in monthly_distance],
         "monthly_time": [round(t, 2) for t in monthly_time_min],
         "daily_distance_km": [[round(d, 2) for d in month] for month in daily_distance],
-        "daily_time_min": [[round(t, 2) for t in month] for t in daily_time_min]
+        "daily_time_min": [[round(t, 2) for t in month] for month in daily_time_min]
     }
     found_athletes.append(alias)
 
-    # --- Fetch activities for current month per-activity JSONs ---
     current_month_activities = fetch_activities(access_token, after_current_month_ts)
 
     for act_type in ALL_TYPES:
@@ -211,7 +201,7 @@ for username, info in refresh_tokens.items():
             daily_field: [[round(v, 2) if act_type in DISTANCE_TYPES else int(v) for v in daily_array]]
         }
 
-# --- Save athletes.json (unchanged) ---
+# --- Save athletes.json ---
 os.makedirs("data", exist_ok=True)
 with open("data/athletes.json", "w") as f:
     json.dump({
