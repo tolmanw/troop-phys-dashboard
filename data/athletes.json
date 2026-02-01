@@ -548,7 +548,7 @@
     },
     "MC8439": {
       "display_name": "MC8439",
-      "profile": "",
+      "profile": "https://dgalywyr863hv.cloudfront.net/pictures/athletes/126010892/29827253/2/large.jpg",
       "monthly_distances": [
         0.0,
         0.0,
@@ -626,7 +626,7 @@
     },
     "MI6344": {
       "display_name": "MI6344",
-      "profile": "",
+      "profile": "https://dgalywyr863hv.cloudfront.net/pictures/athletes/101476051/30394628/1/large.jpg",
       "monthly_distances": [
         0.0,
         0.0,
@@ -704,7 +704,7 @@
     },
     "WI5110": {
       "display_name": "WI5110",
-      "profile": "",
+      "profile": "https://dgalywyr863hv.cloudfront.net/pictures/athletes/32825129/14026312/1/large.jpg",
       "monthly_distances": [
         0.0,
         0.0,
@@ -782,20 +782,20 @@
     },
     "SH6615": {
       "display_name": "SH6615",
-      "profile": "",
+      "profile": "https://dgalywyr863hv.cloudfront.net/pictures/athletes/134224107/42732138/1/large.jpg",
       "monthly_distances": [
-        0.0,
+        18.93,
         0.0,
         0.0
       ],
       "monthly_time": [
-        0,
+        88,
         0,
         0
       ],
       "daily_distance_km": [
         [
-          0.0,
+          18.93,
           0.0,
           0.0,
           0.0,
@@ -827,7 +827,7 @@
       ],
       "daily_time_min": [
         [
-          0.0,
+          87.52,
           0.0,
           0.0,
           0.0,
@@ -860,7 +860,7 @@
     },
     "CO3727": {
       "display_name": "CO3727",
-      "profile": "",
+      "profile": "https://lh3.googleusercontent.com/a/ACg8ocLg0lRffCM8EItO6hjvi301GHTrphpTSpX69mHJim3FgxBLImU=s96-c",
       "monthly_distances": [
         0.0,
         0.0,
@@ -938,7 +938,7 @@
     },
     "SC1707": {
       "display_name": "SC1707",
-      "profile": "",
+      "profile": "https://lh3.googleusercontent.com/a/ACg8ocJo7OqJH0WqElpFJdoFySO_XLDygjuw_NbMi1SbBjdtd8vxxA=s96-c",
       "monthly_distances": [
         0.0,
         0.0,
@@ -1016,7 +1016,7 @@
     },
     "PE6710": {
       "display_name": "PE6710",
-      "profile": "",
+      "profile": "https://lh3.googleusercontent.com/a/ACg8ocKEIfkP9p_Eb_1fhJLnzRw8gm0CsRwJ0a9_4UfNyK3mDSuZUVoA=s96-c",
       "monthly_distances": [
         0.0,
         0.0,
@@ -1094,7 +1094,7 @@
     },
     "GA8821": {
       "display_name": "GA8821",
-      "profile": "",
+      "profile": "https://dgalywyr863hv.cloudfront.net/pictures/athletes/30645001/9185272/1/large.jpg",
       "monthly_distances": [
         0.0,
         0.0,
@@ -1174,5 +1174,5 @@
   "month_names": [
     "February 2026"
   ],
-  "last_synced": "01-02-2026 19:14"
+  "last_synced": "01-02-2026 19:24"
 }
