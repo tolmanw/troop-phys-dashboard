@@ -2,7 +2,7 @@ name: Sync Strava Data
 
 on:
   schedule:
-    - cron: '0 * * * *'
+    - cron: '0 * * * *'  # every hour
   workflow_dispatch:
 
 jobs:
@@ -32,18 +32,20 @@ jobs:
           ATHLETE_ALIASES: ${{ secrets.ATHLETE_ALIASES }}
         run: python scripts/fetch_strava.py
 
-      # Commit updated JSON files (including month winners)
+      # Commit updated JSON files safely
       - name: Commit updated JSON files
         run: |
+          set -e
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
-          # Force-add ignored JSON files
+          # Force-add all relevant JSON files, including monthly winners
           git add -f data/athletes.json data/*_Challenge_*.json data/monthlyWinners.json
 
-          # Commit only if something actually changed
+          # Commit only if something changed
           if ! git diff --cached --quiet; then
             git commit -m "Sync Strava data"
             git push
           else
             echo "No changes to JSON files, skipping commit."
+          fi
