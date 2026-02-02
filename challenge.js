@@ -140,7 +140,7 @@ function combineChallengeData(jsons) {
 }
 
 // --- Render Challenge ---
-function renderChallenge(athletesData) {
+async function renderChallenge(athletesData) {
     if (!athletesData) return;
 
     const today = new Date();
@@ -176,7 +176,7 @@ function renderChallenge(athletesData) {
 
     const { fontSize, athleteImgSize, chartHeight, chartPadding, chartPaddingBottom, paddingRight, cardWidth, headerPaddingTop, headerFontSize, isMobile } = getSettings();
 
-    // --- Styles for Rules Card ---
+    // --- Rules Card ---
     const rulesCard = container.querySelector(".challenge-rules-card");
     rulesCard.style.width = cardWidth;
     rulesCard.style.margin = "0 0 12px 0";
@@ -185,27 +185,22 @@ function renderChallenge(athletesData) {
     rulesCard.style.background = "#1b1f25";
     rulesCard.style.borderRadius = "15px";
 
-    const rulesTitle = rulesCard.querySelector("h3");
-    rulesTitle.style.margin = "0 0 12px 0";
-    rulesTitle.style.fontSize = headerFontSize + "px";
-    rulesTitle.style.color = "#e6edf3";
+    const rulesBody = rulesCard.querySelector(".challenge-rules");
+    rulesBody.innerHTML = `
+        <div style="line-height:1.5;">
+            <div style="margin-bottom:8px; color: #c9d1d9;">Gain points for distance during a Run, Ride, Swim or gain points for time doing a Workout (Weight Training, HIIT, Sport etc.)</div>
+            <div style="margin-bottom:8px; color: #c9d1d9;">Tag your Strava activity to the categories below to record your points on the chart.</div>
+            🏊 Swim: 1 mile = 4 pts<br>
+            🏃 Run: 1 mile = 1 pt<br>
+            🚴 Ride: 1 mile = 0.25 pts<br>
+            🏋️ Workout: 10 mins = 1 pt
+        </div>
+    `;
+    rulesBody.style.fontSize = fontSize + "px";
+    rulesBody.style.color = "#e6edf3";
+    rulesBody.style.opacity = "0.85";
 
-	const rulesBody = rulesCard.querySelector(".challenge-rules");
-	rulesBody.innerHTML = `
-		<div style="line-height:1.5;">
-			<div style="margin-bottom:8px; color: #c9d1d9;">Gain points for distance during a Run, Ride, Swim or gain points for time doing a Workout (Weight Training, HIIT, Sport etc.)</div>
-			<div style="margin-bottom:8px; color: #c9d1d9;">Tag your Strava activity to the categories below to record your points on the chart.</div>
-			🏊 Swim: 1 mile = 4 pts<br>
-			🏃 Run: 1 mile = 1 pt<br>
-			🚴 Ride: 1 mile = 0.25 pts<br>
-			🏋️ Workout: 10 mins = 1 pt
-		</div>
-	`;
-	rulesBody.style.fontSize = fontSize + "px";
-	rulesBody.style.color = "#e6edf3";
-	rulesBody.style.opacity = "0.85";
-
-    // --- Styles for Chart Card ---
+    // --- Chart Card ---
     const chartCard = container.querySelector(".challenge-chart-card");
     chartCard.style.width = cardWidth;
     chartCard.style.height = chartHeight + "px";
@@ -213,11 +208,6 @@ function renderChallenge(athletesData) {
     chartCard.style.padding = `${headerPaddingTop}px ${chartPadding}px ${chartPadding}px ${chartPadding}px`;
     chartCard.style.background = "#1b1f25";
     chartCard.style.borderRadius = "15px";
-
-    const chartTitle = chartCard.querySelector("h2");
-    chartTitle.style.margin = "0 0 12px 0";
-    chartTitle.style.fontSize = headerFontSize + "px";
-    chartTitle.style.color = "#e6edf3";
 
     const canvas = document.getElementById("challengeChartCanvas");
     canvas.width = chartCard.offsetWidth - 2 * chartPadding;
@@ -252,11 +242,6 @@ function renderChallenge(athletesData) {
     summaryCard.style.background = "#1b1f25";
     summaryCard.style.borderRadius = "15px";
 
-    const summaryTitle = summaryCard.querySelector("h3");
-    summaryTitle.style.margin = "0 0 12px 0";
-    summaryTitle.style.fontSize = headerFontSize + "px";
-    summaryTitle.style.color = "#e6edf3";
-
     const summary = summaryCard.querySelector(".challenge-summary");
     summary.style.display = "flex";
     summary.style.flexDirection = "column";
@@ -277,81 +262,32 @@ function renderChallenge(athletesData) {
         </div>
     `).join("");
 
-	// --- Monthly Winners Card ---
-	const winnersCard = container.querySelector(".challenge-winners-card");
-	winnersCard.style.width = cardWidth;
-	winnersCard.style.margin = "12px 0 0 0";
-	winnersCard.style.boxSizing = "border-box";
-	winnersCard.style.padding = `${isMobile ? 16 : 20}px ${chartPadding}px`;
-	winnersCard.style.background = "#1b1f25";
-	winnersCard.style.borderRadius = "15px";
-	
-	const winnersTitle = winnersCard.querySelector("h3");
-	winnersTitle.style.margin = "0 0 12px 0";
-	winnersTitle.style.fontSize = headerFontSize + "px";
-	winnersTitle.style.color = "#e6edf3";
-	
-	const winnersContainer = winnersCard.querySelector(".challenge-winners");
-	winnersContainer.style.display = "flex";
-	winnersContainer.style.flexDirection = "column";
-	winnersContainer.style.gap = "6px";
-	winnersContainer.style.fontSize = fontSize + "px";
-	winnersContainer.style.color = "#e6edf3";
-	
-	// ---- Persistent monthly winners logic ----
-	const storageKey = "monthlyWinners";
-	const pastWinners = JSON.parse(localStorage.getItem(storageKey) || "[]");
-	
-	const monthKey = `${today.getFullYear()}-${today.getMonth()}`;
-	const monthLabelFull = currentMonthFull;
-	
-	// Check if this month is already saved
-	const alreadySaved = pastWinners.some(w => w.key === monthKey);
-	
-	// Determine cutoff day
-	const isCurrentMonth =
-	    today.getMonth() === new Date().getMonth() &&
-	    today.getFullYear() === new Date().getFullYear();
-	
-	const cutoffDay = isCurrentMonth ? today.getDate() : 31;
-	
-	// Compute winner ONLY if not already saved
-	if (!alreadySaved) {
-	    const winner = Object.values(athletesData)
-	        .map(a => {
-	            const total =
-	                a.daily_points
-	                    .slice(0, cutoffDay)
-	                    .filter(v => typeof v === "number")
-	                    .pop() || 0;
-	            return { athlete: a, total };
-	        })
-	        .sort((a, b) => b.total - a.total)[0];
-	
-	    if (winner) {
-	        pastWinners.push({
-	            key: monthKey,
-	            monthName: monthLabelFull,
-	            name: winner.athlete.display_name,
-	            profile: winner.athlete.profile || "default_profile.png",
-	            points: +winner.total.toFixed(1)
-	        });
-	
-	        localStorage.setItem(storageKey, JSON.stringify(pastWinners));
-	    }
-	}
-	
-	// Render ALL winners (past + current)
-	winnersContainer.innerHTML = pastWinners
-	    .sort((a, b) => a.key.localeCompare(b.key))
-	    .map(w => `
-	        <div style="display:flex;align-items:center;gap:8px;">
-	            <img src="${w.profile}" style="width:22px;height:22px;border-radius:50%;">
-	            <span>${w.name}</span>
-	            <span style="opacity:0.7">${w.points} pts (${w.monthName})</span>
-	        </div>
-	    `)
-	    .join("");
+    // --- Monthly Winners Card ---
+    const winnersCard = container.querySelector(".challenge-winners-card");
+    const winnersContainer = winnersCard.querySelector(".challenge-winners");
+    winnersContainer.innerHTML = "";
+
+    async function loadMonthlyWinners() {
+        try {
+            const res = await fetch("data/challenge_winners.json");
+            return await res.json();
+        } catch {
+            return {};
+        }
+    }
+
+    const winnersData = await loadMonthlyWinners();
+    const sortedMonths = Object.keys(winnersData).sort();
+    winnersContainer.innerHTML = sortedMonths.map(key => {
+        const w = winnersData[key];
+        return `
+        <div style="display:flex;align-items:center;gap:8px;">
+            <img src="${w.profile}" style="width:22px;height:22px;border-radius:50%;">
+            <span>${w.winner}</span>
+            <span style="opacity:0.7">${w.points} pts (${w.month})</span>
+        </div>
+        `;
+    }).join("");
 
     // --- Chart.js ---
     challengeChart = new Chart(ctx, {
@@ -434,7 +370,7 @@ function initChallengeToggle() {
 
             const jsons = await loadChallengeJSONs(currentMonthShort);
             const athletesData = combineChallengeData(jsons);
-            renderChallenge(athletesData);
+            await renderChallenge(athletesData);
         } else {
             destroyChallenge();
             challenge.style.display = "none";
