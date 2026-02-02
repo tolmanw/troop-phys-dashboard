@@ -277,49 +277,81 @@ function renderChallenge(athletesData) {
         </div>
     `).join("");
 
-    // --- Monthly Winners Card ---
-    const winnersCard = container.querySelector(".challenge-winners-card");
-    winnersCard.style.width = cardWidth;
-    winnersCard.style.margin = "12px 0 0 0";
-    winnersCard.style.boxSizing = "border-box";
-    winnersCard.style.padding = `${isMobile ? 16 : 20}px ${chartPadding}px`;
-    winnersCard.style.background = "#1b1f25";
-    winnersCard.style.borderRadius = "15px";
-
-    const winnersTitle = winnersCard.querySelector("h3");
-    winnersTitle.style.margin = "0 0 12px 0";
-    winnersTitle.style.fontSize = headerFontSize + "px";
-    winnersTitle.style.color = "#e6edf3";
-
-    const winnersContainer = winnersCard.querySelector(".challenge-winners");
-    winnersContainer.style.display = "flex";
-    winnersContainer.style.flexDirection = "column";
-    winnersContainer.style.gap = "6px";
-    winnersContainer.style.fontSize = fontSize + "px";
-    winnersContainer.style.color = "#e6edf3";
-
-    const pastWinners = JSON.parse(localStorage.getItem("monthlyWinners") || "[]");
-
-    const currentWinner = Object.values(athletesData)
-        .map(a => ({ athlete: a, total: a.daily_points.slice(0, today.getDate()).filter(v=>typeof v==="number").pop()||0 }))
-        .sort((a,b)=>b.total-a.total)[0];
-
-    const filteredWinners = pastWinners.filter(w => w.monthName !== currentMonthFull);
-    filteredWinners.push({
-        monthName: currentMonthFull,
-        name: currentWinner.athlete.display_name,
-        profile: currentWinner.athlete.profile || "default_profile.png",
-        points: currentWinner.total
-    });
-    localStorage.setItem("monthlyWinners", JSON.stringify(filteredWinners));
-
-    winnersContainer.innerHTML = filteredWinners.map(w => `
-        <div style="display:flex;align-items:center;gap:8px;">
-            <img src="${w.profile}" style="width:22px;height:22px;border-radius:50%;">
-            <span>${w.name}</span>
-            <span style="opacity:0.7">${w.points.toFixed(1)} pts (${w.monthName})</span>
-        </div>
-    `).join("");
+	// --- Monthly Winners Card ---
+	const winnersCard = container.querySelector(".challenge-winners-card");
+	winnersCard.style.width = cardWidth;
+	winnersCard.style.margin = "12px 0 0 0";
+	winnersCard.style.boxSizing = "border-box";
+	winnersCard.style.padding = `${isMobile ? 16 : 20}px ${chartPadding}px`;
+	winnersCard.style.background = "#1b1f25";
+	winnersCard.style.borderRadius = "15px";
+	
+	const winnersTitle = winnersCard.querySelector("h3");
+	winnersTitle.style.margin = "0 0 12px 0";
+	winnersTitle.style.fontSize = headerFontSize + "px";
+	winnersTitle.style.color = "#e6edf3";
+	
+	const winnersContainer = winnersCard.querySelector(".challenge-winners");
+	winnersContainer.style.display = "flex";
+	winnersContainer.style.flexDirection = "column";
+	winnersContainer.style.gap = "6px";
+	winnersContainer.style.fontSize = fontSize + "px";
+	winnersContainer.style.color = "#e6edf3";
+	
+	// ---- Persistent monthly winners logic ----
+	const storageKey = "monthlyWinners";
+	const pastWinners = JSON.parse(localStorage.getItem(storageKey) || "[]");
+	
+	const monthKey = `${today.getFullYear()}-${today.getMonth()}`;
+	const monthLabelFull = currentMonthFull;
+	
+	// Check if this month is already saved
+	const alreadySaved = pastWinners.some(w => w.key === monthKey);
+	
+	// Determine cutoff day
+	const isCurrentMonth =
+	    today.getMonth() === new Date().getMonth() &&
+	    today.getFullYear() === new Date().getFullYear();
+	
+	const cutoffDay = isCurrentMonth ? today.getDate() : 31;
+	
+	// Compute winner ONLY if not already saved
+	if (!alreadySaved) {
+	    const winner = Object.values(athletesData)
+	        .map(a => {
+	            const total =
+	                a.daily_points
+	                    .slice(0, cutoffDay)
+	                    .filter(v => typeof v === "number")
+	                    .pop() || 0;
+	            return { athlete: a, total };
+	        })
+	        .sort((a, b) => b.total - a.total)[0];
+	
+	    if (winner) {
+	        pastWinners.push({
+	            key: monthKey,
+	            monthName: monthLabelFull,
+	            name: winner.athlete.display_name,
+	            profile: winner.athlete.profile || "default_profile.png",
+	            points: +winner.total.toFixed(1)
+	        });
+	
+	        localStorage.setItem(storageKey, JSON.stringify(pastWinners));
+	    }
+	}
+	
+	// Render ALL winners (past + current)
+	winnersContainer.innerHTML = pastWinners
+	    .sort((a, b) => a.key.localeCompare(b.key))
+	    .map(w => `
+	        <div style="display:flex;align-items:center;gap:8px;">
+	            <img src="${w.profile}" style="width:22px;height:22px;border-radius:50%;">
+	            <span>${w.name}</span>
+	            <span style="opacity:0.7">${w.points} pts (${w.monthName})</span>
+	        </div>
+	    `)
+	    .join("");
 
     // --- Chart.js ---
     challengeChart = new Chart(ctx, {
