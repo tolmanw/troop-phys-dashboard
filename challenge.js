@@ -62,11 +62,12 @@ async function loadChallengeJSONs(currentMonthShort) {
 }
 
 // --- Combine per-activity JSONs into cumulative points ---
-function combineChallengeData(jsons) {
+// Added lastDayOverride so past months can calculate full points
+function combineChallengeData(jsons, lastDayOverride) {
     const athletes = {};
     const kmToMiles = km => km * 0.621371;
     const today = new Date();
-    const currentDay = today.getDate();
+    const currentDay = lastDayOverride || today.getDate();
     const daysInMonth = 31;
 
     const athleteIds = new Set();
@@ -126,7 +127,7 @@ function combineChallengeData(jsons) {
 
             cumulative += pointsToday;
 
-            if (day < currentDay) {
+            if(day < currentDay) {
                 athletes[id].daily_points[day] = +cumulative.toFixed(2);
                 dayData.Cumulative = +cumulative.toFixed(2);
                 athletes[id].activities.push(dayData);
@@ -140,7 +141,7 @@ function combineChallengeData(jsons) {
 }
 
 // --- Render Challenge ---
-function renderChallenge(athletesData) {
+async function renderChallenge(athletesData) {
     if (!athletesData) return;
 
     const today = new Date();
@@ -176,7 +177,7 @@ function renderChallenge(athletesData) {
 
     const { fontSize, athleteImgSize, chartHeight, chartPadding, chartPaddingBottom, paddingRight, cardWidth, headerPaddingTop, headerFontSize, isMobile } = getSettings();
 
-    // --- Styles for Rules Card ---
+    // --- Rules Card ---
     const rulesCard = container.querySelector(".challenge-rules-card");
     rulesCard.style.width = cardWidth;
     rulesCard.style.margin = "0 0 12px 0";
@@ -205,7 +206,7 @@ function renderChallenge(athletesData) {
 	rulesBody.style.color = "#e6edf3";
 	rulesBody.style.opacity = "0.85";
 
-    // --- Styles for Chart Card ---
+    // --- Chart Card ---
     const chartCard = container.querySelector(".challenge-chart-card");
     chartCard.style.width = cardWidth;
     chartCard.style.height = chartHeight + "px";
@@ -298,26 +299,39 @@ function renderChallenge(athletesData) {
     winnersContainer.style.fontSize = fontSize + "px";
     winnersContainer.style.color = "#e6edf3";
 
-    const pastWinners = JSON.parse(localStorage.getItem("monthlyWinners") || "[]");
+    // --- New Monthly Winners Logic with lastDay fix ---
+    const currentMonthIndex = today.getMonth();
+    const monthlyWinners = [];
 
-    const currentWinner = Object.values(athletesData)
-        .map(a => ({ athlete: a, total: a.daily_points.slice(0, today.getDate()).filter(v=>typeof v==="number").pop()||0 }))
-        .sort((a,b)=>b.total-a.total)[0];
+    for (let i = 0; i <= currentMonthIndex; i++) {
+        const monthShort = monthNamesShort[i];
+        const monthFull = monthNamesFull[i];
 
-    const filteredWinners = pastWinners.filter(w => w.monthName !== currentMonthFull);
-    filteredWinners.push({
-        monthName: currentMonthFull,
-        name: currentWinner.athlete.display_name,
-        profile: currentWinner.athlete.profile || "default_profile.png",
-        points: currentWinner.total
-    });
-    localStorage.setItem("monthlyWinners", JSON.stringify(filteredWinners));
+        const lastDay = i === currentMonthIndex ? today.getDate() : 31;
+        const jsons = await loadChallengeJSONs(monthShort);
+        const monthData = combineChallengeData(jsons, lastDay); // pass lastDay for correct cumulative
 
-    winnersContainer.innerHTML = filteredWinners.map(w => `
+        const winner = Object.values(monthData)
+            .map(a => ({ athlete: a, total: a.daily_points.slice(0, lastDay).filter(v=>typeof v==="number").pop()||0 }))
+            .sort((a,b)=>b.total - a.total)[0];
+
+        if (winner) {
+            monthlyWinners.push({
+                monthName: monthFull,
+                name: winner.athlete.display_name,
+                profile: winner.athlete.profile || "default_profile.png",
+                points: winner.total
+            });
+        }
+    }
+
+    localStorage.setItem("monthlyWinners", JSON.stringify(monthlyWinners));
+
+    winnersContainer.innerHTML = monthlyWinners.map(w => `
         <div style="display:flex;align-items:center;gap:8px;">
             <img src="${w.profile}" style="width:22px;height:22px;border-radius:50%;">
             <span>${w.name}</span>
-            <span style="opacity:0.7">${w.points.toFixed(1)} pts (${w.monthName})</span>
+            <span style="opacity:0.7">${w.points.toFixed(2)} pts (${w.monthName})</span>
         </div>
     `).join("");
 
@@ -402,7 +416,7 @@ function initChallengeToggle() {
 
             const jsons = await loadChallengeJSONs(currentMonthShort);
             const athletesData = combineChallengeData(jsons);
-            renderChallenge(athletesData);
+            await renderChallenge(athletesData);
         } else {
             destroyChallenge();
             challenge.style.display = "none";
