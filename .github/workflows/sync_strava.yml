@@ -1,4 +1,4 @@
-name: Update Challenge Data
+name: strava data update
 
 on:
   schedule:
