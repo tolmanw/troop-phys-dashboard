@@ -153,27 +153,27 @@ async function renderChallenge(athletesData) {
     const container = document.getElementById("challengeContainer");
     container.style.display = "block";
 
-    container.innerHTML = `
-        <div class="challenge-card challenge-rules-card">
-            <h3>Challenge Rules</h3>
-            <div class="challenge-rules"></div>
-        </div>
+	container.innerHTML = `
+		<div class="challenge-card challenge-rules-card">
+			<h3>Challenge Rules</h3>
+			<div class="challenge-rules"></div>
+		</div>
 
-        <div class="challenge-card challenge-chart-card">
-            <h2>Challenge Point Chart</h2>
-            <canvas id="challengeChartCanvas"></canvas>
-        </div>
+		<div class="challenge-card challenge-chart-card">
+			<h2>Challenge Point Chart</h2>
+			<canvas id="challengeChartCanvas"></canvas>
+		</div>
 
-        <div class="challenge-card challenge-summary-card">
-            <h3>Total Points</h3>
-            <div class="challenge-summary"></div>
-        </div>
+		<div class="challenge-card challenge-winners-card">
+			<h3>Monthly Leader</h3>
+			<div class="challenge-winners"></div>
+		</div>
 
-        <div class="challenge-card challenge-winners-card">
-            <h3>Monthly Leader</h3>
-            <div class="challenge-winners"></div>
-        </div>
-    `;
+		<div class="challenge-card challenge-summary-card">
+			<h3>Total Points</h3>
+			<div class="challenge-summary"></div>
+		</div>
+	`;
 
     const { fontSize, athleteImgSize, chartHeight, chartPadding, chartPaddingBottom, paddingRight, cardWidth, headerPaddingTop, headerFontSize, isMobile } = getSettings();
 
