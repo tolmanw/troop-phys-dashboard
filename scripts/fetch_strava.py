@@ -73,7 +73,7 @@ def uk_now():
 now = uk_now()
 CHALLENGE_YEAR = now.year
 CHALLENGE_MONTH = now.month
-CHALLENGE_MONTH_NAME = now.strftime("%B")
+CHALLENGE_MONTH_NAME = now.strftime("%b")
 days_in_month = (get_month_start(CHALLENGE_YEAR, CHALLENGE_MONTH+1) - timedelta(days=1)).day if CHALLENGE_MONTH < 12 else 31
 after_ts_month = int(get_month_start(CHALLENGE_YEAR, CHALLENGE_MONTH).timestamp())
 
