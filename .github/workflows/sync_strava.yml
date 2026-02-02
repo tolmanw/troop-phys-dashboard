@@ -32,15 +32,14 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          CHANGED=false
-          for FILE in data/athletes.json data/*_Challenge_*.json; do
-            if [ -f "$FILE" ] && ! git diff --quiet "$FILE"; then
-              git add "$FILE"
-              CHANGED=true
-            fi
-          done
-          if [ "$CHANGED" = true ]; then
+
+          # Force-add ignored JSON files
+          git add -f data/athletes.json data/*_Challenge_*.json
+
+          # Commit only if something actually changed
+          if ! git diff --cached --quiet; then
             git commit -m "Sync Strava data"
             git push
           else
             echo "No changes to JSON files, skipping commit."
+          fi
