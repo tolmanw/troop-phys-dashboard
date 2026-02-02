@@ -1,45 +1,42 @@
-name: Sync Strava Data
+name: Update Challenge Data
 
 on:
   schedule:
-    - cron: '0 * * * *'
-  workflow_dispatch:
+    # Runs every hour
+    - cron: "0 * * * *"
+  workflow_dispatch:  # allows manual trigger
 
 jobs:
-  sync:
+  update_challenge:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v4
+      # 1. Checkout repo
+      - name: Checkout repository
+        uses: actions/checkout@v3
 
+      # 2. Set up Python (if your scripts are in Python)
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
-          python-version: '3.10'
+          python-version: "3.11"
 
+      # 3. Install dependencies
       - name: Install dependencies
-        run: pip install requests
-
-      - name: Run Strava fetch
-        env:
-          STRAVA_CLIENT_ID: ${{ secrets.STRAVA_CLIENT_ID }}
-          STRAVA_CLIENT_SECRET: ${{ secrets.STRAVA_CLIENT_SECRET }}
-          STRAVA_REFRESH_TOKENS: ${{ secrets.STRAVA_REFRESH_TOKENS }}
-          ATHLETE_ALIASES: ${{ secrets.ATHLETE_ALIASES }}
-        run: python scripts/fetch_strava.py
-
-      - name: Commit updated JSON files
         run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          python -m pip install --upgrade pip
+          pip install requests pytz
 
-          # Force-add ignored JSON files
-          git add -f data/athletes.json data/*_Challenge_*.json
+      # 4. Run challenge update script
+      - name: Run challenge update
+        run: |
+          python scripts/update_challenge.py
 
-          # Commit only if something actually changed
-          if ! git diff --cached --quiet; then
-            git commit -m "Sync Strava data"
-            git push
-          else
-            echo "No changes to JSON files, skipping commit."
-          fi
+      # 5. Commit and push updated JSONs
+      - name: Commit and push updates
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git add data/*.json
+          git commit -m "Hourly update challenge JSONs [skip ci]" || echo "No changes to commit"
+          git push
