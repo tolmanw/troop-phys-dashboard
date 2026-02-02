@@ -102,7 +102,7 @@ skipped_athletes = []
 now = uk_now()
 CHALLENGE_YEAR = now.year
 CHALLENGE_MONTH = now.month
-CHALLENGE_MONTH_NAME = now.strftime("%B")
+CHALLENGE_MONTH_NAME = now.strftime("%b")
 days_in_challenge_month = days_in_month(datetime(CHALLENGE_YEAR, CHALLENGE_MONTH, 1, tzinfo=timezone.utc))
 
 DISTANCE_TYPES = ["Run", "Ride", "Swim"]
