@@ -62,7 +62,6 @@ async function loadChallengeJSONs(currentMonthShort) {
 }
 
 // --- Combine per-activity JSONs into cumulative points ---
-// Added lastDayOverride so past months can calculate full points
 function combineChallengeData(jsons, lastDayOverride) {
     const athletes = {};
     const kmToMiles = km => km * 0.621371;
@@ -75,67 +74,73 @@ function combineChallengeData(jsons, lastDayOverride) {
         if (json?.athletes) Object.keys(json.athletes).forEach(id => athleteIds.add(id));
     });
 
-    athleteIds.forEach(id => {
-        athletes[id] = {
-            display_name: null,
-            profile: null,
-            daily_points: Array(daysInMonth).fill(null),
-            activities: []
-        };
+	athleteIds.forEach(id => {
+		athletes[id] = {
+			display_name: null,
+			profile: null,
+			daily_points: Array(daysInMonth).fill(null), // <-- use null for future days
+			activities: []
+		};
 
-        let cumulative = 0;
-        for (let day = 0; day < daysInMonth; day++) {
-            let pointsToday = 0;
-            const dayData = {};
+		let cumulative = 0;
+		for (let day = 0; day < daysInMonth; day++) {
+			let pointsToday = 0;
+			const dayData = {};
 
-            const runJson = jsons.Run?.athletes[id];
-            if (runJson) {
-                const runPoints = kmToMiles(getDailyValue(runJson.daily_distance_km, day));
-                pointsToday += runPoints;
-                dayData.Run = runPoints;
-                athletes[id].display_name = runJson.display_name;
-                athletes[id].profile = runJson.profile;
-            }
+			// Run
+			const runJson = jsons.Run?.athletes[id];
+			if (runJson) {
+				const runPoints = kmToMiles(getDailyValue(runJson.daily_distance_km, day));
+				pointsToday += runPoints;
+				dayData.Run = runPoints;
+				athletes[id].display_name = runJson.display_name;
+				athletes[id].profile = runJson.profile;
+			}
 
-            const swimJson = jsons.Swim?.athletes[id];
-            if (swimJson) {
-                const swimPoints = kmToMiles(getDailyValue(swimJson.daily_distance_km, day)) * 4;
-                pointsToday += swimPoints;
-                dayData.Swim = swimPoints;
-                athletes[id].display_name ||= swimJson.display_name;
-                athletes[id].profile ||= swimJson.profile;
-            }
+			// Swim
+			const swimJson = jsons.Swim?.athletes[id];
+			if (swimJson) {
+				const swimPoints = kmToMiles(getDailyValue(swimJson.daily_distance_km, day)) * 4;
+				pointsToday += swimPoints;
+				dayData.Swim = swimPoints;
+				athletes[id].display_name ||= swimJson.display_name;
+				athletes[id].profile ||= swimJson.profile;
+			}
 
-            const rideJson = jsons.Ride?.athletes[id];
-            if (rideJson) {
-                const ridePoints = kmToMiles(getDailyValue(rideJson.daily_distance_km, day)) * 0.25;
-                pointsToday += ridePoints;
-                dayData.Ride = ridePoints;
-                athletes[id].display_name ||= rideJson.display_name;
-                athletes[id].profile ||= rideJson.profile;
-            }
+			// Ride
+			const rideJson = jsons.Ride?.athletes[id];
+			if (rideJson) {
+				const ridePoints = kmToMiles(getDailyValue(rideJson.daily_distance_km, day)) * 0.25;
+				pointsToday += ridePoints;
+				dayData.Ride = ridePoints;
+				athletes[id].display_name ||= rideJson.display_name;
+				athletes[id].profile ||= rideJson.profile;
+			}
 
-            const workoutJson = jsons.Workout?.athletes[id];
-            if (workoutJson) {
-                const val = (workoutJson.daily_time_min && workoutJson.daily_time_min[0]?.[day]) || 0;
-                const workoutPoints = val / 10;
-                pointsToday += workoutPoints;
-                dayData.Workout = workoutPoints;
-                athletes[id].display_name ||= workoutJson.display_name;
-                athletes[id].profile ||= workoutJson.profile;
-            }
+			// Workout
+			const workoutJson = jsons.Workout?.athletes[id];
+			if (workoutJson) {
+				const minutes = getDailyValue(workoutJson.daily_time_min, day);
+				const workoutPoints = minutes / 10; // 10 mins = 1 pt
+				pointsToday += workoutPoints;
+				dayData.Workout = workoutPoints;
 
-            cumulative += pointsToday;
+				athletes[id].display_name ||= workoutJson.display_name;
+				athletes[id].profile ||= workoutJson.profile;
+			}
 
-            if(day < currentDay) {
-                athletes[id].daily_points[day] = +cumulative.toFixed(2);
-                dayData.Cumulative = +cumulative.toFixed(2);
-                athletes[id].activities.push(dayData);
-            } else {
-                athletes[id].daily_points[day] = null;
-            }
-        }
-    });
+			cumulative += pointsToday;
+
+			// Only fill daily_points for days <= today
+			if (day < currentDay) {
+				athletes[id].daily_points[day] = +cumulative.toFixed(2);
+				dayData.Cumulative = +cumulative.toFixed(2);
+				athletes[id].activities.push(dayData);
+			} else {
+				athletes[id].daily_points[day] = null; // future days = null
+			}
+		}
+	});
 
     return athletes;
 }
