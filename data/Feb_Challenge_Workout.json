@@ -3,12 +3,12 @@
     "T02388": {
       "display_name": "T02388",
       "profile": "https://dgalywyr863hv.cloudfront.net/pictures/athletes/15478346/24115300/2/large.jpg",
-      "monthly_time": 59,
+      "monthly_time": 93,
       "daily_time_min": [
         0,
         59,
         0,
-        0,
+        34,
         0,
         0,
         0,
@@ -143,13 +143,13 @@
     "GO6856": {
       "display_name": "GO6856",
       "profile": "https://graph.facebook.com/1618376504/picture?height=256&width=256",
-      "monthly_time": 141,
+      "monthly_time": 187,
       "daily_time_min": [
         0,
         0,
         97,
         43,
-        0,
+        45,
         0,
         0,
         0,
@@ -564,5 +564,5 @@
   "month_names": [
     "Feb 2026"
   ],
-  "last_synced": "05-02-2026 07:53"
+  "last_synced": "05-02-2026 08:41"
 }
