@@ -388,14 +388,14 @@
     "CO3727": {
       "display_name": "CO3727",
       "profile": "https://lh3.googleusercontent.com/a/ACg8ocLg0lRffCM8EItO6hjvi301GHTrphpTSpX69mHJim3FgxBLImU=s96-c",
-      "monthly_time": 78,
+      "monthly_time": 135,
       "daily_time_min": [
         0,
         0,
         48,
         30,
         0,
-        0,
+        56,
         0,
         0,
         0,
@@ -564,5 +564,5 @@
   "month_names": [
     "Feb 2026"
   ],
-  "last_synced": "06-02-2026 18:51"
+  "last_synced": "06-02-2026 19:37"
 }
