@@ -248,7 +248,7 @@
     "MC8439": {
       "display_name": "MC8439",
       "profile": "https://dgalywyr863hv.cloudfront.net/pictures/athletes/126010892/29827253/2/large.jpg",
-      "monthly_time": 46,
+      "monthly_time": 86,
       "daily_time_min": [
         0,
         0,
@@ -261,7 +261,7 @@
         0,
         0,
         0,
-        0,
+        40,
         0,
         0,
         0,
@@ -564,5 +564,5 @@
   "month_names": [
     "Feb 2026"
   ],
-  "last_synced": "12-02-2026 07:52"
+  "last_synced": "12-02-2026 08:46"
 }
