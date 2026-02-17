@@ -318,7 +318,7 @@
     "WI5110": {
       "display_name": "WI5110",
       "profile": "https://dgalywyr863hv.cloudfront.net/pictures/athletes/32825129/14026312/1/large.jpg",
-      "monthly_distances": 31.12,
+      "monthly_distances": 43.13,
       "daily_distance_km": [
         0.0,
         0.0,
@@ -335,7 +335,7 @@
         0.0,
         0.0,
         0.0,
-        0.0,
+        12.01,
         0.0,
         0.0,
         0.0,
@@ -564,5 +564,5 @@
   "month_names": [
     "Feb 2026"
   ],
-  "last_synced": "17-02-2026 07:04"
+  "last_synced": "17-02-2026 08:44"
 }
