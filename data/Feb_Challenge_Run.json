@@ -528,7 +528,7 @@
     "TO2222": {
       "display_name": "TO2222",
       "profile": "https://graph.facebook.com/1594334161272560/picture?height=256&width=256",
-      "monthly_distances": 22.56,
+      "monthly_distances": 28.31,
       "daily_distance_km": [
         0.0,
         0.0,
@@ -551,7 +551,7 @@
         0.0,
         0.0,
         0.0,
-        0.0,
+        5.75,
         0.0,
         0.0,
         0.0,
@@ -564,5 +564,5 @@
   "month_names": [
     "Feb 2026"
   ],
-  "last_synced": "22-02-2026 14:26"
+  "last_synced": "22-02-2026 15:24"
 }
