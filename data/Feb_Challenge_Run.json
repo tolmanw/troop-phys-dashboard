@@ -213,7 +213,7 @@
     "SH5067": {
       "display_name": "SH5067",
       "profile": "https://dgalywyr863hv.cloudfront.net/pictures/athletes/78169490/26581843/5/large.jpg",
-      "monthly_distances": 62.54,
+      "monthly_distances": 68.52,
       "daily_distance_km": [
         0.0,
         0.0,
@@ -237,7 +237,7 @@
         0.0,
         0.0,
         7.04,
-        0.0,
+        5.98,
         0.0,
         0.0,
         0.0,
@@ -564,5 +564,5 @@
   "month_names": [
     "Feb 2026"
   ],
-  "last_synced": "24-02-2026 19:01"
+  "last_synced": "24-02-2026 20:35"
 }
