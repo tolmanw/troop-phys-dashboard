@@ -528,7 +528,7 @@
     "TO2222": {
       "display_name": "TO2222",
       "profile": "https://dgalywyr863hv.cloudfront.net/pictures/athletes/148744104/43796659/1/large.jpg",
-      "monthly_distances": 28.31,
+      "monthly_distances": 33.37,
       "daily_distance_km": [
         0.0,
         0.0,
@@ -553,7 +553,7 @@
         0.0,
         5.75,
         0.0,
-        0.0,
+        5.07,
         0.0,
         0.0,
         0.0,
@@ -564,5 +564,5 @@
   "month_names": [
     "Feb 2026"
   ],
-  "last_synced": "24-02-2026 21:34"
+  "last_synced": "24-02-2026 22:33"
 }
