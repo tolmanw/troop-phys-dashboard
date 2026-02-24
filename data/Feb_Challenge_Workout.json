@@ -493,7 +493,7 @@
     "GA8821": {
       "display_name": "GA8821",
       "profile": "https://dgalywyr863hv.cloudfront.net/pictures/athletes/30645001/9185272/1/large.jpg",
-      "monthly_time": 90,
+      "monthly_time": 135,
       "daily_time_min": [
         0,
         0,
@@ -516,7 +516,7 @@
         0,
         60,
         0,
-        0,
+        45,
         0,
         0,
         0,
@@ -564,5 +564,5 @@
   "month_names": [
     "Feb 2026"
   ],
-  "last_synced": "24-02-2026 17:10"
+  "last_synced": "24-02-2026 19:01"
 }
