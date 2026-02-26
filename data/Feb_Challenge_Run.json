@@ -318,7 +318,7 @@
     "WI5110": {
       "display_name": "WI5110",
       "profile": "https://dgalywyr863hv.cloudfront.net/pictures/athletes/32825129/14026312/1/large.jpg",
-      "monthly_distances": 66.89,
+      "monthly_distances": 72.01,
       "daily_distance_km": [
         0.0,
         0.0,
@@ -345,7 +345,7 @@
         9.76,
         9.0,
         5.0,
-        0.0,
+        5.12,
         0.0,
         0.0
       ]
@@ -528,7 +528,7 @@
     "TO2222": {
       "display_name": "TO2222",
       "profile": "https://dgalywyr863hv.cloudfront.net/pictures/athletes/148744104/43796659/1/large.jpg",
-      "monthly_distances": 33.37,
+      "monthly_distances": 38.21,
       "daily_distance_km": [
         0.0,
         0.0,
@@ -555,7 +555,7 @@
         0.0,
         5.07,
         0.0,
-        0.0,
+        4.84,
         0.0,
         0.0
       ]
@@ -564,5 +564,5 @@
   "month_names": [
     "Feb 2026"
   ],
-  "last_synced": "26-02-2026 19:03"
+  "last_synced": "26-02-2026 20:37"
 }
