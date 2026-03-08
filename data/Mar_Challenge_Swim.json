@@ -155,7 +155,7 @@
     "GO6856": {
       "display_name": "GO6856",
       "profile": "https://graph.facebook.com/1618376504/picture?height=256&width=256",
-      "monthly_distances": 0.0,
+      "monthly_distances": 0.16,
       "daily_distance_km": [
         0.0,
         0.0,
@@ -164,7 +164,7 @@
         0.0,
         0.0,
         0.0,
-        0.0,
+        0.16,
         0.0,
         0.0,
         0.0,
@@ -612,5 +612,5 @@
   "month_names": [
     "Mar 2026"
   ],
-  "last_synced": "08-03-2026 13:39"
+  "last_synced": "08-03-2026 14:24"
 }
