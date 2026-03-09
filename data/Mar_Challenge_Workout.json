@@ -3,7 +3,7 @@
     "T02388": {
       "display_name": "T02388",
       "profile": "https://dgalywyr863hv.cloudfront.net/pictures/athletes/15478346/24115300/2/large.jpg",
-      "monthly_time": 201,
+      "monthly_time": 256,
       "daily_time_min": [
         36,
         0,
@@ -13,7 +13,7 @@
         0,
         40,
         49,
-        0,
+        54,
         0,
         0,
         0,
@@ -612,5 +612,5 @@
   "month_names": [
     "Mar 2026"
   ],
-  "last_synced": "09-03-2026 19:40"
+  "last_synced": "09-03-2026 20:34"
 }
