@@ -117,7 +117,7 @@
     "JB4407": {
       "display_name": "JB4407",
       "profile": "https://graph.facebook.com/1909778415930379/picture?height=256&width=256",
-      "monthly_distances": 6.26,
+      "monthly_distances": 8.65,
       "daily_distance_km": [
         6.26,
         0.0,
@@ -127,7 +127,7 @@
         0.0,
         0.0,
         0.0,
-        0.0,
+        2.39,
         0.0,
         0.0,
         0.0,
@@ -612,5 +612,5 @@
   "month_names": [
     "Mar 2026"
   ],
-  "last_synced": "09-03-2026 20:34"
+  "last_synced": "09-03-2026 21:32"
 }
