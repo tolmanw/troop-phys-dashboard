@@ -117,7 +117,7 @@
     "JB4407": {
       "display_name": "JB4407",
       "profile": "https://graph.facebook.com/1909778415930379/picture?height=256&width=256",
-      "monthly_distances": 8.65,
+      "monthly_distances": 11.06,
       "daily_distance_km": [
         6.26,
         0.0,
@@ -127,7 +127,7 @@
         0.0,
         0.0,
         0.0,
-        2.39,
+        4.8,
         0.0,
         0.0,
         0.0,
@@ -269,7 +269,7 @@
     "MC8439": {
       "display_name": "MC8439",
       "profile": "https://dgalywyr863hv.cloudfront.net/pictures/athletes/126010892/29827253/2/large.jpg",
-      "monthly_distances": 33.19,
+      "monthly_distances": 36.15,
       "daily_distance_km": [
         10.0,
         6.78,
@@ -279,7 +279,7 @@
         6.94,
         0.0,
         0.0,
-        2.93,
+        5.89,
         0.0,
         0.0,
         0.0,
@@ -612,5 +612,5 @@
   "month_names": [
     "Mar 2026"
   ],
-  "last_synced": "09-03-2026 21:32"
+  "last_synced": "09-03-2026 22:28"
 }

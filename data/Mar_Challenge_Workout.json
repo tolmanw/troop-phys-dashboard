@@ -117,7 +117,7 @@
     "JB4407": {
       "display_name": "JB4407",
       "profile": "https://graph.facebook.com/1909778415930379/picture?height=256&width=256",
-      "monthly_time": 70,
+      "monthly_time": 121,
       "daily_time_min": [
         35,
         0,
@@ -127,7 +127,7 @@
         0,
         0,
         15,
-        10,
+        61,
         0,
         0,
         0,
@@ -612,5 +612,5 @@
   "month_names": [
     "Mar 2026"
   ],
-  "last_synced": "09-03-2026 21:32"
+  "last_synced": "09-03-2026 22:28"
 }
