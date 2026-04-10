@@ -40,7 +40,7 @@
     "WE2339": {
       "display_name": "WE2339",
       "profile": "https://dgalywyr863hv.cloudfront.net/pictures/athletes/51494809/13782919/1/large.jpg",
-      "monthly_distances": 60.18,
+      "monthly_distances": 65.02,
       "daily_distance_km": [
         10.47,
         5.9,
@@ -51,7 +51,7 @@
         10.35,
         7.48,
         11.59,
-        0.0,
+        4.84,
         0.0,
         0.0,
         0.0,
@@ -596,5 +596,5 @@
   "month_names": [
     "Apr 2026"
   ],
-  "last_synced": "10-04-2026 08:27"
+  "last_synced": "10-04-2026 10:08"
 }
