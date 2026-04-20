@@ -225,7 +225,7 @@
     "SH5067": {
       "display_name": "SH5067",
       "profile": "https://dgalywyr863hv.cloudfront.net/pictures/athletes/78169490/26581843/5/large.jpg",
-      "monthly_distances": 78.03,
+      "monthly_distances": 83.05,
       "daily_distance_km": [
         0.0,
         9.09,
@@ -246,7 +246,7 @@
         0.0,
         0.0,
         0.0,
-        0.0,
+        5.01,
         0.0,
         0.0,
         0.0,
@@ -558,7 +558,7 @@
     "TO2222": {
       "display_name": "TO2222",
       "profile": "https://dgalywyr863hv.cloudfront.net/pictures/athletes/148744104/43796659/1/large.jpg",
-      "monthly_distances": 3.84,
+      "monthly_distances": 8.67,
       "daily_distance_km": [
         0.0,
         0.0,
@@ -579,7 +579,7 @@
         0.0,
         0.0,
         0.0,
-        0.0,
+        4.83,
         0.0,
         0.0,
         0.0,
@@ -596,5 +596,5 @@
   "month_names": [
     "Apr 2026"
   ],
-  "last_synced": "20-04-2026 21:44"
+  "last_synced": "20-04-2026 22:45"
 }
