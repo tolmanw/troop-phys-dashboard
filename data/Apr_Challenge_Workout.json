@@ -113,7 +113,7 @@
     },
     "JB4407": {
       "display_name": "JB4407",
-      "profile": "https://graph.facebook.com/1909778415930379/picture?height=256&width=256",
+      "profile": "https://dgalywyr863hv.cloudfront.net/pictures/athletes/25293162/47205236/1/large.jpg",
       "monthly_time": 70,
       "daily_time_min": [
         15,
@@ -596,5 +596,5 @@
   "month_names": [
     "Apr 2026"
   ],
-  "last_synced": "22-04-2026 23:47"
+  "last_synced": "23-04-2026 00:44"
 }
