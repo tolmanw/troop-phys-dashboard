@@ -231,9 +231,9 @@
     "SH5067": {
       "display_name": "SH5067",
       "profile": "https://dgalywyr863hv.cloudfront.net/pictures/athletes/78169490/26581843/5/large.jpg",
-      "monthly_time": 0,
+      "monthly_time": 90,
       "daily_time_min": [
-        0,
+        90,
         0,
         0,
         0,
@@ -612,5 +612,5 @@
   "month_names": [
     "May 2026"
   ],
-  "last_synced": "02-05-2026 15:45"
+  "last_synced": "02-05-2026 16:44"
 }
