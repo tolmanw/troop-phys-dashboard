@@ -2145,12 +2145,12 @@
       "profile": "https://dgalywyr863hv.cloudfront.net/pictures/athletes/134224107/42732138/1/large.jpg",
       "monthly_distances": [
         160.26,
-        52.17,
+        61.17,
         0.0
       ],
       "monthly_time": [
         1195,
-        414,
+        460,
         0
       ],
       "daily_distance_km": [
@@ -2217,7 +2217,7 @@
           0.0,
           0.0,
           0.0,
-          0.0
+          9.01
         ],
         [
           0.0,
@@ -2317,7 +2317,7 @@
           0.0,
           0.0,
           0.0,
-          0.0
+          46.28
         ],
         [
           0.0,
@@ -3430,5 +3430,5 @@
     "April 2026",
     "May 2026"
   ],
-  "last_synced": "03-05-2026 09:09"
+  "last_synced": "03-05-2026 11:03"
 }
