@@ -79,7 +79,7 @@
     "MA6404": {
       "display_name": "MA6404",
       "profile": "https://dgalywyr863hv.cloudfront.net/pictures/athletes/6693142/2518556/2/large.jpg",
-      "monthly_time": 230,
+      "monthly_time": 275,
       "daily_time_min": [
         100,
         0,
@@ -88,7 +88,7 @@
         70,
         0,
         0,
-        0,
+        45,
         0,
         0,
         0,
@@ -574,5 +574,5 @@
   "month_names": [
     "May 2026"
   ],
-  "last_synced": "10-05-2026 09:53"
+  "last_synced": "10-05-2026 11:14"
 }
