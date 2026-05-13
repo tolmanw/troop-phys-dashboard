@@ -117,7 +117,7 @@
     "JB4407": {
       "display_name": "JB4407",
       "profile": "https://dgalywyr863hv.cloudfront.net/pictures/athletes/25293162/47205236/1/large.jpg",
-      "monthly_time": 33,
+      "monthly_time": 48,
       "daily_time_min": [
         0,
         33,
@@ -130,7 +130,7 @@
         0,
         0,
         0,
-        0,
+        15,
         0,
         0,
         0,
@@ -574,5 +574,5 @@
   "month_names": [
     "May 2026"
   ],
-  "last_synced": "13-05-2026 00:00"
+  "last_synced": "13-05-2026 01:09"
 }
