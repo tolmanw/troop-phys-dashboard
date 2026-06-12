@@ -114,7 +114,7 @@
     "JB4407": {
       "display_name": "JB4407",
       "profile": "https://dgalywyr863hv.cloudfront.net/pictures/athletes/25293162/47205236/1/large.jpg",
-      "monthly_distances": 23.46,
+      "monthly_distances": 27.22,
       "daily_distance_km": [
         4.6,
         0.0,
@@ -127,7 +127,7 @@
         0.0,
         9.31,
         0.0,
-        0.0,
+        3.75,
         0.0,
         0.0,
         0.0,
@@ -336,7 +336,7 @@
     "SH6615": {
       "display_name": "SH6615",
       "profile": "https://dgalywyr863hv.cloudfront.net/pictures/athletes/134224107/42732138/1/large.jpg",
-      "monthly_distances": 15.12,
+      "monthly_distances": 18.92,
       "daily_distance_km": [
         0.0,
         0.0,
@@ -349,7 +349,7 @@
         9.09,
         0.0,
         0.0,
-        0.0,
+        3.81,
         0.0,
         0.0,
         0.0,
@@ -521,7 +521,7 @@
     "TO2222": {
       "display_name": "TO2222",
       "profile": "https://dgalywyr863hv.cloudfront.net/pictures/athletes/148744104/43796659/1/large.jpg",
-      "monthly_distances": 24.95,
+      "monthly_distances": 28.37,
       "daily_distance_km": [
         5.54,
         0.0,
@@ -534,7 +534,7 @@
         8.63,
         0.0,
         0.0,
-        0.0,
+        3.42,
         0.0,
         0.0,
         0.0,
@@ -559,5 +559,5 @@
   "month_names": [
     "Jun 2026"
   ],
-  "last_synced": "12-06-2026 13:18"
+  "last_synced": "12-06-2026 17:17"
 }
