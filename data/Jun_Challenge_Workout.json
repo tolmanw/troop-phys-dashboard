@@ -114,7 +114,7 @@
     "JB4407": {
       "display_name": "JB4407",
       "profile": "https://dgalywyr863hv.cloudfront.net/pictures/athletes/25293162/47205236/1/large.jpg",
-      "monthly_time": 321,
+      "monthly_time": 382,
       "daily_time_min": [
         0,
         39,
@@ -129,7 +129,7 @@
         55,
         0,
         0,
-        0,
+        60,
         0,
         0,
         0,
@@ -336,7 +336,7 @@
     "SH6615": {
       "display_name": "SH6615",
       "profile": "https://dgalywyr863hv.cloudfront.net/pictures/athletes/134224107/42732138/1/large.jpg",
-      "monthly_time": 585,
+      "monthly_time": 604,
       "daily_time_min": [
         0,
         0,
@@ -351,7 +351,7 @@
         0,
         0,
         0,
-        0,
+        19,
         0,
         0,
         0,
@@ -559,5 +559,5 @@
   "month_names": [
     "Jun 2026"
   ],
-  "last_synced": "14-06-2026 21:16"
+  "last_synced": "14-06-2026 23:08"
 }
