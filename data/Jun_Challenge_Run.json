@@ -262,7 +262,7 @@
     "MI6344": {
       "display_name": "MI6344",
       "profile": "https://dgalywyr863hv.cloudfront.net/pictures/athletes/101476051/30394628/1/large.jpg",
-      "monthly_distances": 6.75,
+      "monthly_distances": 16.84,
       "daily_distance_km": [
         0.0,
         0.0,
@@ -278,7 +278,7 @@
         0.0,
         0.0,
         0.0,
-        0.0,
+        10.09,
         0.0,
         0.0,
         0.0,
@@ -559,5 +559,5 @@
   "month_names": [
     "Jun 2026"
   ],
-  "last_synced": "15-06-2026 19:24"
+  "last_synced": "15-06-2026 22:42"
 }
