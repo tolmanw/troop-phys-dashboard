@@ -497,7 +497,7 @@
     "GA8821": {
       "display_name": "GA8821",
       "profile": "https://dgalywyr863hv.cloudfront.net/pictures/athletes/30645001/9185272/1/large.jpg",
-      "monthly_distances": 7.94,
+      "monthly_distances": 16.06,
       "daily_distance_km": [
         0.0,
         7.94,
@@ -508,7 +508,7 @@
         0.0,
         0.0,
         0.0,
-        0.0,
+        8.12,
         0.0,
         0.0,
         0.0,
@@ -574,5 +574,5 @@
   "month_names": [
     "Jul 2026"
   ],
-  "last_synced": "10-07-2026 09:21"
+  "last_synced": "10-07-2026 12:51"
 }
