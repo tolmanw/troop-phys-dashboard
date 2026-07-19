@@ -193,7 +193,7 @@
     "MI7984": {
       "display_name": "MI7984",
       "profile": "https://dgalywyr863hv.cloudfront.net/pictures/athletes/64959060/16261149/6/large.jpg",
-      "monthly_time": 0,
+      "monthly_time": 60,
       "daily_time_min": [
         0,
         0,
@@ -213,7 +213,7 @@
         0,
         0,
         0,
-        0,
+        60,
         0,
         0,
         0,
@@ -650,5 +650,5 @@
   "month_names": [
     "Jul 2026"
   ],
-  "last_synced": "19-07-2026 14:23"
+  "last_synced": "19-07-2026 15:54"
 }
