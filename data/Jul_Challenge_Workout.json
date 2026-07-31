@@ -3,7 +3,7 @@
     "TO2388": {
       "display_name": "TO2388",
       "profile": "https://dgalywyr863hv.cloudfront.net/pictures/athletes/15478346/24115300/2/large.jpg",
-      "monthly_time": 1173,
+      "monthly_time": 1222,
       "daily_time_min": [
         0,
         31,
@@ -35,7 +35,7 @@
         48,
         49,
         0,
-        0
+        48
       ]
     },
     "WE2339": {
@@ -650,5 +650,5 @@
   "month_names": [
     "Jul 2026"
   ],
-  "last_synced": "31-07-2026 12:58"
+  "last_synced": "31-07-2026 15:25"
 }
