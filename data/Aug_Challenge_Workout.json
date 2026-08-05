@@ -497,12 +497,12 @@
     "TO2222": {
       "display_name": "TO2222",
       "profile": "https://dgalywyr863hv.cloudfront.net/pictures/athletes/148744104/43796659/1/large.jpg",
-      "monthly_time": 64,
+      "monthly_time": 93,
       "daily_time_min": [
         0,
         0,
         64,
-        0,
+        28,
         0,
         0,
         0,
@@ -650,5 +650,5 @@
   "month_names": [
     "Aug 2026"
   ],
-  "last_synced": "04-08-2026 23:10"
+  "last_synced": "05-08-2026 01:00"
 }
