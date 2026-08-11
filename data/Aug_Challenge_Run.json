@@ -117,7 +117,7 @@
     "JB4407": {
       "display_name": "JB4407",
       "profile": "https://dgalywyr863hv.cloudfront.net/pictures/athletes/25293162/47205236/1/large.jpg",
-      "monthly_distances": 16.94,
+      "monthly_distances": 23.04,
       "daily_distance_km": [
         0.0,
         7.79,
@@ -129,7 +129,7 @@
         0.0,
         9.16,
         0.0,
-        0.0,
+        6.1,
         0.0,
         0.0,
         0.0,
@@ -650,5 +650,5 @@
   "month_names": [
     "Aug 2026"
   ],
-  "last_synced": "11-08-2026 18:06"
+  "last_synced": "11-08-2026 19:59"
 }
