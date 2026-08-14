@@ -79,7 +79,7 @@
     "MA6404": {
       "display_name": "MA6404",
       "profile": "https://dgalywyr863hv.cloudfront.net/pictures/athletes/6693142/2518556/2/large.jpg",
-      "monthly_time": 240,
+      "monthly_time": 300,
       "daily_time_min": [
         60,
         60,
@@ -94,7 +94,7 @@
         0,
         0,
         0,
-        0,
+        60,
         0,
         0,
         0,
@@ -117,7 +117,7 @@
     "JB4407": {
       "display_name": "JB4407",
       "profile": "https://dgalywyr863hv.cloudfront.net/pictures/athletes/25293162/47205236/1/large.jpg",
-      "monthly_time": 138,
+      "monthly_time": 164,
       "daily_time_min": [
         88,
         0,
@@ -132,7 +132,7 @@
         0,
         0,
         0,
-        0,
+        25,
         0,
         0,
         0,
@@ -497,7 +497,7 @@
     "TO2222": {
       "display_name": "TO2222",
       "profile": "https://dgalywyr863hv.cloudfront.net/pictures/athletes/148744104/43796659/1/large.jpg",
-      "monthly_time": 139,
+      "monthly_time": 229,
       "daily_time_min": [
         0,
         0,
@@ -511,7 +511,7 @@
         0,
         46,
         0,
-        0,
+        90,
         0,
         0,
         0,
@@ -611,7 +611,7 @@
     "CA7540": {
       "display_name": "CA7540",
       "profile": "https://dgalywyr863hv.cloudfront.net/pictures/athletes/41626900/17853855/1/large.jpg",
-      "monthly_time": 163,
+      "monthly_time": 203,
       "daily_time_min": [
         0,
         0,
@@ -626,7 +626,7 @@
         60,
         62,
         0,
-        0,
+        40,
         0,
         0,
         0,
@@ -650,5 +650,5 @@
   "month_names": [
     "Aug 2026"
   ],
-  "last_synced": "14-08-2026 14:02"
+  "last_synced": "14-08-2026 15:49"
 }
