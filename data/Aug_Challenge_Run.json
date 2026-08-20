@@ -611,7 +611,7 @@
     "CA7540": {
       "display_name": "CA7540",
       "profile": "https://dgalywyr863hv.cloudfront.net/pictures/athletes/41626900/17853855/1/large.jpg",
-      "monthly_distances": 55.07,
+      "monthly_distances": 67.41,
       "daily_distance_km": [
         0.0,
         0.0,
@@ -632,7 +632,7 @@
         5.0,
         0.0,
         8.05,
-        0.0,
+        12.34,
         0.0,
         0.0,
         0.0,
@@ -650,5 +650,5 @@
   "month_names": [
     "Aug 2026"
   ],
-  "last_synced": "20-08-2026 13:45"
+  "last_synced": "20-08-2026 14:44"
 }
