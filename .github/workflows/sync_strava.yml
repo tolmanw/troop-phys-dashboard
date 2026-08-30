@@ -5,12 +5,12 @@ on:
     - cron: "0 * * * *" # every hour
   workflow_dispatch:
 
-# Prevent scheduled and manually triggered runs from pushing simultaneously
+# Prevent multiple Strava sync runs from operating at the same time
 concurrency:
   group: strava-data-sync
   cancel-in-progress: false
 
-# Allow the workflow's GitHub token to push repository changes
+# Allow GitHub Actions to commit and push generated JSON
 permissions:
   contents: write
 
@@ -19,32 +19,77 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # Checkout repository with full Git history
+      # ------------------------------------------------------
+      # Checkout repository
+      # ------------------------------------------------------
       - name: Checkout repository
         uses: actions/checkout@v7
         with:
           fetch-depth: 0
+          ref: main
 
-      # Set up Python 3.10
+      # ------------------------------------------------------
+      # Make absolutely sure we are starting from latest main
+      # BEFORE generating any JSON
+      # ------------------------------------------------------
+      - name: Update local main
+        run: |
+          set -e
+
+          git fetch origin main
+
+          git checkout main
+
+          git reset --hard origin/main
+
+          echo "Repository updated to latest origin/main:"
+          git log -1 --oneline
+
+      # ------------------------------------------------------
+      # Set up Python
+      # ------------------------------------------------------
       - name: Set up Python
         uses: actions/setup-python@v7
         with:
           python-version: "3.10"
 
-      # Install dependencies
+      # ------------------------------------------------------
+      # Install Python dependencies
+      # ------------------------------------------------------
       - name: Install dependencies
-        run: pip install requests
+        run: |
+          python -m pip install --upgrade pip
+          pip install requests
 
-      # Run Strava fetch script
+      # ------------------------------------------------------
+      # Fetch Strava data and regenerate JSON files
+      # ------------------------------------------------------
       - name: Run Strava fetch
         env:
           STRAVA_CLIENT_ID: ${{ secrets.STRAVA_CLIENT_ID }}
           STRAVA_CLIENT_SECRET: ${{ secrets.STRAVA_CLIENT_SECRET }}
           STRAVA_REFRESH_TOKENS: ${{ secrets.STRAVA_REFRESH_TOKENS }}
           ATHLETE_ALIASES: ${{ secrets.ATHLETE_ALIASES }}
-        run: python scripts/fetch_strava.py
+        run: |
+          set -e
 
-      # Commit and push updated JSON files
+          python scripts/fetch_strava.py
+
+      # ------------------------------------------------------
+      # Show generated changes for debugging
+      # ------------------------------------------------------
+      - name: Show generated changes
+        run: |
+          echo "Changed files:"
+          git status --short
+
+          echo
+          echo "JSON files:"
+          find data -maxdepth 1 -type f -name "*.json" -print | sort
+
+      # ------------------------------------------------------
+      # Commit and push generated data
+      # ------------------------------------------------------
       - name: Commit updated JSON files
         run: |
           set -e
@@ -52,32 +97,24 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
-          # Add all generated data files
+          # Add generated JSON files
           git add -f data/
 
-          # Stop successfully when nothing changed
+          # Nothing changed
           if git diff --cached --quiet; then
-            echo "No changes to JSON files, skipping commit."
+            echo "No changes to JSON files."
             exit 0
           fi
 
+          echo "Changes to commit:"
+          git diff --cached --stat
+
           git commit -m "Sync Strava data"
 
-          # Rebase onto the latest main branch and retry if main changes again
-          for attempt in 1 2 3; do
-            echo "Push attempt ${attempt}"
+          # Push directly.
+          #
+          # We deliberately DO NOT run git pull --rebase here.
+          # Generated JSON should not be manually merged/rebased.
+          git push origin HEAD:main
 
-            git fetch origin main
-            git rebase origin/main
-
-            if git push origin HEAD:main; then
-              echo "Strava data pushed successfully."
-              exit 0
-            fi
-
-            echo "Remote changed before push; retrying..."
-            sleep 5
-          done
-
-          echo "Push failed after three attempts."
-          exit 1
+          echo "Strava data pushed successfully."
