@@ -558,7 +558,7 @@
     "WH2319": {
       "display_name": "WH2319",
       "profile": "https://dgalywyr863hv.cloudfront.net/pictures/athletes/28738923/45629578/1/large.jpg",
-      "monthly_distances": 0.0,
+      "monthly_distances": 3.54,
       "daily_distance_km": [
         0.0,
         0.0,
@@ -566,7 +566,7 @@
         0.0,
         0.0,
         0.0,
-        0.0,
+        3.54,
         0.0,
         0.0,
         0.0,
@@ -633,5 +633,5 @@
   "month_names": [
     "Sep 2026"
   ],
-  "last_synced": "07-09-2026 20:00"
+  "last_synced": "07-09-2026 22:58"
 }
