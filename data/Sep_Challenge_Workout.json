@@ -595,7 +595,7 @@
     "CA7540": {
       "display_name": "CA7540",
       "profile": "https://dgalywyr863hv.cloudfront.net/pictures/athletes/41626900/17853855/1/large.jpg",
-      "monthly_time": 87,
+      "monthly_time": 110,
       "daily_time_min": [
         0,
         0,
@@ -605,7 +605,7 @@
         0,
         0,
         87,
-        0,
+        23,
         0,
         0,
         0,
@@ -633,5 +633,5 @@
   "month_names": [
     "Sep 2026"
   ],
-  "last_synced": "09-09-2026 21:27"
+  "last_synced": "09-09-2026 23:56"
 }
