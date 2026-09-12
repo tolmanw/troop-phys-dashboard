@@ -3,7 +3,7 @@
     "TO2388": {
       "display_name": "TO2388",
       "profile": "https://dgalywyr863hv.cloudfront.net/pictures/athletes/15478346/24115300/2/large.jpg",
-      "monthly_distances": 8.04,
+      "monthly_distances": 13.86,
       "daily_distance_km": [
         4.6,
         0.0,
@@ -16,7 +16,7 @@
         0.0,
         0.0,
         0.0,
-        0.0,
+        5.82,
         0.0,
         0.0,
         0.0,
@@ -595,7 +595,7 @@
     "CA7540": {
       "display_name": "CA7540",
       "profile": "https://dgalywyr863hv.cloudfront.net/pictures/athletes/41626900/17853855/1/large.jpg",
-      "monthly_distances": 21.93,
+      "monthly_distances": 26.45,
       "daily_distance_km": [
         0.0,
         0.0,
@@ -608,7 +608,7 @@
         0.0,
         8.0,
         0.0,
-        0.0,
+        4.51,
         0.0,
         0.0,
         0.0,
@@ -633,5 +633,5 @@
   "month_names": [
     "Sep 2026"
   ],
-  "last_synced": "12-09-2026 16:01"
+  "last_synced": "12-09-2026 19:06"
 }
