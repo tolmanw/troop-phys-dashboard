@@ -521,7 +521,7 @@
     "BI0553": {
       "display_name": "BI0553",
       "profile": "https://lh3.googleusercontent.com/a/ACg8ocKrb94Y_UbwkNP9s75xPhz10wc_0YiAe3EvoTt65SiiUkpglA=s96-c",
-      "monthly_time": 0,
+      "monthly_time": 60,
       "daily_time_min": [
         0,
         0,
@@ -540,7 +540,7 @@
         0,
         0,
         0,
-        0,
+        60,
         0,
         0,
         0,
@@ -633,5 +633,5 @@
   "month_names": [
     "Sep 2026"
   ],
-  "last_synced": "18-09-2026 08:05"
+  "last_synced": "18-09-2026 13:43"
 }
