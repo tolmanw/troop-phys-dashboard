@@ -336,7 +336,7 @@
     "SH6615": {
       "display_name": "SH6615",
       "profile": "https://dgalywyr863hv.cloudfront.net/pictures/athletes/134224107/42732138/1/large.jpg",
-      "monthly_time": 214,
+      "monthly_time": 215,
       "daily_time_min": [
         16,
         0,
@@ -359,7 +359,7 @@
         0,
         0,
         4,
-        0,
+        1,
         0,
         0,
         0,
@@ -633,5 +633,5 @@
   "month_names": [
     "Sep 2026"
   ],
-  "last_synced": "22-09-2026 04:27"
+  "last_synced": "22-09-2026 10:02"
 }
