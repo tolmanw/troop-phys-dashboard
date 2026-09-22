@@ -336,7 +336,7 @@
     "SH6615": {
       "display_name": "SH6615",
       "profile": "https://dgalywyr863hv.cloudfront.net/pictures/athletes/134224107/42732138/1/large.jpg",
-      "monthly_time": 215,
+      "monthly_time": 268,
       "daily_time_min": [
         16,
         0,
@@ -359,7 +359,7 @@
         0,
         0,
         4,
-        1,
+        54,
         0,
         0,
         0,
@@ -595,7 +595,7 @@
     "CA7540": {
       "display_name": "CA7540",
       "profile": "https://dgalywyr863hv.cloudfront.net/pictures/athletes/41626900/17853855/1/large.jpg",
-      "monthly_time": 210,
+      "monthly_time": 240,
       "daily_time_min": [
         0,
         0,
@@ -618,7 +618,7 @@
         70,
         0,
         0,
-        0,
+        30,
         0,
         0,
         0,
@@ -633,5 +633,5 @@
   "month_names": [
     "Sep 2026"
   ],
-  "last_synced": "22-09-2026 15:20"
+  "last_synced": "22-09-2026 19:30"
 }
