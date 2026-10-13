@@ -3,7 +3,7 @@
     "TO2388": {
       "display_name": "TO2388",
       "profile": "https://dgalywyr863hv.cloudfront.net/pictures/athletes/15478346/24115300/2/large.jpg",
-      "monthly_time": 239,
+      "monthly_time": 276,
       "daily_time_min": [
         25,
         0,
@@ -16,7 +16,7 @@
         0,
         41,
         33,
-        0,
+        37,
         0,
         0,
         0,
@@ -497,7 +497,7 @@
     "TO2222": {
       "display_name": "TO2222",
       "profile": "https://dgalywyr863hv.cloudfront.net/pictures/athletes/148744104/43796659/1/large.jpg",
-      "monthly_time": 296,
+      "monthly_time": 416,
       "daily_time_min": [
         0,
         0,
@@ -510,7 +510,7 @@
         0,
         86,
         60,
-        0,
+        120,
         0,
         0,
         0,
@@ -650,5 +650,5 @@
   "month_names": [
     "Oct 2026"
   ],
-  "last_synced": "12-10-2026 18:24"
+  "last_synced": "13-10-2026 01:10"
 }
