@@ -3,7 +3,7 @@
     "TO2388": {
       "display_name": "TO2388",
       "profile": "https://dgalywyr863hv.cloudfront.net/pictures/athletes/15478346/24115300/2/large.jpg",
-      "monthly_distances": 8.83,
+      "monthly_distances": 16.06,
       "daily_distance_km": [
         0.0,
         0.0,
@@ -19,7 +19,7 @@
         0.0,
         0.0,
         0.0,
-        0.0,
+        7.23,
         0.0,
         0.0,
         0.0,
@@ -650,5 +650,5 @@
   "month_names": [
     "Oct 2026"
   ],
-  "last_synced": "15-10-2026 14:58"
+  "last_synced": "15-10-2026 19:08"
 }
