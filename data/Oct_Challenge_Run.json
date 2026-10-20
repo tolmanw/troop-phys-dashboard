@@ -79,7 +79,7 @@
     "MA6404": {
       "display_name": "MA6404",
       "profile": "https://dgalywyr863hv.cloudfront.net/pictures/athletes/6693142/2518556/2/large.jpg",
-      "monthly_distances": 51.78,
+      "monthly_distances": 53.36,
       "daily_distance_km": [
         0.0,
         3.85,
@@ -100,7 +100,7 @@
         0.0,
         0.0,
         5.9,
-        0.0,
+        1.59,
         0.0,
         0.0,
         0.0,
@@ -650,5 +650,5 @@
   "month_names": [
     "Oct 2026"
   ],
-  "last_synced": "20-10-2026 04:31"
+  "last_synced": "20-10-2026 10:08"
 }
