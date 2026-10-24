@@ -79,7 +79,7 @@
     "MA6404": {
       "display_name": "MA6404",
       "profile": "https://dgalywyr863hv.cloudfront.net/pictures/athletes/6693142/2518556/2/large.jpg",
-      "monthly_distances": 53.36,
+      "monthly_distances": 63.02,
       "daily_distance_km": [
         0.0,
         3.85,
@@ -104,7 +104,7 @@
         0.0,
         0.0,
         0.0,
-        0.0,
+        9.66,
         0.0,
         0.0,
         0.0,
@@ -535,7 +535,7 @@
     "BI0553": {
       "display_name": "BI0553",
       "profile": "https://lh3.googleusercontent.com/a/ACg8ocKrb94Y_UbwkNP9s75xPhz10wc_0YiAe3EvoTt65SiiUkpglA=s96-c",
-      "monthly_distances": 33.61,
+      "monthly_distances": 64.31,
       "daily_distance_km": [
         0.0,
         0.0,
@@ -560,7 +560,7 @@
         16.51,
         0.0,
         0.0,
-        0.0,
+        30.7,
         0.0,
         0.0,
         0.0,
@@ -650,5 +650,5 @@
   "month_names": [
     "Oct 2026"
   ],
-  "last_synced": "24-10-2026 11:20"
+  "last_synced": "24-10-2026 15:15"
 }
