@@ -336,11 +336,11 @@
     "SH6615": {
       "display_name": "SH6615",
       "profile": "https://dgalywyr863hv.cloudfront.net/pictures/athletes/134224107/42732138/1/large.jpg",
-      "monthly_time": 0,
+      "monthly_time": 30,
       "daily_time_min": [
         0,
         0,
-        0,
+        30,
         0,
         0,
         0,
@@ -484,13 +484,13 @@
     "TO2222": {
       "display_name": "TO2222",
       "profile": "https://dgalywyr863hv.cloudfront.net/pictures/athletes/148744104/43796659/1/large.jpg",
-      "monthly_time": 100,
+      "monthly_time": 182,
       "daily_time_min": [
         0,
         0,
         100,
         0,
-        0,
+        82,
         0,
         0,
         0,
@@ -595,13 +595,13 @@
     "CA7540": {
       "display_name": "CA7540",
       "profile": "https://dgalywyr863hv.cloudfront.net/pictures/athletes/41626900/17853855/1/large.jpg",
-      "monthly_time": 0,
+      "monthly_time": 60,
       "daily_time_min": [
         0,
         0,
         0,
         0,
-        0,
+        60,
         0,
         0,
         0,
@@ -633,5 +633,5 @@
   "month_names": [
     "Nov 2026"
   ],
-  "last_synced": "05-11-2026 11:52"
+  "last_synced": "05-11-2026 19:31"
 }
