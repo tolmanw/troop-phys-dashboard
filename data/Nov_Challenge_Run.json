@@ -521,7 +521,7 @@
     "BI0553": {
       "display_name": "BI0553",
       "profile": "https://lh3.googleusercontent.com/a/ACg8ocKrb94Y_UbwkNP9s75xPhz10wc_0YiAe3EvoTt65SiiUkpglA=s96-c",
-      "monthly_distances": 88.78,
+      "monthly_distances": 97.59,
       "daily_distance_km": [
         31.11,
         0.0,
@@ -532,7 +532,7 @@
         0.0,
         0.0,
         32.26,
-        0.0,
+        8.81,
         0.0,
         0.0,
         0.0,
@@ -633,5 +633,5 @@
   "month_names": [
     "Nov 2026"
   ],
-  "last_synced": "10-11-2026 12:07"
+  "last_synced": "10-11-2026 20:13"
 }
