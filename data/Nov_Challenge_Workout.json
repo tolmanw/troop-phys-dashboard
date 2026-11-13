@@ -151,7 +151,7 @@
     "GO6856": {
       "display_name": "GO6856",
       "profile": "https://graph.facebook.com/1618376504/picture?height=256&width=256",
-      "monthly_time": 178,
+      "monthly_time": 209,
       "daily_time_min": [
         0,
         0,
@@ -165,7 +165,7 @@
         79,
         0,
         0,
-        0,
+        30,
         0,
         0,
         0,
@@ -633,5 +633,5 @@
   "month_names": [
     "Nov 2026"
   ],
-  "last_synced": "13-11-2026 10:33"
+  "last_synced": "13-11-2026 18:22"
 }
