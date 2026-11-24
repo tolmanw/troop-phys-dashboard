@@ -336,7 +336,7 @@
     "SH6615": {
       "display_name": "SH6615",
       "profile": "https://dgalywyr863hv.cloudfront.net/pictures/athletes/134224107/42732138/1/large.jpg",
-      "monthly_distances": 6.87,
+      "monthly_distances": 10.1,
       "daily_distance_km": [
         0.0,
         3.37,
@@ -360,7 +360,7 @@
         0.0,
         0.0,
         0.0,
-        0.0,
+        3.23,
         0.0,
         0.0,
         0.0,
@@ -633,5 +633,5 @@
   "month_names": [
     "Nov 2026"
   ],
-  "last_synced": "23-11-2026 19:51"
+  "last_synced": "24-11-2026 04:37"
 }
