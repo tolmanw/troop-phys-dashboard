@@ -370,43 +370,6 @@
         0.0
       ]
     },
-    "CO3727": {
-      "display_name": "CO3727",
-      "profile": "https://lh3.googleusercontent.com/a/ACg8ocLg0lRffCM8EItO6hjvi301GHTrphpTSpX69mHJim3FgxBLImU=s96-c",
-      "monthly_distances": 0.0,
-      "daily_distance_km": [
-        0.0,
-        0.0,
-        0.0,
-        0.0,
-        0.0,
-        0.0,
-        0.0,
-        0.0,
-        0.0,
-        0.0,
-        0.0,
-        0.0,
-        0.0,
-        0.0,
-        0.0,
-        0.0,
-        0.0,
-        0.0,
-        0.0,
-        0.0,
-        0.0,
-        0.0,
-        0.0,
-        0.0,
-        0.0,
-        0.0,
-        0.0,
-        0.0,
-        0.0,
-        0.0
-      ]
-    },
     "SC1707": {
       "display_name": "SC1707",
       "profile": "https://lh3.googleusercontent.com/a/ACg8ocJo7OqJH0WqElpFJdoFySO_XLDygjuw_NbMi1SbBjdtd8vxxA=s96-c",
@@ -521,7 +484,7 @@
     "BI0553": {
       "display_name": "BI0553",
       "profile": "https://lh3.googleusercontent.com/a/ACg8ocKrb94Y_UbwkNP9s75xPhz10wc_0YiAe3EvoTt65SiiUkpglA=s96-c",
-      "monthly_distances": 225.61,
+      "monthly_distances": 242.39,
       "daily_distance_km": [
         31.11,
         0.0,
@@ -547,7 +510,7 @@
         0.0,
         0.0,
         19.85,
-        0.0,
+        16.79,
         0.0,
         0.0,
         0.0,
@@ -633,5 +596,5 @@
   "month_names": [
     "Nov 2026"
   ],
-  "last_synced": "25-11-2026 09:33"
+  "last_synced": "25-11-2026 11:37"
 }
